@@ -1,0 +1,23 @@
+@charset "utf-8";
+.row .col-lg-10.about-league p {
+	font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "メイリオ", Meiryo, Osaka, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+	margin-top: 17px;
+	margin-bottom: 12px;
+	padding-top: 0px;
+	text-indent: 0px;
+	text-decoration: none;
+	line-height: 30px;
+}
+.nav.side li a {
+	color: #000000;
+	font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "メイリオ", Meiryo, Osaka, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+	font-size: 15px;
+	border-bottom: 1px dotted #000000;
+}
+
+.container-fluid .row .col-lg-10.about-league {
+	margin-bottom: 24px;
+}
+.container-fluid .row .col-lg-2.about-menu {
+	margin-top: 16px;
+}

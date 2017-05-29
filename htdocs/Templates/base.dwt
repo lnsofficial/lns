@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- TemplateBeginEditable name="doctitle" -->
+	<title>LNS</title>
+	<!-- TemplateEndEditable -->
+	<!-- Bootstrap -->
+	<link href="../css/bootstrap.css" rel="stylesheet">
+	<link href="../css/style.css" rel="stylesheet" type="text/css">
+
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+  <!--The following script tag downloads a font from the Adobe Edge Web Fonts server for use within the web page. We recommend that you do not modify it.--><script>var __adobewebfontsappname__="dreamweaver"</script><script src="http://use.edgefonts.net/open-sans:n3,n8,n4:default;overlock:n4:default;poiret-one:n4:default;paytone-one:n4:default.js" type="text/javascript"></script>
+  <!-- TemplateBeginEditable name="head" -->
+  <!-- TemplateEndEditable -->
+</head>
+  <body>
+  <nav class="navbar navbar-default navbar-static-top">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#defaultNavbar1" aria-expanded="false"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
+        <a class="navbar-brand" href="../index.html">LNS
+     	</a></div>
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="defaultNavbar1">
+<ul class="nav navbar-nav navbar-right header-font">
+        <li></li>
+        <li><a href="../About_regardingLNS.html">ABOUT</a></li>
+        <li><a href="#">TEAM</a></li>
+        <li><a href="#">SCHEDULE</a></li>
+        <li><a href="#">CONTACT</a></li>
+        <li><a href="#" class="login">LOGIN</a></li>
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container-fluid -->
+  </nav>
+  <!-- TemplateBeginEditable name="contents" -->
+  <div class="container-fluid"></div>
+  <!-- TemplateEndEditable -->
+  <div class="footer-info">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="teme col-lg-3">
+        <p class="unei">LNS運営チーム(仮)<br>
+        代表者：のりじろ</p>
+      </div>
+      <div class="Riot col-lg-9">
+        <p>LNS​ League of Legends ​Nippon Salaryman　は、ライアットゲームズが公式承認するものではなく、ライアットゲームズ又はリーグ・オブ・レジェンドの製作・管理に正式に関与したいかなる者の見解・意見に基づくものではありません。リーグ・オブ・レジェンド及びライアットゲームズは、Riot Games, Inc.の商標又は登録商標です。リーグ・オブ・レジェンド © Riot Games, Inc.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+	<script src="../js/jquery-1.11.3.min.js"></script>
+
+	<!-- Include all compiled plugins (below), or include individual files as needed --> 
+	<script src="../js/bootstrap.js"></script>
+  </body>
+</html>

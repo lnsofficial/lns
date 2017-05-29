@@ -1,0 +1,12 @@
+AddType application/x-httpd-php .html
+
+RewriteEngine on
+RewriteBase /
+RewriteCond %{HTTP_HOST} ^www\.lns-lol\.com$
+RewriteRule ^(.*)$ http://lns-lol.com/$1 [R=301,L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ $1
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php [L]

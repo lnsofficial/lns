@@ -1,0 +1,59 @@
+@charset "utf-8";
+
+form {
+	margin-top: 0;
+	margin-left: 0px;
+	margin-bottom: 0;
+	padding: 1em;
+	border-radius: 1em;
+}
+
+form div + div {
+    margin-top: 10px;
+}
+
+label {
+	display: inline-block;
+	text-align: right;
+}
+form div input {
+	width: 80%;
+
+}
+
+
+textarea {
+	vertical-align: top;
+	height: 5em;
+	resize: vertical;
+	width: 80%;
+}
+
+form div #msg {
+	vertical-align: top;
+	height: 7em;
+	resize: vertical;
+}
+
+
+.button {
+    padding-left: 90px;
+}
+button {
+	margin-left: 0.5em;
+}
+form div #men2 {
+	padding-left: 0px;
+	margin-left: 107px;
+	width: 80%;
+	margin-top: 6px;
+	margin-bottom: 0px;
+
+}
+
+@media (max-width: 611px){
+form div #men2 {
+	margin-left: 0px;
+}
+
+}

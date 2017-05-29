@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LNS</title>
+    <!-- Bootstrap -->
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+
+    <script>var __adobewebfontsappname__="dreamweaver"</script>
+    <script src="http://use.edgefonts.net/open-sans:n3,n8,n4:default;overlock:n4:default;poiret-one:n4:default;paytone-one:n4:default.js" type="text/javascript"></script>
+    <style>
+      table.team_list {
+          width:80%;
+          border-collapse: collapse;
+          text-align: left;
+          line-height: 1.5;
+          border-top: 1px solid #ccc;
+          border-bottom: 1px solid #ccc;
+          margin: auto auto 2%;
+      }
+      table.team_list th {
+          width: 150px;
+          padding: 10px;
+          font-weight: bold;
+          vertical-align: top;
+      }
+      table.team_list td {
+          width: 50%;
+          padding: 10px;
+          vertical-align: top;
+      }
+      table.team_list .even {
+          background: #00cccc;
+      }
+      .team_list_title_box {
+        width: 80%;
+        margin: auto;
+        font-weight: bold;
+        background-color:#222222;
+        color:#ffffff;
+      }
+      .team_list_title {
+          padding:5px;
+      }
+    </style>
+  </head>
+  <body>
+    {include file='header.tmpl'}
+    <div>
+      {foreach from=$team_list item=team key=id}
+        <div class="team_list_title_box">
+            <div class="team_list_title">{$team.team_name}</div>
+        </div>
+        <table class="team_list">
+          {foreach from=$team.member item=member key=member_id}
+            <tr>
+              <th scope="row" {if $member_id % 2 == 0}class="even"{/if}>{$member.summoner_name}</th>
+              <td {if $member_id % 2 == 0}class="even"{/if}></td>
+            </tr>
+          {/foreach}
+        </table>
+      {/foreach}
+    </div>
+    {include file='footer.tmpl'}
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="js/jquery-1.11.3.min.js"></script>
+
+    <!-- Include all compiled plugins (below), or include individual files as needed --> 
+    <script src="js/bootstrap.js"></script>
+  </body>
+</html>

@@ -1,0 +1,65 @@
+<?php
+ini_set('display_errors', 1);
+
+require_once('../../lib/common/Define.php');
+require_once( PATH_LIB . '/common/Db.php');
+require_once( LIB_SMARTY );
+
+$sSelectTeamInfoSql = "SELECT " .
+						"team_id, " .
+						"mail_address, " .
+						"team_name, " .
+						"team_name_kana, " .
+						"team_tag, " .
+						"team_tag_kana, " .
+						"comment " .
+					"FROM " .
+						"m_team " .
+					"ORDER BY " .
+						"team_id";
+
+$oDb = new Db();
+
+$oSelectTeamResult = $oDb->execute($sSelectTeamInfoSql);
+
+$ahsTeam = [];
+
+while ($row = $oSelectTeamResult->fetch_assoc()) {
+	$sSelectMemberInfoSql = "SELECT " .
+								"summoner_name " .
+							"FROM " .
+								"m_member " .
+							"WHERE " .
+								"team_id = " . $row["team_id"] . " " .
+							"ORDER BY " .
+								"member_id";
+	
+	$hsTeam = [
+		"team_name" => $row["team_name"],
+		"team_name_kana" => $row["team_name_kana"],
+		"team_tag" => $row["team_tag"],
+		"team_tag_kana" => $row["team_tag_kana"],
+		"mail_address" => $row["mail_address"],
+		"comment" => $row["comment"]
+	];
+	
+	$oSelectMemberInfoResult = $oDb->execute($sSelectMemberInfoSql);
+	
+	$arrayMember = [];
+	while ($row = $oSelectMemberInfoResult->fetch_assoc()) {
+		$arrayMember[] = $row;
+	}
+	
+	$hsTeam["member"] = $arrayMember;
+	
+	$ahsTeam[] = $hsTeam;
+}
+
+$smarty = new Smarty();
+
+$smarty->template_dir = PATH_TMPL;
+$smarty->compile_dir  = PATH_TMPL_C;
+
+$smarty->assign("teamList",$ahsTeam);
+
+$smarty->display('TeamList_admin.tmpl');
