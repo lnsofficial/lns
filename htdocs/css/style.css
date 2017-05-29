@@ -1,6 +1,6 @@
 @charset "utf-8";
 .header-image {
-	background-image: url(../img/JinxSuits2.jpg);
+	background-image: url(../img/AhriSuits.jpg);
 	background-repeat: no-repeat;
 	background-size: 45
 # auto;
@@ -84,7 +84,7 @@
 
 @media (max-width: 375px){
 .header-image {
-	background-image: url(../img/JinxSuits2.jpg);
+	background-image: url(../img/AhriSuits.jpg);
 	background-size: 298px auto;
 	height: 419px;
 }
