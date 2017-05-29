@@ -1,3 +1,17 @@
+<?php
+// TODO その内やり方修正
+require_once( getenv('BASE_PATH') . '/lib/common/Define.php');
+require_once( PATH_LIB . '/common/Db.php');
+
+$handler = new MysqlSessionHandler();
+
+@session_start();
+
+$showMatch = false;
+if( $_SESSION["id"] ){
+  $showMatch;
+}
+?>
   <nav class="navbar navbar-default navbar-static-top">
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
@@ -9,12 +23,11 @@
       <div class="collapse navbar-collapse" id="defaultNavbar1">
         <ul class="nav navbar-nav navbar-right header-font">
         <li></li>
-         <li><a href="/About.html">ABOUT</a></li>
-        <li><a href="#"><s>TEAM</s></a></li>
-        <li><a href="#"><s>LEAGUE</s></a></li>
-        <li><a href="#"><s>SCHEDULE</s></a></li>
-        <li><a href="#"><s>CONTACT</s></a></li>
-        <li><a href="#" class="login">LOGIN</a></li>
+        <li><a href="/About/About.html">ABOUT</a></li>
+        <li><a href="/Rule/Rule2.html">RULE</a></li>
+        <li><a href="/LadderRanking/display">RANKING</a></li>
+        <?php if( $showMatch ){ ?><li><a href="/Match/RecruitList">MATCH</a></li><?php } ?>
+        <li><a href="/login.html" class="login">LOGIN</a></li>
         </ul>
       </div>
       <!-- /.navbar-collapse -->
