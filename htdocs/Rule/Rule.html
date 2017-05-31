@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="utf-8">
@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>LNS</title>
     <!-- Bootstrap -->
-    <link href="/css/bootstrap.css" rel="stylesheet">
-    <link href="/css/style.css" rel="stylesheet" type="text/css">
-    <link href="/css/about.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+    <link href="css/about.css" rel="stylesheet" type="text/css" media="screen">
 
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -18,16 +18,17 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
   <!--The following script tag downloads a font from the Adobe Edge Web Fonts server for use within the web page. We recommend that you do not modify it.--><script>var __adobewebfontsappname__="dreamweaver"</script><script src="http://use.edgefonts.net/open-sans:n3,n8,n4:default;overlock:n4:default;poiret-one:n4:default;paytone-one:n4:default.js" type="text/javascript"></script>
+  <script type="text/javascript" src="../LNS/js/about.js"></script>
 </head>
   <body>
   <?php include($_SERVER['DOCUMENT_ROOT'] . "/include/header.html"); ?>
   
   <div class="container-fluid">
     <div class="row">
-      <?php include($_SERVER['DOCUMENT_ROOT'] . "/include/menu_rule.html"); ?>
+      <?php include($_SERVER['DOCUMENT_ROOT'] . "/include/menu_about.html"); ?>
       <div class="col-lg-10 about-league">
         <h2>大会ルール</h2>
-
+        
 1 募集要項<br />
 <br />
 1.1 参加条件<br />
@@ -48,6 +49,7 @@
 2 試合<br />
 　• サーバ：日本<br />
 　• マップ：サモナーズリフト<br />
+　• 試合形式：BO1<br />
 　• 観戦：全て<br />
 　• ゲームタイプ：トーナメントドラフト<br />
 　• 部屋名：LNS ○ vs ○ (○はチームナンバー)<br />
@@ -80,10 +82,12 @@
 <br />
 3.2 マッチング方式<br />
 マッチング方式は「ホストゲスト方式」を採用しています。<br />
-　•  ホスト側（試合を募集する側）が「チーム名、開始希望日時、希望ブロック(同ブロック以上)」を指定して募集。<br />
+　• ホスト側（試合を募集する側）が「チーム名、開始希望日時、希望ブロック(同ブロック以上)」を指定して募集。<br />
+　• ホスト側として募集しマッチング可能な試合数は、1ヶ月に4試合までと制限します。<br />
 ゲスト側（試合を申し込む側）がそのホスト側に対し、対戦希望を出したらマッチ成立、対戦となります。<br />
 　• マッチング後のチーム同士の連絡は、代表者(もしくは、その代理)が行います。<br />
 　• ホスト側のチームがブルーサイドとします。<br />
+　• ゲスト側での試合数制限はありませんが、ゲスト側で試合申し込みを行った場合、そこから5日間は、募集開始から1日以上経過した試合にのみ申し込み可能といたします。<br />
 <br />
 4 チーム<br />
 　• チームメンバー：5名以上10名以下<br />
@@ -105,10 +109,10 @@
 ※理由のないポーズは罰則の対象となり得ますので、無暗にポーズを行わないこと。<br />
 <br />
 6.2 ディスコネクト<br />
-BanPick時にディスコネクトがあった場合は、その時点でQuit した後同じBanPickを行うこと。<br />
+BanPick時にディスコネクトがあった場合は、その時点でQuitした後同じBanPickを行うこと。<br />
 Quitせずに相手のPickが終わった場合は変更不可とします。<br />
 試合中のディスコネクトは、ディスコネクトが発生したチームメンバーがポーズを掛けること。<br />
-ポーズした時点から5分以内に復帰が出来ない場合は、切断者が居るチームの敗北扱いとします。<br />
+ポーズした時点から10分以内に復帰が出来ない場合は、切断者が居るチームの敗北扱いとします。<br />
 同タイミングで切断者が発生した、試合開始時点で接続出来な勝った等、両チームに切断者がいる場合、両者敗北扱いとします。<br />
 <br />
 6.3 遅刻<br />
@@ -156,9 +160,9 @@ LNSリーグ参加チームは、運営から指示があった場合直ちに�
 
     <?php include($_SERVER['DOCUMENT_ROOT'] . "/include/footer.html"); ?>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
-    <script src="/js/jquery-1.11.3.min.js"></script>
+    <script src="js/jquery-1.11.3.min.js"></script>
 
     <!-- Include all compiled plugins (below), or include individual files as needed --> 
-    <script src="/js/bootstrap.js"></script>
+    <script src="js/bootstrap.js"></script>
   </body>
 </html>
