@@ -33,7 +33,7 @@
 	define( "ERR_MATCH_NOT_RECRUITE"		, "募集中でないマッチです" );
 	define( "ERR_MATCH_HOST_EQ_GUEST"		, "自分の募集には登録できません" );
 	define( "ERR_MATCH_HOST_DONT_APPLY"		, "募集条件に合致しないため、登録できません" );
-	define( "ERR_MATCH_REGIST_INTERVAL"		, "試合へ応募して５日間経過していないため、登録できません" );
+	define( "ERR_MATCH_REGIST_INTERVAL"		, "試合を申し込んでから５日間が経過していないため、試合を申し込めません。<br />※ゲスト側で試合申し込みを行った場合、そこから５日間は新たな試合を申し込めません。ただし、募集開始から１日以上経過した試合には申し込むことが可能です。" );
 	define( "ERR_MATCH_COMPLETE"			, "試合の登録が失敗しました" );
 	define( "ERR_MATCH_PERMISSION"			, "権限がありません" );
 	define( "ERR_MATCH_OVER_REGIST"			, "既に該当月での試合の募集回数が上限に達しているため、応募できません" );
