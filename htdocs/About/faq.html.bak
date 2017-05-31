@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LNS</title>
+    <!-- Bootstrap -->
+	<link href="css/bootstrap.css" rel="stylesheet">
+	<link href="css/style.css" rel="stylesheet" type="text/css">
+	<link href="css/about.css" rel="stylesheet" type="text/css" media="screen">
+	
+
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+  <!--The following script tag downloads a font from the Adobe Edge Web Fonts server for use within the web page. We recommend that you do not modify it.--><script>var __adobewebfontsappname__="dreamweaver"</script><script src="http://use.edgefonts.net/open-sans:n3,n8,n4:default;overlock:n4:default;poiret-one:n4:default;paytone-one:n4:default.js" type="text/javascript"></script>
+  <script type="text/javascript" src="../LNS/js/about.js"></script>
+</head>
+  <body>
+  <?php include($_SERVER['DOCUMENT_ROOT'] . "/include/header.html"); ?>
+  
+  <div class="container-fluid">
+    <div class="row">
+      <?php include($_SERVER['DOCUMENT_ROOT'] . "/include/menu_about.html"); ?>
+      <div class="col-lg-10 about-league">
+                <h2>FAQ</h2>
+        
+サモナーズリフトのマップで行われる総当りのリーグ戦で、<br />
+実力分けされた１リーグ４チームで週１回のペースで毎回異なるチームと戦って<br />
+勝敗を決めていきます<br />
+総当りが終わると（期間としては２ヶ月程度を予定）再度エントリーをして頂く形になり<br />
+再エントリーの場合は前成績を元に適正のリーグに振り分けられます<br />
+<br />
+Q.LNSってどういうものですか？<br />
+A.仕事で忙しい社会人でも参加できるをコンセプトに非営利で運営されている数カ月に渡るリーグ戦です<br />
+<br />
+Q.実力ごとにリーグ分けされるとありますが、初参加の場合はどのように分けますか？<br />
+A.LNSリーグ１期目は運営側でランダムにリーグ配属させて頂きますが、２期目以降は一番下のリーグからの参加になります。<br />
+<br />
+Q.１期何戦しますか？<br />
+A.リーグ内の各チームと総当たりで１戦ずつ対戦してもらいます、１期合計３戦となります。<br />
+<br />
+Q.３チーム以上の勝敗が並んでいる場合はどのようにして順位を決めますか？<br />
+A.勝ち試合の時間の合計が短いチームを上位とします。<br />
+<br />
+Q.何かしらのトラブルでプレイヤーが切断されてしまった場合どうしますか？<br />
+A.試合自体に直接運営が関与することはありません。<br />
+切断した方のチームがpauseを行って試合を一時中断してください。<br />
+5分以内に復帰が出来ない場合は、切断者が居るチームの敗北扱いとします。<br />
+同タイミングで切断者が発生した、試合開始時点で接続出来なかった等、5分経過時点で両チームに切断者がいる場合、両チーム共に敗北扱いとします。<br />
+<br />
+Q.チームのメンバーが試合開始時に５名集まっていない場合はどうなりますか？<br />
+A.試合開始予定時間を５分超えた場合、チームメンバーが揃っていない方を敗北扱いとします。<br />
+また両チーム共に５名揃っていない状態で試合開始時間５分を超えた場合、両者敗北扱いとします。<br />
+ただし、双方のチーム同士で合意した場合は例外を認めます。<br />
+<br />
+Q.個人で応募可能ですか？<br />
+A.個人での応募は受け付けておりません、外部サイトなどを利用してメンバーを集めてください。<br />
+また、Twitterでチームメンバー募集用ツイートを定期的に発信しますので、そちらもご利用ください。<br />
+<br />
+Q.リーグ期間はどれくらいになりますか？<br />
+A.１期約２か月を想定しています。<br />
+<br />
+Q.リーグ開催日時はいつになりますか？土日開催なのか平日開催なのかが気になります。<br />
+A.10日程度の期間を設け、その中で各チーム都合の合う日時を調整し、運営側で最終的に開催日時を決定します。<br />
+<br />
+Q.社会人じゃないと参加してはいけませんか？<br />
+A.１８歳以上で日本語でコミュニケーションが取れる方であれば誰でも参加可能です。<br />
+え？あいつ１８歳以下だって？私たちは皆さんを信じてます。<br />
+<br />
+Q.参加にランク制限はありますか？<br />
+A.ありません。ただし、日本サーバに、サモナーレベル30で、ドラフトモードに参加可能なチャンピオン数を所持しているアカウントをご用意ください。<br />
+<br />
+Q.１チームに何人まで参加可能ですか？<br />
+A.１チーム１０人までとします。<br />
+<br />
+Q.もし試合日に、急にチームメンバーが参加できなくなったらどうなりますか？<br />
+A.事前登録したチームメンバーの中から、５名の参加者を決めてください。<br />
+試合日に参加可能なメンバーが５名に満たない場合敗北扱いとします。<br />
+<br />
+Q.試合中にVCなどのソフトウェアを使用してもいいですか？<br />
+A.自由です。ただし競技プレイに大きな影響のある、不許可もしくはゲーム外の方法を使用すること（たとえば電気機器を使った合図、ハック等）は禁止になります。<br />
+<br />
+Q.レーンは固定ですか？<br />
+A.自由です。試合毎にチーム内でご相談ください。<br />
+<br />
+Q.リーグ開催期間中にチームメンバーの変更は可能ですか？<br />
+A.変更することはできません。メンバーの名前で他のチームメイト、またはチーム部外者がプレイすることは禁止になります。<br />
+ただしFakerを自分に憑かせる降霊術などのスピリチュアルな行為は可能です。<br />
+<br />
+Q.リーグ参加に費用はかかりますか？<br />
+A.かかりません！<br />
+<br />
+Q.試合のライブ動画、または録画した動画を配信してもいいですか？<br />
+A.配信していただいて構いませんが、ゴースティングなどの行為がありましても運営は関与しませんので自己責任でお願いします。<br />
+<br />
+Q.商品はありますか？<br />
+A.基本的にはありません。ですが今後スポンサーがついた場合あるかも？<br />
+LNSはスポンサー様を募集しています！<br />
+<br />
+その他の問題に関しては運営の判断に順じます。また、不明な点があればLNS運営公式ツイッターにご連絡ください。<br />
+     </div>
+    </div>
+  </div>
+
+  <?php include($_SERVER['DOCUMENT_ROOT'] . "/include/footer.html"); ?>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+	<script src="js/jquery-1.11.3.min.js"></script>
+
+	<!-- Include all compiled plugins (below), or include individual files as needed --> 
+	<script src="js/bootstrap.js"></script>
+  </body>
+</html>

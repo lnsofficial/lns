@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LNS</title>
+    <!-- Bootstrap -->
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+	<link href="/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" >
+	<link href="/css/jquery-ui.css" rel="stylesheet" type="text/css" >
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  <!--The following script tag downloads a font from the Adobe Edge Web Fonts server for use within the web page. We recommend that you do not modify it.--><script>var __adobewebfontsappname__="dreamweaver"</script><script src="http://use.edgefonts.net/open-sans:n3,n8,n4:default;overlock:n4:default;poiret-one:n4:default;paytone-one:n4:default.js" type="text/javascript"></script>
+</head>
+  <body>
+  {include file='header.tmpl'}
+  <div class="container-fluid">
+    <style>
+    </style>
+    <form name="form1" method="POST">
+      <div class="row">
+        <div class="col-lg-2 about-menu">
+          <ul class="nav side">
+            <li role="presentation"><a href="/Match/form">試合を募集</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-10" id="tabbox">
+          <input type="hidden" name="match_id" value="">
+          <h2>絞り込み条件</h2>
+          <div class="row" id="search_option">
+            <div class="col-md-3">
+              <select id="state" name="search_option[state]" class="form-control">
+                <option value="" {if $state == null}selected{/if}>募集状態</option>
+                <option value="1" {if $state == 1}selected{/if}>募集中</option>
+                <option value="2" {if $state == 2}selected{/if}>試合結果登録待ち</option>
+                <option value="3" {if $state == 3}selected{/if}>取り消し</option>
+                <option value="4" {if $state == 4}selected{/if}>終了</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <input type="text" id="search_start_date" name="search_option[start_date]" class="form-control datepicker" placeholder="検索開始日時" value="{$start_date}">
+            </div>
+            <div class="col-md-2">
+              <input type="text" id="search_end_date" name="search_option[end_date]" class="form-control datepicker" placeholder="検索終了日時" value="{$end_date}">
+            </div>
+          </div>
+          <h2>試合募集一覧</h2>
+          <table class="table">
+            <tr>
+              <th>状態</th>
+              <th>試合日時</th>
+              <th>募集チーム（ブロック）</th>
+              <th>勝敗</th>
+              <th>対戦相手チーム（ブロック）</th>
+              <th>勝敗</th>
+              <th>詳細</th>
+            </tr>
+            {foreach from=$match_recruit_list item=match key=id}
+            <tr>
+              <td>{if $match.state==1}募集中{elseif $match.state==2}試合結果登録待ち{elseif $match.state==3}取り消し{elseif $match.state==4}終了{/if}</td>
+              <td>{$match.match_date}</td>
+              <td>{$match.host_team_name}（{$match.host_league_name}）</td>
+              <td>{if $match.winner!=NULL}{if $match.host_team_id==$match.winner}Win{else}Lose{/if}{/if}</td>
+              <td>{if $match.apply_team_name!=NULL}{$match.apply_team_name}（{$match.apply_league_name}）{/if}</td>
+              <td>{if $match.winner!=NULL}{if $match.apply_team_id==$match.winner}Win{else}Lose{/if}{/if}</td>
+              <td><a href="" onClick="showDetail( {$match.id} ); return false;">詳細</a></td>
+            </tr>
+            {/foreach}
+          </table>
+        </div>
+      </div>
+    </form>
+  </div>
+  {include file='footer.tmpl'}
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+  <script src="/js/jquery-1.11.3.min.js"></script>
+  <!-- Include all compiled plugins (below), or include individual files as needed --> 
+  <script src="/js/bootstrap.js"></script>
+  <script type="text/javascript">
+    function showDetail( match_id ){
+      document.form1.action = "/Match/display";
+      document.form1.match_id.value = match_id;
+      document.form1.submit();
+    }
+    $(function(){
+      $('.datepicker').datepicker({
+        language: 'ja',
+        dateFormat: 'yy/mm/dd'
+      });
+      $("#search_option").change( function(){
+        updateMatchRecruitList();
+      });
+    });
+    function updateMatchRecruitList(){
+      document.form1.action = "/Match/RecruitList";
+      document.form1.submit();
+    }
+  </script>
+  <script src="/js/bootstrap-datepicker.min.js"></script>
+  <script src="/js/bootstrap-datepicker.ja.min.js"></script>
+  <script src="/js/jquery-ui.js"></script>
+  </body>
+</html>
