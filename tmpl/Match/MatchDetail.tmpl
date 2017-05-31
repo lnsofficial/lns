@@ -56,7 +56,7 @@
              <label for="team_name">配信可否</label>
              <select class="form-control" disabled>
                <option {if $stream}selected{/if}>配信を希望する</option>
-               <option {if $stream}selected{/if}>配信を希望しない</option>
+               <option {if !$stream}selected{/if}>配信を希望しない</option>
              </select>
           </div>
         </div>
