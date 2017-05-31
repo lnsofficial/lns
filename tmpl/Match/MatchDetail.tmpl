@@ -34,6 +34,7 @@
         <div class="col-lg-9">
           <input type="hidden" name="match_id" value="{$match_id}">
           <div class="form-group">
+            （何か説明あれば記載）
           </div>
           <h2>募集チーム</h2>
           <div class="form-group">
@@ -48,15 +49,15 @@
              <label for="mail_address">ブロック指定</label>
              <select class="form-control" disabled>
                <option {if $type == 1}selected{/if}>どこからでも</option>
-               <option {if $type == 3}selected{/if}>１つ上のブロック以下</option>
-               <option {if $type == 2}selected{/if}>同ブロック以下</option>
+               <option {if $type == 2}selected{/if}>１つ上のブロック以下</option>
+               <option {if $type == 3}selected{/if}>同ブロック以下</option>
              </select>
           </div>
           <div class="form-group">
              <label for="team_name">配信可否</label>
              <select class="form-control" disabled>
                <option {if $stream}selected{/if}>配信を希望する</option>
-               <option {if $stream}selected{/if}>配信を希望しない</option>
+               <option {if !$stream}selected{/if}>配信を希望しない</option>
              </select>
           </div>
         </div>
