@@ -7,9 +7,10 @@ $handler = new MysqlSessionHandler();
 
 @session_start();
 
-$showMatch = false;
-if( $_SESSION["id"] ){
-  $showMatch;
+if( !empty( $_SESSION ) ){
+  if( $_SESSION["id"] ){
+    $showMatch = true;
+  }
 }
 ?>
   <nav class="navbar navbar-default navbar-static-top">

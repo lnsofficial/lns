@@ -15,27 +15,23 @@ $oDb = new Db();
 
 // パスワード取得
 $sSelectLoginAccountSql = "SELECT account_id, passwd FROM login_account WHERE login_id = ?";
-if( $stmt = $oDb->db->prepare( $sSelectLoginAccountSql ) ){
-	$stmt->bind_param( "s", $sLoginId );
-	$stmt->execute();
-	$stmt->store_result();
-	
-	if( $stmt->error ){
-		// TODO エラー処理
-		echo $stmt->error;
-	}else{
-		$stmt->bind_result( $iAccountId, $sPasswordHash );
-		$stmt->fetch();
-		$stmt->close();
-		
-		if( password_verify( $sPassword, $sPasswordHash ) ){
-			session_regenerate_id(true);
-			$_SESSION["id"] = $iAccountId;
-			header('location: /Match/RecruitList');
-			exit;
-		} else {
-			header('location: login.html');
-			exit;
-		}
-	}
+$ahsParameter = [ $sLoginId ];
+
+$oResult = $oDb->executePrepare( $sSelectLoginAccountSql, "s", $ahsParameter );
+$iAccountId		= 0;
+$sPasswordHash	= "";
+while( $row = $oResult->fetch_assoc() ){
+	$iAccountId = $row["account_id"];
+	$sPasswordHash = $row["passwd"];
+	break;
+}
+
+if( password_verify( $sPassword, $sPasswordHash ) ){
+	session_regenerate_id(true);
+	$_SESSION["id"] = $iAccountId;
+	header('location: /Match/RecruitList');
+	exit;
+} else {
+	header('location: login.html');
+	exit;
 }
