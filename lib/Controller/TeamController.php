@@ -216,7 +216,7 @@ class TeamController extends BaseController{
 		
 		$smarty->display('TeamRegister_err.tmpl');
 	}
-
+/*
 	public function showTeamList(){
         $sSelectTeamInfoSql = "SELECT " .
             "* " .
@@ -261,4 +261,5 @@ class TeamController extends BaseController{
 
 	private function displayTeamList(){
 	}
+	*/
 }
