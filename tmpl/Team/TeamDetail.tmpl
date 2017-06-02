@@ -65,24 +65,6 @@
   {include file='footer.tmpl'}
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
   <script src="/js/jquery-1.11.3.min.js"></script>
-  <script type="text/javascript">
-    function join(){
-      if( window.confirm( 'この試合に参加します。' ) ){
-        document.form1.action = "/Match/Join";
-        document.form1.submit();
-      }
-    }
-    function cancel(){
-      if( window.confirm( 'この試合をキャンセルします。' ) ){
-        document.form1.action = "/Match/Cancel";
-        document.form1.submit();
-      }
-    }
-    function registerResult(){
-      document.form1.action = "/MatchResult/Form";
-      document.form1.submit();
-    }
-  </script>
   <!-- Include all compiled plugins (below), or include individual files as needed --> 
   <script src="/js/bootstrap.js"></script>
   </body>

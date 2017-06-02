@@ -1,6 +1,20 @@
-@charset "utf-8";
+﻿@charset "utf-8";
 .header-image {
 	background-image: url(../img/AhriSuits.jpg);
+	background-repeat: no-repeat;
+	background-size: 45
+# auto;
+	height: 650px;
+	background-position: 50% 50px;
+	margin-left: -15px;
+	margin-right: -15px;
+	background-size: 800px auto;
+	-webkit-box-shadow: 0px 0px;
+	box-shadow: 0px 0px;
+	border-bottom: 4px solid #00CCCC;
+}
+.header-image-jinx {
+	background-image: url(../img/JinxSuits2.jpg);
 	background-repeat: no-repeat;
 	background-size: 45
 # auto;
@@ -22,7 +36,12 @@
 	margin-left: 10px;
 	margin-top: 2px;
 }
-
+.koumoku-l {
+	border-bottom: 1px dotted #003791;
+}
+.rule-p>p {
+	line-height: 1.00;
+}
 
 
 
@@ -85,6 +104,11 @@
 @media (max-width: 375px){
 .header-image {
 	background-image: url(../img/AhriSuits.jpg);
+	background-size: 298px auto;
+	height: 419px;
+}
+.header-image-jinx {
+	background-image: url(../img/JinxSuits2.jpg);
 	background-size: 298px auto;
 	height: 419px;
 }
