@@ -22,29 +22,39 @@
   <div class="container-fluid">
     <style>
     </style>
-    <div class="container-fluid">
-      <table class="table table-bordered">
-        <tr>
-          <th>順位</th>
-          <th>チーム名</th>
-          <th>ブロック</th>
-          <th>ポイント</th>
-        </tr>
-        {foreach from=$ladder_list item=ladder key=id}
-        <tr>
-          <td>{$ladder.order}</td>
-          <td>{$ladder.team_name}</td>
-          <td>{$ladder.league_name}</td>
-          <td>{$ladder.point}</td>
-        </tr>
-        {/foreach}
-      </table>
-    </div>
+    <form name="form1" method="POST">
+      <input type="hidden" id="team_id" name="team_id" value="">
+      <div class="container-fluid">
+        <table class="table table-bordered table-hover">
+          <tr class="row info">
+            <th class="col-md-1">{$login}順位</th>
+            <th class="col-md-6">チーム名</th>
+            <th class="col-md-3">ブロック</th>
+            <th class="col-md-2">ポイント</th>
+          </tr>
+          {foreach from=$ladder_list item=ladder key=id}
+          <tr class="row">
+            <td class="col-md-1">{$ladder.order}</td>
+            <td class="col-md-6"><a href="" onClick="showTeamDetail( {$ladder.team_id} ); return false;">{$ladder.team_name}</a></td>
+            <td class="col-md-3">{$ladder.league_name}</td>
+            <td class="col-md-2">{$ladder.point}</td>
+          </tr>
+          {/foreach}
+        </table>
+      </div>
+    </form>
   </div>
   {include file='footer.tmpl'}
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
   <script src="/js/jquery-1.11.3.min.js"></script>
   <!-- Include all compiled plugins (below), or include individual files as needed --> 
   <script src="/js/bootstrap.js"></script>
+  <script type="text/javascript">
+    function showTeamDetail( team_id ){
+      document.form1.action = "/Team/Detail";
+      document.form1.team_id.value = team_id;
+      document.form1.submit();
+    }
+  </script>
   </body>
 </html>
