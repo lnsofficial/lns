@@ -25,19 +25,19 @@
     <form name="form1" method="POST">
       <input type="hidden" id="team_id" name="team_id" value="">
       <div class="container-fluid">
-        <table class="table table-bordered">
-          <tr>
-            <th>{$login}順位</th>
-            <th>チーム名</th>
-            <th>ブロック</th>
-            <th>ポイント</th>
+        <table class="table table-bordered table-hover">
+          <tr class="row info">
+            <th class="col-md-1">{$login}順位</th>
+            <th class="col-md-6">チーム名</th>
+            <th class="col-md-3">ブロック</th>
+            <th class="col-md-2">ポイント</th>
           </tr>
           {foreach from=$ladder_list item=ladder key=id}
-          <tr>
-            <td>{$ladder.order}</td>
-            <td><a href="" onClick="showTeamDetail( {$ladder.team_id} ); return false;">{$ladder.team_name}</a></td>
-            <td>{$ladder.league_name}</td>
-            <td>{$ladder.point}</td>
+          <tr class="row">
+            <td class="col-md-1">{$ladder.order}</td>
+            <td class="col-md-6"><a href="" onClick="showTeamDetail( {$ladder.team_id} ); return false;">{$ladder.team_name}</a></td>
+            <td class="col-md-3">{$ladder.league_name}</td>
+            <td class="col-md-2">{$ladder.point}</td>
           </tr>
           {/foreach}
         </table>
