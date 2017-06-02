@@ -216,6 +216,29 @@ class TeamController extends BaseController{
 		
 		$smarty->display('TeamRegister_err.tmpl');
 	}
+	
+	public function detail(){
+		$iTeamId = $_REQUEST["team_id"];
+		
+		$oDb = new Db();
+		
+		$oTeam = new Team( $oDb, $iTeamId );
+		
+		$aoTeamMember = $oTeam->getTeamMember( $oDb );
+		
+		$smarty = new Smarty();
+		
+		$smarty->template_dir = PATH_TMPL;
+		$smarty->compile_dir  = PATH_TMPL_C;
+		
+		$smarty->assign( "team_name"		, $oTeam->team_name );
+		$smarty->assign( "team_name_kana"	, $oTeam->team_name_kana );
+		$smarty->assign( "team_tag"			, $oTeam->team_tag );
+		$smarty->assign( "team_tag_kana"	, $oTeam->team_tag_kana );
+		$smarty->assign( "team_member"		, $aoTeamMember );
+		
+		$smarty->display('Team/TeamDetail.tmpl');
+	}
 /*
 	public function showTeamList(){
         $sSelectTeamInfoSql = "SELECT " .

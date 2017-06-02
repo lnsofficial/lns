@@ -3,6 +3,7 @@ require_once( PATH_MODEL . "Base.php" );
 require_once( PATH_MODEL . "League.php" );
 require_once( PATH_MODEL . "LastJoin.php" );
 require_once( PATH_MODEL . "LadderRanking.php" );
+require_once( PATH_MODEL . "Member.php" );
 
 class Team extends Base{
 	const MAIN_TABLE			= "m_team";
@@ -55,5 +56,23 @@ class Team extends Base{
 		$oLeague = new League( $oDb, $oLadder->league_id );
 		
 		return $oLeague;
+	}
+	
+	public function getTeamMember( $oDb ){
+		$sSelectTeamMember = "SELECT * FROM m_member WHERE team_id = ?";
+		$ahsParameter = [ $this->team_id ];
+		
+		$oResult = $oDb->executePrepare( $sSelectTeamMember, "i", $ahsParameter );
+		
+		$aoTeamMember = [];
+		while( $row = $oResult->fetch_assoc() ) {
+			$aMember = [];
+			$aMember["id"]				= $row["member_id"];
+			$aMember["summoner_name"]	= $row["summoner_name"];
+			
+			$aoTeamMember[] = $aMember;
+		}
+		
+		return $aoTeamMember;
 	}
 }
