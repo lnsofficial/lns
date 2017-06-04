@@ -34,8 +34,8 @@ class MatchResultController extends BaseController{
 			exit;
 		}
 		
-		// 試合予定時間から2時間以上経過しての登録はエラー
-		if( date( 'Y-m-d H:i:s' ) > date('Y-m-d H:i:s', strtotime( $oMatch->match_date . " + 2 hour" ) ) ){
+		// 試合結果の登録可能時間を過ぎての登録はエラー
+		if( !$oMatch->expirationRegistMatchResult() ){
 			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_OVER_RESULT_REGIST );
 			exit;
 		}
@@ -75,8 +75,8 @@ class MatchResultController extends BaseController{
 			exit;
 		}
 		
-		// 試合予定時間から2時間以上経過しての登録はエラー
-		if( date( 'Y-m-d H:i:s' ) > date('Y-m-d H:i:s', strtotime( $oMatch->match_date . " + 2 hour" ) ) ){
+		// 試合結果の登録可能時間を過ぎての登録はエラー
+		if( !$oMatch->expirationRegistMatchResult() ){
 			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_OVER_RESULT_REGIST );
 			exit;
 		}
@@ -147,8 +147,8 @@ class MatchResultController extends BaseController{
 			exit;
 		}
 		
-		// 試合予定時間から2時間以上経過しての登録はエラー
-		if( date( 'Y-m-d H:i:s' ) > date('Y-m-d H:i:s', strtotime( $oMatch->match_date . " + 2 hour" ) ) ){
+		// 試合結果の登録可能時間を過ぎての登録はエラー
+		if( !$oMatch->expirationRegistMatchResult() ){
 			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_OVER_RESULT_REGIST );
 			exit;
 		}

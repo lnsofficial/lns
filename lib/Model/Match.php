@@ -90,4 +90,17 @@ class Match extends Base{
 		
 		return $oResult;
 	}
+	
+	// 試合結果の登録可能な時間を過ぎてないかチェック
+	public function expirationRegistMatchResult(){
+		$bResult = true;
+		// 次のバッチ開始予定時間の1時間前取得
+		$nextExecuteBatchDate = date( 'Y-m-d 5:00:00', strtotime( $this->match_date . " next Monday") );
+		
+		if( date( 'Y-m-d H:i:s' ) > $nextExecuteBatchDate ){
+			$bResult = false;
+		}
+		
+		return $bResult;
+	}
 }
