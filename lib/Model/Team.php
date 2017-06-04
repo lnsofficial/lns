@@ -37,6 +37,35 @@ class Team extends Base{
 		return $oLastJoin;
 	}
 	
+	public function getBeforeLadder( $oDb ){
+		$sSelectTermSql = "SELECT MAX(term) as term FROM t_ladder_ranking";
+		$oTerm = $oDb->execute( $sSelectTermSql );
+		
+		$iTerm = 0;
+		while( $row = $oTerm->fetch_assoc() ) {
+			$iTerm = $row["term"];
+		}
+		
+		if( $iTerm == 0 ){
+			return false;
+		}elseif( $iTerm > 1 ){
+			$iTerm--;
+		}
+		
+		$sSelectLadder = "SELECT * FROM t_ladder_ranking WHERE team_id = ? AND term = ?";
+		$ahsParameter = [ $this->team_id, $iTerm ];
+		
+		$oResult = $oDb->executePrepare( $sSelectLadder, "ii", $ahsParameter );
+		
+		$oLadder = null;
+		while( $row = $oResult->fetch_array() ){
+			$oLadder = new LadderRanking( $oDb, $row["ladder_id"] );
+			break;
+		}
+		
+		return $oLadder;
+	}
+	
 	public function getCurrentLadder( $oDb ){
 		$sSelectLadder = "SELECT * FROM t_ladder_ranking WHERE team_id = ? ORDER BY term DESC";
 		$ahsParameter = [ $this->team_id ];

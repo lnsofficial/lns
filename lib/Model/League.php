@@ -15,8 +15,14 @@ class League extends Base{
 	
 	// 一つ上のリーグ取得
 	public function getUpperOneLeague( $oDb ){
+		$iRank = 0;
+		if( $this->rank == 1 ){
+			$iRank = $this->rank;
+		}else{
+			$iRank = $this->rank - 1;
+		}
 		$sSelectLeagueSql = "SELECT * FROM m_league WHERE rank = ?";
-		$ahsParameter = [ $this->rank - 1 ];
+		$ahsParameter = [ $iRank ];
 		
 		$oResult = $oDb->executePrepare( $sSelectLeagueSql, "i", $ahsParameter );
 		
@@ -31,8 +37,15 @@ class League extends Base{
 	
 	// 一つ下のリーグ取得
 	public function getUnderOneLeague( $oDb ){
+		$iRank = 0;
+		if( $this->rank == 8 ){
+			$iRank = $this->rank;
+		}else{
+			$iRank = $this->rank + 1;
+		}
+		
 		$sSelectLeagueSql = "SELECT * FROM m_league WHERE rank = ?";
-		$ahsParameter = [ $this->rank + 1 ];
+		$ahsParameter = [ $iRank ];
 		
 		$oResult = $oDb->executePrepare( $sSelectLeagueSql, "i", $ahsParameter );
 		
