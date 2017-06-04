@@ -27,7 +27,7 @@ if( !empty( $_SESSION ) ){
         <li><a href="/About/About.html">ABOUT</a></li>
         <li><a href="/Rule/Rule2.html">RULE</a></li>
         <li><a href="/LadderRanking/display">RANKING</a></li>
-        <?php if( $showMatch ){ ?><li><a href="/Match/RecruitList">MATCH</a></li><?php } ?>
+        <?php if( !empty($showMatch) ){ ?><li><a href="/Match/RecruitList">MATCH</a></li><?php } ?>
         <li><a href="/login.html" class="login">LOGIN</a></li>
         </ul>
       </div>
