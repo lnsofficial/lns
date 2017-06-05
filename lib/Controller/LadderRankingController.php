@@ -28,7 +28,7 @@ class LadderRankingController extends BaseController{
 		$iBeforePoint	= -1;
 		while( $row = $oLadderRanking->fetch_assoc() ) {
 			if( $iBeforeRank >= 0 ){
-				if( ( $iBeforeRank != $row["rank"] ) && ( $iBeforePoint != $row["point"] ) ){
+				if( ( $iBeforeRank != $row["rank"] ) || ( $iBeforePoint != $row["point"] ) ){
 					$iOrder++;
 				}
 			}
@@ -46,7 +46,7 @@ class LadderRankingController extends BaseController{
 			
 			$ahsLadderRanking[] = $ahsTeamLadder;
 			$iBeforeRank	= $row["rank"];
-			$iBeforPoint	= $row["point"];
+			$iBeforePoint	= $row["point"];
 		}
 		
 		$smarty = new Smarty();

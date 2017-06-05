@@ -24,7 +24,7 @@ class LadderRanking extends Base{
 	
 	public function getLadderRanking( $oDb ){
 		// サブクエリどっちに使ったほうが早かったっけ？
-		$sSelectLadderSql = "SELECT tlr.team_id,tlr.league_id,tlr.term,point,ml.league_name,ml.league_tag,ml.rank  FROM t_ladder_ranking tlr LEFT JOIN m_league ml ON tlr.league_id = ml.league_id  WHERE term = (SELECT MAX(term) FROM t_ladder_ranking) ORDER BY ml.rank,tlr.point";
+		$sSelectLadderSql = "SELECT tlr.team_id,tlr.league_id,tlr.term,point,ml.league_name,ml.league_tag,ml.rank  FROM t_ladder_ranking tlr LEFT JOIN m_league ml ON tlr.league_id = ml.league_id  WHERE term = (SELECT MAX(term) FROM t_ladder_ranking) ORDER BY ml.rank,tlr.point DESC";
 		
 		$oResult = $oDb->execute( $sSelectLadderSql );
 		
