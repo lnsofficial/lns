@@ -81,7 +81,7 @@ class Team extends Base{
 	}
 	
 	public function getLeague( $oDb ){
-		$oLadder = self::getCurrentLadder( $oDb );
+		$oLadder = $this->getCurrentLadder( $oDb );
 		$oLeague = new League( $oDb, $oLadder->league_id );
 		
 		return $oLeague;

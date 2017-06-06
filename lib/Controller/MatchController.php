@@ -87,6 +87,7 @@ class MatchController extends BaseController{
 		$smarty->assign( "match_id", $iMatchId );
 		$smarty->assign( "host_team_name", $oHostTeam->team_name );
 		$smarty->assign( "match_date", $oMatch->match_date );
+		$smarty->assign( "recruit_start_date", $oMatch->recruit_start_date );
 		$smarty->assign( "stream", $oMatch->stream );
 		$smarty->assign( "type", $oMatch->type );
 		$smarty->assign( "show_join", $showJoin );
@@ -157,8 +158,10 @@ class MatchController extends BaseController{
 			if( $oLatestLastJoin ){
 				$dtLastJoin = date($oLatestLastJoin->join_date);
 				if( date('Y-m-d H:i:s') < date('Y-m-d H:i:s', strtotime($oLatestLastJoin->join_date . " + 5 day") ) ){
-					self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_REGIST_INTERVAL );
-					exit;
+					if( date('Y-m-d H:i:s') < date('Y-m-d H:i:s', strtotime( $oMatch->recruit_start_date . " + 1 day") ) ){
+						self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_REGIST_INTERVAL );
+						exit;
+					}
 				}
 			}
 		}
@@ -258,10 +261,14 @@ class MatchController extends BaseController{
 		
 		while( $row = $oMatchList->fetch_assoc() ) {
 			$oHostTeam = new Team( $oDb, $row["host_team_id"] );
-			$oApplyTeam = new Team( $oDb, $row["apply_team_id"] );
-			
 			$oHostLeague = $oHostTeam->getLeague( $oDb );
-			$oApplyLeague = $oApplyTeam->getLeague( $oDb );
+			
+			$oApplyTeam = null;
+			$oApplyLeague = null;
+			if( $row["apply_team_id"] != 0 ){
+				$oApplyTeam = new Team( $oDb, $row["apply_team_id"] );
+				$oApplyLeague = $oApplyTeam->getLeague( $oDb );
+			}
 			
 			$ahsMatch = [];
 			$ahsMatch["id"]					= $row["id"];
@@ -270,9 +277,11 @@ class MatchController extends BaseController{
 			$ahsMatch["host_team_id"]		= $row["host_team_id"];
 			$ahsMatch["host_team_name"]		= $oHostTeam->team_name;
 			$ahsMatch["host_league_name"]	= $oHostLeague->league_name;
-			$ahsMatch["apply_team_id"]		= $row["apply_team_id"];
-			$ahsMatch["apply_team_name"]	= $oApplyTeam->team_name;
-			$ahsMatch["apply_league_name"]	= $oApplyLeague->league_name;
+			if( $oApplyTeam ){
+				$ahsMatch["apply_team_id"]		= $row["apply_team_id"];
+				$ahsMatch["apply_team_name"]	= $oApplyTeam->team_name;
+				$ahsMatch["apply_league_name"]	= $oApplyLeague->league_name;
+			}
 			$ahsMatch["winner"]				= $row["winner"];
 			
 			$ahsMatchList[] = $ahsMatch;
@@ -309,16 +318,17 @@ class MatchController extends BaseController{
 		$oDb->beginTransaction();
 		
 		$oMatch = new Match( $oDb );
-		$oMatch->host_team_id	= $oLoginAccount->team_id;
-		$oMatch->match_date		= $_REQUEST["match_date"];
-		$oMatch->type			= $_REQUEST["type"];
-		$oMatch->stream			= $_REQUEST["stream"];
-		$oMatch->state			= Match::MATCH_STATE_RECRUIT;
+		$oMatch->host_team_id		= $oLoginAccount->team_id;
+		$oMatch->match_date			= $_REQUEST["match_date"];
+		$oMatch->recruit_start_date	= date( 'Y-m-d H:i:s' );
+		$oMatch->type				= $_REQUEST["type"];
+		$oMatch->stream				= $_REQUEST["stream"];
+		$oMatch->state				= Match::MATCH_STATE_RECRUIT;
 		$oMatch->save();
 		
 		$oDb->commit();
 		
-		self::displayCommonScreen( MSG_HEAD_MATCH_COMPLETE, MSG_MATCH_COMPLETE );
+		self::displayCommonScreen( MSG_HEAD_MATCH_COMPLETE, MSG_MATCH_RECRUIT_COMPLETE );
 	}
 
 	public function confirm(){
