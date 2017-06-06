@@ -67,9 +67,9 @@
               <td>{if $match.state==1}募集中{elseif $match.state==2}試合結果登録待ち{elseif $match.state==3}取り消し{elseif $match.state==4}終了{/if}</td>
               <td>{$match.match_date}</td>
               <td>{$match.host_team_name}（{$match.host_league_name}）</td>
-              <td>{if $match.winner!=NULL}{if $match.host_team_id==$match.winner}Win{else}Lose{/if}{/if}</td>
-              <td>{if $match.apply_team_name!=NULL}{$match.apply_team_name}（{$match.apply_league_name}）{/if}</td>
-              <td>{if $match.winner!=NULL}{if $match.apply_team_id==$match.winner}Win{else}Lose{/if}{/if}</td>
+              <td>{if isset($match.winner)}{if $match.host_team_id==$match.winner}Win{else}Lose{/if}{/if}</td>
+              <td>{if isset($match.apply_team_name)}{$match.apply_team_name}（{$match.apply_league_name}）{/if}</td>
+              <td>{if isset($match.winner)}{if $match.apply_team_id==$match.winner}Win{else}Lose{/if}{/if}</td>
               <td><a href="" onClick="showDetail( {$match.id} ); return false;">詳細</a></td>
             </tr>
             {/foreach}

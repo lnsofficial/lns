@@ -26,7 +26,9 @@
       <div class="row">
         <div class="col-lg-2 about-menu">
           <ul class="nav side">
-            {if $show_join}<li role="presentation"><a href="" onClick="join(); return false;">試合へ参加</a></li>{/if}
+            <li role="presentation">募集開始日時</li>
+            <li role="presentation">{$recruit_start_date}</li>
+            {if $show_join}<li role="presentation"><a href="" onClick="join(); return false;">試合を申し込む</a></li>{/if}
             {if $show_cancel}<li role="presentation"><a href="" onClick="cancel(); return false;">試合をキャンセル</a></li>{/if}
             {if $show_register_result}<li role="presentation"><a href="" onClick="registerResult(); return false;">試合結果を登録</a></li>{/if}
           </ul>
@@ -68,7 +70,7 @@
   <script src="/js/jquery-1.11.3.min.js"></script>
   <script type="text/javascript">
     function join(){
-      if( window.confirm( 'この試合に参加します。' ) ){
+      if( window.confirm( '試合を申し込みます。' ) ){
         document.form1.action = "/Match/Join";
         document.form1.submit();
       }
