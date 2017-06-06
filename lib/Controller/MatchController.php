@@ -158,8 +158,10 @@ class MatchController extends BaseController{
 			if( $oLatestLastJoin ){
 				$dtLastJoin = date($oLatestLastJoin->join_date);
 				if( date('Y-m-d H:i:s') < date('Y-m-d H:i:s', strtotime($oLatestLastJoin->join_date . " + 5 day") ) ){
-					self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_REGIST_INTERVAL );
-					exit;
+					if( date('Y-m-d H:i:s') < date('Y-m-d H:i:s', strtotime( $oMatch->recruit_start_date . " + 1 day") ) ){
+						self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_REGIST_INTERVAL );
+						exit;
+					}
 				}
 			}
 		}
