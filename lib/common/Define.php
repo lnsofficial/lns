@@ -27,6 +27,7 @@
 	
 	// メッセージ
 	define( "MSG_MATCH_COMPLETE"			, "試合の登録が完了しました" );
+	define( "MSG_MATCH_RECRUIT_COMPLETE"	, "試合の募集が完了しました。" );
 	define( "MSG_MATCH_RESULT_COMPLETE"		, "試合結果の登録が完了しました" );
 	define( "MSG_MATCH_CANCEL"				, "試合のキャンセルが完了しました" );
 	define( "ERR_COMMON_INPUT"				, "入力に誤りがあります。再度やり直してください" );
