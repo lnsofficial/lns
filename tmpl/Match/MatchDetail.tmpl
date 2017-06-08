@@ -61,6 +61,12 @@
                <option {if !$stream}selected{/if}>配信を希望しない</option>
              </select>
           </div>
+          {if $image_path != ""}
+          <div class="form-group">
+             <label for="team_name">試合結果画像</label>
+             <img class="img-thumbnail" src="/tmp/image/{$image_path}" width="30%" height="30%">
+          </div>
+          {/if}
           <div class="form-group">
             ※試合結果は、試合日時から4時間以内に登録してください
           </div>
