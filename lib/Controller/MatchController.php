@@ -271,10 +271,16 @@ class MatchController extends BaseController{
 				$oApplyLeague = $oApplyTeam->getLeague( $oDb );
 			}
 			
+			$bNew = False;
+			if( date('Y-m-d H:i:s') < date('Y-m-d H:i:s', strtotime( $row["recruit_start_date"] . " + 1 day") ) ){
+				$bNew = True;
+			}
+			
 			$ahsMatch = [];
 			$ahsMatch["id"]					= $row["id"];
+			$ahsMatch["new"]				= $bNew;
 			$ahsMatch["state"]				= $row["state"];
-			$ahsMatch["match_date"]			= $row["match_date"];
+			$ahsMatch["match_date"]			= date('n月j日 H:i', strtotime( $row["match_date"]) );
 			$ahsMatch["host_team_id"]		= $row["host_team_id"];
 			$ahsMatch["host_team_name"]		= $oHostTeam->team_name;
 			$ahsMatch["host_league_name"]	= $oHostLeague->league_name;
