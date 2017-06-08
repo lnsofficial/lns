@@ -28,6 +28,8 @@
       <div class="row">
         <div class="col-lg-2 about-menu">
           <ul class="nav side">
+            <li role="presentation">最終試合応募日時</li>
+            <li role="presentation">{$last_join_date}</li>
             <li role="presentation"><a href="/Match/form">試合を募集</a></li>
           </ul>
         </div>
@@ -64,7 +66,7 @@
             </tr>
             {foreach from=$match_recruit_list item=match key=id}
             <tr>
-              <td>{if $match.state==1}募集中{elseif $match.state==2}結果登録待ち{elseif $match.state==3}取り消し{elseif $match.state==4}終了{/if}</td>
+              <td>{if $match.state==1}{if $match.new}<i>new</i> {/if}募集中{elseif $match.state==2}結果登録待ち{elseif $match.state==3}取り消し{elseif $match.state==4}終了{/if}</td>
               <td>{$match.match_date}</td>
               <td>{$match.host_team_name}（{$match.host_league_name}）</td>
               <td>{if isset($match.winner)}{if $match.host_team_id==$match.winner}Win{else}Lose{/if}{/if}</td>
