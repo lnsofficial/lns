@@ -271,9 +271,9 @@ class MatchController extends BaseController{
 				$oApplyLeague = $oApplyTeam->getLeague( $oDb );
 			}
 			
-			$bNew = False;
+			$bNew = false;
 			if( date('Y-m-d H:i:s') < date('Y-m-d H:i:s', strtotime( $row["recruit_start_date"] . " + 1 day") ) ){
-				$bNew = True;
+				$bNew = true;
 			}
 			
 			$ahsMatch = [];
@@ -294,12 +294,17 @@ class MatchController extends BaseController{
 			$ahsMatchList[] = $ahsMatch;
 		}
 		
+		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
+		$oLoginTeam = new Team( $oDb, $oLoginAccount->team_id );
+		$oLatestLastJoin = $oLoginTeam->getLastJoin( $oDb );
+		
 		$smarty = new Smarty();
 		
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
 		
 		$smarty->assign( "match_recruit_list"	, $ahsMatchList );
+		$smarty->assign( "last_join_date"		, $oLatestLastJoin->join_date );
 		$smarty->assign( "state"				, $iState );
 		$smarty->assign( "start_date"			, $sStartDate );
 		$smarty->assign( "end_date"				, $sEndDate );
