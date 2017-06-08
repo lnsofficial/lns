@@ -4,7 +4,7 @@
 	define( "PATH_CONTROLLER"	, PATH_LIB . "Controller/" );
 	define( "PATH_MODEL"		, PATH_LIB . "Model/" );
 	define( "PATH_TMP_IMAGE"	, PATH_BASE . "htdocs/tmp/image/" );
-	define( "PATH_IMAGE"		, PATH_BASE . "image/" );
+	define( "PATH_IMAGE"		, PATH_BASE . "htdocs/img/result/" );
 	define( "PATH_TMPL"			, PATH_BASE . "tmpl/" );
 	define( "PATH_TMPL_C"		, PATH_BASE . "tmpl_c/" );
 	define( "PATH_SMARTY"		, PATH_LIB . "smarty-3.1.30/" );
