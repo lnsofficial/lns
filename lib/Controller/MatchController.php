@@ -89,6 +89,7 @@ class MatchController extends BaseController{
 		$smarty->assign( "match_date", $oMatch->match_date );
 		$smarty->assign( "recruit_start_date", $oMatch->recruit_start_date );
 		$smarty->assign( "stream", $oMatch->stream );
+		$smarty->assign( "image_path", $oMatch->screen_shot_url );
 		$smarty->assign( "type", $oMatch->type );
 		$smarty->assign( "show_join", $showJoin );
 		$smarty->assign( "show_cancel", $showCancel );
