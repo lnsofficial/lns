@@ -28,14 +28,15 @@ class Match extends Base{
 	const MATCH_STATE_MATCHED	= 2;
 	const MATCH_STATE_CANCEL	= 3;
 	const MATCH_STATE_FINISHED	= 4;
+	const MATCH_STATE_ABSTAINED	= 5;
 	
 	const MAX_MATCH_RECRUIT_COUNT = 4;
 	
 	public function getMatchLastWeek( $oDb ){
-		$sSelectMatchSql = "SELECT * FROM match_recruit_list WHERE state = ? AND match_date BETWEEN DATE_FORMAT(NOW() - INTERVAL " . INTERVAL_BATCH_TIME . ", '%Y-%m-%d 06:00:00') AND DATE_FORMAT(NOW() , '%Y-%m-%d 06:00:00') ORDER BY match_date ASC";
-		$ahsParameter = [ self::MATCH_STATE_FINISHED ];
+		$sSelectMatchSql = "SELECT * FROM match_recruit_list WHERE state IN(?,?) AND match_date BETWEEN DATE_FORMAT(NOW() - INTERVAL " . INTERVAL_BATCH_TIME . ", '%Y-%m-%d 06:00:00') AND DATE_FORMAT(NOW() , '%Y-%m-%d 06:00:00') ORDER BY match_date ASC";
+		$ahsParameter = [ self::MATCH_STATE_FINISHED, self::MATCH_STATE_ABSTAINED ];
 		
-		$oResult = $oDb->executePrepare( $sSelectMatchSql, "i", $ahsParameter );
+		$oResult = $oDb->executePrepare( $sSelectMatchSql, "ii", $ahsParameter );
 		
 		return $oResult;
 	}
@@ -99,6 +100,19 @@ class Match extends Base{
 		$nextExecuteBatchDate = date('Y-m-d H:i:s', strtotime( $oMatch->match_date . " + 4 hour" ) );
 		
 		if( date( 'Y-m-d H:i:s' ) > $nextExecuteBatchDate ){
+			$bResult = false;
+		}
+		
+		return $bResult;
+	}
+	
+	// 試合結果をキャンセル登録可能な時間を過ぎてないかチェック
+	public function enableCancel(){
+		$bResult = true;
+		// 試合日時の1日前はキャンセル不可
+		$enableCancelDate = date('Y-m-d H:i:s', strtotime( $this->match_date . " - 12 hour" ) );
+		
+		if( date( 'Y-m-d H:i:s' ) > $enableCancelDate ){
 			$bResult = false;
 		}
 		
