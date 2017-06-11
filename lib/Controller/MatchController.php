@@ -43,7 +43,9 @@ class MatchController extends BaseController{
 						break;
 					case Match::MATCH_STATE_MATCHED:
 						// 試合結果登録待ち
-						$showCancel = true;
+						if( $oMatch->enableCancel() ){
+							$showCancel = true;
+						}
 						$showRegsiterResult = true;
 						break;
 				}
@@ -57,7 +59,9 @@ class MatchController extends BaseController{
 						break;
 					case Match::MATCH_STATE_MATCHED:
 						// 試合結果登録待ち
-						$showCancel = true;
+						if( $oMatch->enableCancel() ){
+							$showCancel = true;
+						}
 						$showRegsiterResult = true;
 						break;
 				}
