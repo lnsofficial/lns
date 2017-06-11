@@ -110,7 +110,7 @@ class Match extends Base{
 	public function enableCancel(){
 		$bResult = true;
 		// 試合日時の1日前はキャンセル不可
-		$enableCancelDate = date('Y-m-d H:i:s', strtotime( $this->match_date . " - 1 day" ) );
+		$enableCancelDate = date('Y-m-d H:i:s', strtotime( $this->match_date . " - 12 hour" ) );
 		
 		if( date( 'Y-m-d H:i:s' ) > $enableCancelDate ){
 			$bResult = false;
