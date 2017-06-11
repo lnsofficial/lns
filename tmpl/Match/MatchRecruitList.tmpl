@@ -24,7 +24,7 @@
   <div class="container-fluid">
     <style>
     </style>
-    <form name="form1" method="POST">
+    <form name="form1" method="GET">
       <div class="row">
         <div class="col-lg-2 about-menu">
           <ul class="nav side">
@@ -43,6 +43,7 @@
                 <option value="1" {if $state == 1}selected{/if}>募集中</option>
                 <option value="2" {if $state == 2}selected{/if}>結果登録待ち</option>
                 <option value="3" {if $state == 3}selected{/if}>取り消し</option>
+                <option value="5" {if $state == 5}selected{/if}>不戦勝</option>
                 <option value="4" {if $state == 4}selected{/if}>終了</option>
               </select>
             </div>
@@ -66,13 +67,13 @@
             </tr>
             {foreach from=$match_recruit_list item=match key=id}
             <tr>
-              <td>{if $match.state==1}{if $match.new}<i>new</i> {/if}募集中{elseif $match.state==2}結果登録待ち{elseif $match.state==3}取り消し{elseif $match.state==4}終了{/if}</td>
+              <td>{if $match.state==1}{if $match.new}<i>new</i> {/if}募集中{elseif $match.state==2}結果登録待ち{elseif $match.state==3}取り消し{elseif $match.state==4}終了{elseif $match.state==5}不戦勝{/if}</td>
               <td>{$match.match_date}</td>
               <td>{$match.host_team_name}（{$match.host_league_name}）</td>
               <td>{if isset($match.winner)}{if $match.host_team_id==$match.winner}Win{else}Lose{/if}{/if}</td>
               <td>{if isset($match.apply_team_name)}{$match.apply_team_name}（{$match.apply_league_name}）{/if}</td>
               <td>{if isset($match.winner)}{if $match.apply_team_id==$match.winner}Win{else}Lose{/if}{/if}</td>
-              <td><a href="" onClick="showDetail( {$match.id} ); return false;">詳細</a></td>
+              <td><a href="/Match/display?match_id={$match.id}">詳細</a></td>
             </tr>
             {/foreach}
           </table>
@@ -86,11 +87,6 @@
   <!-- Include all compiled plugins (below), or include individual files as needed --> 
   <script src="/js/bootstrap.js"></script>
   <script type="text/javascript">
-    function showDetail( match_id ){
-      document.form1.action = "/Match/display";
-      document.form1.match_id.value = match_id;
-      document.form1.submit();
-    }
     $(function(){
       $('.datepicker').datepicker({
         language: 'ja',

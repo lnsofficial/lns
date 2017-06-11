@@ -2,7 +2,8 @@
 class Dispatcher{
 	public function dispatch(){
 		// URLを分解
-		$sParameter	= $_SERVER['REQUEST_URI'];
+		$asUrl		= explode( "?", $_SERVER['REQUEST_URI'] );
+		$sParameter	= $asUrl[0];
 		$aParameter	= [];
 		
 		if( $sParameter != '' ){
