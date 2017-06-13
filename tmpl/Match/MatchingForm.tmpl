@@ -115,7 +115,7 @@
       if( $("#date").val() == "" ){
         result = false;
       }
-      if( !$('input[name=stream]:eq(0)').prop('checked') ){
+      if( !$('input[name=stream]:checked').val() ){
         result = false;
       }
       
