@@ -209,6 +209,7 @@ class MatchController extends BaseController{
 		$oMatch = new Match( $oDb, $iMatchId );
 		
 		$oDb->beginTransaction();
+		$oApplyTeamId = $oMatch->apply_team_id;
 		
 		switch( $iCurTeamId ){
 			case $oMatch->host_team_id:
@@ -218,12 +219,7 @@ class MatchController extends BaseController{
 			case $oMatch->apply_team_id:
 				// キャンセルしたのがゲストだったら参加の取り消しのみ、募集は残す
 				$oMatch->state = Match::MATCH_STATE_RECRUIT;
-				// キャンセルしたのがゲストだったら参加履歴のテーブル更新
-				$oApplyTeam = new Team( $oDb, $oMatch->apply_team_id );
 				$oMatch->apply_team_id = 0;
-				$oLastJoin = $oApplyTeam->getLastJoin( $oDb );
-				$oLastJoin->state = LastJoin::STATE_CANCEL;
-				$oLastJoin->save();
 				break;
 			default:
 				// 試合のホスト・ゲスト以外がキャンセルしようとしたらエラー
@@ -232,6 +228,14 @@ class MatchController extends BaseController{
 		}
 		
 		$oMatch->save();
+		
+		// 参加者が居れば履歴のテーブル更新
+		if( $oApplyTeamId ){
+			$oApplyTeam = new Team( $oDb, $oApplyTeamId );
+			$oLastJoin = $oApplyTeam->getLastJoin( $oDb );
+			$oLastJoin->state = LastJoin::STATE_CANCEL;
+			$oLastJoin->save();
+		}
 		
 		$oDb->commit();
 		
