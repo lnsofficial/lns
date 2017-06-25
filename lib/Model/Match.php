@@ -76,12 +76,11 @@ class Match extends Base{
 			}
 		}
 		if( !$bStateSearch ){
-			$asWhereSql[] = " state IN(?,?,?) OR (state = ? AND apply_team_id != 0) ";
+			$asWhereSql[] = " state IN(?,?) OR (state = ? AND apply_team_id != 0) ";
 			$ahsParameter[] = self::MATCH_STATE_RECRUIT;
 			$ahsParameter[] = self::MATCH_STATE_MATCHED;
-			$ahsParameter[] = self::MATCH_STATE_FINISHED;
 			$ahsParameter[] = self::MATCH_STATE_CANCEL;
-			$sType .= "iiii";
+			$sType .= "iii";
 		}
 		
 		$sSelectMatchSql .= implode( " AND ", $asWhereSql );
@@ -110,7 +109,7 @@ class Match extends Base{
 	public function enableCancel(){
 		$bResult = true;
 		// 試合日時の1日前はキャンセル不可
-		$enableCancelDate = date('Y-m-d H:i:s', strtotime( $this->match_date . " - 12 hour" ) );
+		$enableCancelDate = date('Y-m-d H:i:s', strtotime( $this->match_date . " - 24 hour" ) );
 		
 		if( date( 'Y-m-d H:i:s' ) > $enableCancelDate ){
 			$bResult = false;
