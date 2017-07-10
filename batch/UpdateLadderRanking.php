@@ -112,7 +112,7 @@ function updateTeamLadderNormal( $oDb, $oWinTeam, $oLoseTeam ){
 			writeLog("[updateTeamLadderNormal][TeamId:" . $oWinTeam->team_id . ",TeamName:" . $oWinTeam->team_name . "]+2 Point");
 			writeLog("[updateTeamLadderNormal][TeamId:" . $oLoseTeam->team_id . ",TeamName:" . $oLoseTeam->team_name . "]-2 Point");
 			$oWinLadder->point += 2;
-			if( $oLoseLeague->rank == 8 && $oLoseTeam->point < 2 ){
+			if( $oLoseLeague->rank == 8 && $oLoseLadder->point < 2 ){
 				$oLoseLadder->point = 0;
 			} else {
 				$oLoseLadder->point -= 2;
@@ -124,7 +124,7 @@ function updateTeamLadderNormal( $oDb, $oWinTeam, $oLoseTeam ){
 			writeLog("[updateTeamLadderNormal][TeamId:" . $oWinTeam->team_id . ",TeamName:" . $oWinTeam->team_name . "]+3 Point");
 			writeLog("[updateTeamLadderNormal][TeamId:" . $oLoseTeam->team_id . ",TeamName:" . $oLoseTeam->team_name . "]-2 Point");
 			$oWinLadder->point += 3;
-			if( $oLoseLeague->rank == 8 && $oLoseTeam->point < 2 ){
+			if( $oLoseLeague->rank == 8 && $oLoseLadder->point < 2 ){
 				$oLoseLadder->point = 0;
 			} else {
 				$oLoseLadder->point -= 2;
@@ -135,7 +135,7 @@ function updateTeamLadderNormal( $oDb, $oWinTeam, $oLoseTeam ){
 			writeLog("[updateTeamLadderNormal][TeamId:" . $oWinTeam->team_id . ",TeamName:" . $oWinTeam->team_name . "]+2 Point");
 			writeLog("[updateTeamLadderNormal][TeamId:" . $oLoseTeam->team_id . ",TeamName:" . $oLoseTeam->team_name . "]-1 Point");
 			$oWinLadder->point += 2;
-			if( $oLoseLeague->rank == 8 && $oLoseTeam->point < 1 ){
+			if( $oLoseLeague->rank == 8 && $oLoseLadder->point < 1 ){
 				$oLoseLadder->point = 0;
 			} else {
 				$oLoseLadder->point -= 1;
@@ -149,7 +149,7 @@ function updateTeamLadderNormal( $oDb, $oWinTeam, $oLoseTeam ){
 			writeLog("[updateTeamLadderNormal][TeamId:" . $oWinTeam->team_id . ",TeamName:" . $oWinTeam->team_name . "]Up LeagueId:" . $oWinLadder->league_id);
 			writeLog("[updateTeamLadderNormal][TeamId:" . $oLoseTeam->team_id . ",TeamName:" . $oLoseTeam->team_name . "]-2 Point");
 			$oWinLadder->point = 0;
-			if( $oLoseLeague->rank == 8 && $oLoseTeam->point < 2 ){
+			if( $oLoseLeague->rank == 8 && $oLoseLadder->point < 2 ){
 				$oLoseLadder->point = 0;
 			} else {
 				$oLoseLadder->point -= 2;
@@ -193,7 +193,7 @@ function updateTeamLadderCancel( $oDb, $oWinTeam, $oLoseTeam ){
 	writeLog("[updateTeamLadder][TeamId:" . $oWinTeam->team_id . ",TeamName:" . $oWinTeam->team_name . "]+1 Point");
 	writeLog("[updateTeamLadder][TeamId:" . $oLoseTeam->team_id . ",TeamName:" . $oLoseTeam->team_name . "]-1 Point");
 	$oWinLadder->point += 1;
-	if( $oLoseLeague->rank == 8 && $oLoseTeam->point < 0 ){
+	if( $oLoseLeague->rank == 8 && $oLoseLadder->point < 0 ){
 		$oLoseLadder->point = 0;
 	} else {
 		$oLoseLadder->point -= 1;
