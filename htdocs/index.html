@@ -63,11 +63,26 @@
 	<script src="/js/jquery-1.11.3.min.js"></script>
 	<script type="text/javascript">
 $(function(){
-	mainImageCLassNameAhri = "header-image";
-	mainImageCLassNameJinx = "header-image-jinx";
-	if( Math.round( Math.random()*10000 ) % 2 == 0)
+	mainImageCLassNameAhri  = "header-image";
+	mainImageCLassNameJinx  = "header-image-jinx";
+	mainImageCLassNameTeemo = "header-image-teemo";
+	mainImageCLassNameAnie = "header-image-anie";
+	idx = Math.ceil( Math.random()*4 ) % 4;
+	if( idx == 0)
 	{
 		$('.' + mainImageCLassNameAhri).removeClass(mainImageCLassNameAhri).addClass(mainImageCLassNameJinx);
+	}
+	else if( idx == 1)
+	{
+		$('.' + mainImageCLassNameAhri).removeClass(mainImageCLassNameAhri).addClass(mainImageCLassNameTeemo);
+	}
+	else if( idx == 2)
+	{
+		$('.' + mainImageCLassNameAhri).removeClass(mainImageCLassNameAhri).addClass(mainImageCLassNameAnie);
+	}
+	else if( idx == 3)
+	{
+		// そのまま。
 	}
 });
 	</script>

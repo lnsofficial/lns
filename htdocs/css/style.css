@@ -27,6 +27,34 @@
 	box-shadow: 0px 0px;
 	border-bottom: 4px solid #00CCCC;
 }
+.header-image-teemo {
+	background-image: url(../img/Deadline_Teemo.jpg);
+	background-repeat: no-repeat;
+	background-size: 45
+# auto;
+	height: 650px;
+	background-position: 50% 50px;
+	margin-left: -15px;
+	margin-right: -15px;
+	background-size: 800px auto;
+	-webkit-box-shadow: 0px 0px;
+	box-shadow: 0px 0px;
+	border-bottom: 4px solid #00CCCC;
+}
+.header-image-anie {
+	background-image: url(../img/AnieSuits.jpg);
+	background-repeat: no-repeat;
+	background-size: 45
+# auto;
+	height: 650px;
+	background-position: 50% 50px;
+	margin-left: -15px;
+	margin-right: -15px;
+	background-size: 800px auto;
+	-webkit-box-shadow: 0px 0px;
+	box-shadow: 0px 0px;
+	border-bottom: 4px solid #00CCCC;
+}
 .navbar.navbar-default.navbar-static-top {
 	background-color: #00CCCC;		
 }
@@ -109,6 +137,16 @@
 }
 .header-image-jinx {
 	background-image: url(../img/JinxSuits2.jpg);
+	background-size: 298px auto;
+	height: 419px;
+}
+.header-image-teemo {
+	background-image: url(../img/Deadline_Teemo.jpg);
+	background-size: 298px auto;
+	height: 419px;
+}
+.header-image-anie {
+	background-image: url(../img/AnieSuits.jpg);
 	background-size: 298px auto;
 	height: 419px;
 }
