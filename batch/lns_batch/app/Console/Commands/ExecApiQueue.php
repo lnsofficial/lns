@@ -5,9 +5,10 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 
 use App\Models\ApiQueue;
-
-use App\Batches\BatchUserTier;
 use App\Libs\UtilTime;
+
+// actionの振り分け先増えて新しいバッチ追加するときはここにも追加忘れずに～。
+use App\Batches\UpdateUser;
 
 class ExecApiQueue extends Command
 {
@@ -56,7 +57,7 @@ class ExecApiQueue extends Command
 		switch( $action )
 		{
 			case ApiQueue::ACTION_UPDATE_SUMMONER:
-				$batch = new BatchUserTier();
+				$batch = new UpdateUser();
 				break;
 
 			default:
