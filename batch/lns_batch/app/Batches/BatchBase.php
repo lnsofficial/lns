@@ -51,7 +51,7 @@ abstract class BatchBase
 	protected $owner;
 
 	/**
-	 * // 継承先クラスでインスタンス作成する際に引数なしで生成した場合、lockファイルは ApiBatchBase.lock という名前で作られる感じ。
+	 * // 継承先クラスでインスタンス作成する際に引数なしで生成した場合、lockファイルは BatchBase.lock という名前で作られる感じ。
 	 *    指定してたら その名前.lock でlockファイルが作られる感じ。
 	 *
 	 * @param  string                   $name

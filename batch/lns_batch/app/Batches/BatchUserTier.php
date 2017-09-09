@@ -11,13 +11,23 @@ use App\Models\LnsDB;
 
 /**
  * // テストバッチ
+ * ユーザー情報(m_member→usersになる予定ぽい)について最新のサモナー情報に変える感じのやつを。
+ * とりあえずusersがまだないのでm_memberで。
+
+・処理予定のキューの確認
+・キューをSTATE_DOINGにマーク
+・(処理終わったら)キューをSTATE_FINISHEDにマーク
+ここまでいろいろなやつで共通になるはずだから切り出しといて、
+・payloadのチェック
+・キュー1件の処理ロジック
+この２こをabstractで定義しておく感じの基底クラスに変えたい
+
  */
 class BatchUserTier extends BatchBase
 {
 
 	public function main()
 	{
-//		$apikey     = 'RGAPI-e33163b5-face-47ee-9bd2-b9a0a6b99770';
 		$sm_api     = new Summoners();
 
 		// api_queuesテーブルからaction=1,state=0のものを処理する
@@ -89,7 +99,6 @@ class BatchUserTier extends BatchBase
 
 			// RiotApiからsummoner_idを元にデータひっぱってくる
 			$sm_api->setParams(['id'=>$member->summoner_id]);
-//			$sm_api->setApiKey($apikey);
 			$json = $sm_api->execApi();
 
 			// 取れなかったら失敗ということで。
@@ -102,10 +111,9 @@ class BatchUserTier extends BatchBase
 				$queue->save();
 				continue;
 			}
+			\Log::debug('$json = '.print_r($json,true));
 
 			// ちゃんと取れたので、、、
-//$this->log('$json = '.print_r($json,true));
-\Log::debug('$json = '.print_r($json,true));
 			LnsDB::transaction(function()use(&$member, &$queue, $json)
 			{
 				$from = $member->toArray();
@@ -121,75 +129,6 @@ class BatchUserTier extends BatchBase
 				$queue->save();
 			});
 		}
-
-/*
-		$apikey     = 'RGAPI-1883206d-c040-4767-ae43-003b68b3e640';
-		$sm_api     = new Summoners();
-		$league_api = new LeaguesBySummoner();
-*/
-
-/*
-		$list = [
-
-'6181095',
-'6182723',
-'6200694',
-'6193035',
-'6188637',
-		];
-*/
-
-/*
-//		$fp = fopen('test.list', 'r');
-		$list = file('test.list', FILE_IGNORE_NEW_LINES);
-//		fclose($fp);
-*/
-/*
-		foreach( $list as $sid )
-		{
-			// leagueAPI結果中で名前突合せする必要あるので、まずはsummonerNameとっておく。
-			$sm_api->setParams(['id'=>$sid]);
-			$sm_api->setApiKey($apikey);
-			$json = $sm_api->execApi();
-			$name      = 'NoData';
-			if( !empty($json['id']) )
-			{
-				$name      = $json['name'];
-			}
-			// 取れなかったら次のレコードへ。
-			else
-			{
-				continue;
-			}
-
-			// ここからleagueAPIでサモナーのtier情報取ってくる。
-			$league_api->setParams(['summonerId'=>$sid]);
-			$league_api->setApiKey($apikey);
-			$json = $league_api->execApi();
-
-			$tier      = 'Unrank';
-			$rank      = 'Unrank';
-			if( empty($json) )
-			{
-//				Logger::info('■:'.$sid.':'.$tier.':'.$rank);
-				\Log::info('■:'.$sid.':'.$tier.':'.$rank);
-				continue;
-			}
-
-			// そのリーグのメンバー一覧が入ってるので、自分を探す
-			foreach( $json[0]['entries'] as $entrie )
-			{
-				if( $name == $entrie['playerOrTeamName'] )
-				{
-					$tier = $json[0]['tier'];
-					$rank = $entrie['rank'];
-//					Logger::info('■:'.$sid.':'.$tier.':'.$rank);
-					\Log::info('■:'.$sid.':'.$tier.':'.$rank);
-					break;
-				}
-			}
-		}
-*/
 	}
 
 
