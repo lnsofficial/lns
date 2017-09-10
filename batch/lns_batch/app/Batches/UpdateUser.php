@@ -9,11 +9,11 @@ use App\Models\LnsDB;
 
 // ↓バッチによって可変
 use App\Libs\RiotApi\Summoners;
-use App\Models\Member;
+use App\Models\User;
 
 /**
- * // ユーザー情報(m_member→usersになる予定ぽい)について最新のサモナー情報に変える感じのやつを。
- * とりあえずusersがまだないのでm_memberで。
+ * // ユーザー情報(users)について最新のサモナー情報に変える感じのやつを。
+ * 
  */
 class UpdateUser extends QueueBase
 {
@@ -23,23 +23,23 @@ class UpdateUser extends QueueBase
 		// payload切り出しておく。
 		$payload = json_decode($queue->payload, true);
 
-		// 該当のm_memberレコード取ってくる
-		$member  = Member::find($payload['member_id']);
-		if( empty($member) )
+		// 該当のusersレコード取ってくる
+		$user  = User::find($payload['user_id']);
+		if( empty($user) )
 		{
 			// キューを失敗にしておく？
-			$this->log('失敗。memberテーブルに該当レコード見当たらず。member_id:'.$payload['member_id']);
-			$queue->result = '失敗。memberテーブルに該当レコード見当たらず。member_id:'.$payload['member_id'];
+			$this->log('失敗。userテーブルに該当レコード見当たらず。user_id:'.$payload['user_id']);
+			$queue->result = '失敗。usersテーブルに該当レコード見当たらず。user_id:'.$payload['user_id'];
 			$queue->state  = ApiQueue::STATE_FAILED;
 			$queue->save();
 			continue;
 		}
-		// 該当のm_memberレコードにsummoner_idが設定されてなかったらだめ！
-		if( empty($member->summoner_id) )
+		// 該当のusersレコードにsummoner_idが設定されてなかったらだめ！
+		if( empty($user->summoner_id) )
 		{
 			// キューを失敗にして次へ。
-			$this->log('失敗。memberレコードにsummoner_idが設定されてない。$member:'.$member->toJson());
-			$queue->result = '失敗。memberレコードにsummoner_idが設定されてない。$member:'.$member->toJson();
+			$this->log('失敗。usersレコードにsummoner_idが設定されてない。$user:'.$user->toJson());
+			$queue->result = '失敗。userレコードにsummoner_idが設定されてない。$user:'.$user->toJson();
 			$queue->state  = ApiQueue::STATE_FAILED;
 			$queue->save();
 			continue;
@@ -47,7 +47,7 @@ class UpdateUser extends QueueBase
 
 		// RiotApiからsummoner_idを元にデータひっぱってくる
 		$sm_api     = new Summoners();
-		$sm_api->setParams(['id'=>$member->summoner_id]);
+		$sm_api->setParams(['id'=>$user->summoner_id]);
 		$json = $sm_api->execApi();
 
 		// 取れなかったら失敗ということで。
@@ -64,14 +64,14 @@ class UpdateUser extends QueueBase
 
 
 		// ちゃんと取れたので更新
-		LnsDB::transaction(function()use(&$member, &$queue, $json)
+		LnsDB::transaction(function()use(&$user, &$queue, $json)
 		{
-			$from = $member->toArray();
+			$from = $user->toArray();
 			// サモナー情報更新して、
-			$member->summoner_name = $json['name'];
-			$member->account_id    = $json['accountId'];
-			$member->save();
-			$dest = $member->toArray();
+			$user->summoner_name = $json['name'];
+//			$user->account_id    = $json['accountId'];
+			$user->save();
+			$dest = $user->toArray();
 			// キューを完了にする
 			$this->log('$id = '.$queue->id.' is Finished. go to next.');
 			$queue->result = json_encode(['from'=>$from,'desc'=>$dest], JSON_UNESCAPED_UNICODE);
@@ -91,7 +91,7 @@ class UpdateUser extends QueueBase
 	protected function checkPayload( $payload )
 	{
 		$res = true;
-		if( empty($payload) || empty($payload['member_id']) )
+		if( empty($payload) || empty($payload['user_id']) )
 		{
 			$res = false;
 		}
