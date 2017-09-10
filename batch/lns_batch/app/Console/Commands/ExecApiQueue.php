@@ -9,6 +9,7 @@ use App\Libs\UtilTime;
 
 // actionの振り分け先増えて新しいバッチ追加するときはここにも追加忘れずに～。
 use App\Batches\UpdateUser;
+use App\Batches\RegisterUser;
 
 class ExecApiQueue extends Command
 {
@@ -58,6 +59,10 @@ class ExecApiQueue extends Command
 		{
 			case ApiQueue::ACTION_UPDATE_SUMMONER:
 				$batch = new UpdateUser();
+				break;
+
+			case ApiQueue::ACTION_REGISTER_SUMMONER:
+				$batch = new RegisterUser();
 				break;
 
 			default:

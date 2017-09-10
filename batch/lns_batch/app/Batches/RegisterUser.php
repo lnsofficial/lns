@@ -8,16 +8,16 @@ use App\Models\LnsDB;
 // ↑たぶん不変
 
 // ↓バッチによって可変
-use App\Libs\RiotApi\Summoners;
+use App\Libs\RiotApi\SummonersByName;
 use App\Models\User;
 
 /**
- * // ユーザー情報(users)について最新のサモナー情報に変える感じのやつを。
+ * // ユーザー情報(users)について初回登録時にサモネからsummoner_id問い合わせて確定させるみたいなやつ。
  * 
  */
-class UpdateUser extends QueueBase
+class RegisterUser extends QueueBase
 {
-	protected static $action     = ApiQueue::ACTION_UPDATE_SUMMONER; // サモナーネーム変更時のriotApiへの問い合わせ
+	protected static $action     = ApiQueue::ACTION_REGISTER_SUMMONER; // ユーザー初回登録時のriotApiへの問い合わせ
 
 	public function queue_action( $queue )
 	{
@@ -35,20 +35,10 @@ class UpdateUser extends QueueBase
 			$queue->save();
 			return false;
 		}
-		// 該当のusersレコードにsummoner_idが設定されてなかったらだめ！
-		if( empty($user->summoner_id) )
-		{
-			// キューを失敗にして次へ。
-			$this->log('失敗。usersレコードにsummoner_idが設定されてない。$user:'.$user->toJson());
-			$queue->result = '失敗。userレコードにsummoner_idが設定されてない。$user:'.$user->toJson();
-			$queue->state  = ApiQueue::STATE_FAILED;
-			$queue->save();
-			return false;
-		}
 
-		// RiotApiからsummoner_idを元にデータひっぱってくる
-		$sm_api     = new Summoners();
-		$sm_api->setParams(['id'=>$user->summoner_id]);
+		// RiotApiからsummoner_nameを元にデータひっぱってくる
+		$sm_api     = new SummonersByName();
+		$sm_api->setParams(['name'=>$user->summoner_name]);
 		$json = $sm_api->execApi();
 
 		// 取れなかったら失敗ということで。
@@ -70,6 +60,7 @@ class UpdateUser extends QueueBase
 			$from = $user->toArray();
 			// サモナー情報更新して、
 			$user->summoner_name = $json['name'];
+			$user->summoner_id   = $json['id'];
 //			$user->account_id    = $json['accountId'];
 			$user->save();
 			$dest = $user->toArray();

@@ -20,11 +20,12 @@ use App\Models\LnsDB;
  */
 abstract class QueueBase extends BatchBase
 {
+	protected static $action     = 0;                                            // ★継承先で定義すること。
 
 	public function main()
 	{
 		// api_queuesテーブルからaction=1,state=0のものを処理する
-		$queues = ApiQueue::where  ('action',     ApiQueue::ACTION_UPDATE_SUMMONER)
+		$queues = ApiQueue::where  ('action',     static::$action)
 						  ->where  ('state',      ApiQueue::STATE_UNTREATED)
 						  ->orderBy('priority',   'desc')
 						  ->orderBy('created_at', 'asc')
@@ -72,7 +73,10 @@ abstract class QueueBase extends BatchBase
 			}
 
 			// ★↓継承先で処理内容定義してほしい！
-			$this->queue_action($queue);
+			if( !$this->queue_action($queue) )
+			{
+				continue;
+			}
 		}
 	}
 
