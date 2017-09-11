@@ -13,5 +13,19 @@ class Teams extends Base{
 		"team_name_kana"	=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
 		"team_tag"			=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => false	, "null" => true	],
 		"team_tag_kana"		=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => false	, "null" => true	],
+		"status"		    => [ "type" => "tinyint"	, "min" => 0	,"max" => 127			, "required" => false	, "null" => false	],
 	];
+
+    function getTeamFromUserId( $user_id ){
+        $oDb = new Db();
+
+        $sSelectUser = "SELECT * FROM teams WHERE user_id = ?";
+        $ahsParameter = [ $user_id ];
+        
+        $oResult = $oDb->executePrepare( $sSelectUser, "s", $ahsParameter );
+        
+        $oTeam = $oResult->fetch_assoc();
+        
+        return $oTeam;
+    }
 }

@@ -48,6 +48,10 @@ Class Db{
 		$this->db->commit();
 		return true;
 	}
+
+	public function getLastInsertId(){
+		return $this->db->insert_id;
+	}
 }
 
 

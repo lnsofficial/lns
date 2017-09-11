@@ -1,6 +1,8 @@
 <?php
 require_once( PATH_CONTROLLER . 'BaseController.php' );
 require_once( PATH_MODEL . 'Teams.php' );
+require_once( PATH_MODEL . 'TeamOwner.php' );
+require_once( PATH_MODEL . 'TeamContact.php' );
 // TODO 最低限の共通化、全コントローラーで共通部分はBaseControllerにまとめる
 // 特別に処理を入れる場合のみ、各Controllerに追記する形で開発する
 
@@ -35,10 +37,13 @@ class TeamController extends BaseController{
 		}
 		
 		// DBに登録
-		if( !self::insert() ){
+        $team_id = self::insertTeam();
+		if( false === $team_id ){
 			self::displayError();
 			exit;
 		}
+
+        self::insertTeamOwner($team_id);
 		
 		// 画面表示
 		self::_displayCommit();
@@ -63,62 +68,35 @@ class TeamController extends BaseController{
         return $bResult;
 	}
 	
-	private function insert(){
-		try{
-            $oDb = new Db();
-            $oDb->beginTransaction();
-            $oTeams = new Teams( $oDb );
-            $oTeams->user__id = $this->_user_id_tmp;
-            $oTeams->team_name = $_REQUEST["inputTeamNm"];
-            $oTeams->team_name_kana = $_REQUEST["inputTeamNmKana"];
-            $oTeams->team_tag = $_REQUEST["inputTeamTag"];
-            $oTeams->team_tag_kana = $_REQUEST["inputTeamTagKana"];
-            $oTeams->save();
-            $oDb->commit();
-		} catch (Exception $e) {
-			return false;
-		}
-		return true;
-	    /*
-		try{
-			$mysqli	= new mysqli('localhost', DB_USER, DB_PASSWORD, DB_NAME);
-			$mysqli->autocommit(False);
-			
-			if( $mysqli->connect_error ){
-				echo $mysqli->connect_error;
-				exit();
-			}
-			
-			// チーム登録
-			$sInsertTeamSql		= "INSERT INTO teams(user_id,team_name,team_name_kana,team_tag,team_tag_kana) VALUE(?,?,?,?,?)";
-			$iTeamId = 0;
-			if($stmt = $mysqli->prepare($sInsertTeamSql)){
-				$user_id	    = $this->_user_id_tmp;
-				$team_name		= $_REQUEST["inputTeamNm"];
-				$team_name_kana	= $_REQUEST["inputTeamNmKana"];
-				$team_tag		= $_REQUEST["inputTeamTag"];
-				$team_tag_kana	= $_REQUEST["inputTeamTagKana"];
-				$stmt->bind_param("sssss",$user_id,$team_name,$team_name_kana,$team_tag,$team_tag_kana);
-				$stmt->execute();
-				
-				if( $stmt->error ){
-					// TODO エラー処理
-					echo $stmt->error;
-				}else{
-					$iTeamId	= $mysqli->insert_id;
-				}
-				
-				$stmt->close();
-			}
-			
-			$mysqli->commit();
-			
-			$mysqli->close();
-		} catch (Exception $e) {
-			return false;
-		}
-		return true;
-*/
+	private function insertTeam(){
+        // add team
+        $oDb = new Db();
+        $oDb->beginTransaction();
+        $oTeams = new Teams( $oDb );
+        $oTeams->user_id = $this->_user_id_tmp;
+        $oTeams->team_name = $_REQUEST["inputTeamNm"];
+        $oTeams->team_name_kana = $_REQUEST["inputTeamNmKana"];
+        $oTeams->team_tag = $_REQUEST["inputTeamTag"];
+        $oTeams->team_tag_kana = $_REQUEST["inputTeamTagKana"];
+        $oTeams->save();
+        $team_id = $oDb->getLastInsertId();
+        $oDb->commit();
+    
+        if (isset($team_id)) {
+            return $team_id;
+        }
+        return false;
+	}
+
+	private function insertTeamOwner($team_id){
+        // add owner
+        $oDb = new Db();
+        $oDb->beginTransaction();
+        $oTeamOwner = new TeamOwner( $oDb );
+        $oTeamOwner->user_id = $this->_user_id_tmp;
+        $oTeamOwner->team_id = $team_id;
+        $oTeamOwner->save();
+        $oDb->commit();
 	}
 	
 	// 確認画面表示
@@ -162,24 +140,25 @@ class TeamController extends BaseController{
 	}
 	
 	public function detail(){
-		$iTeamId = $_REQUEST["team_id"];
+        // get team from user_id
+        $user_id = $this->_user_id_tmp;
 		
 		$oDb = new Db();
 		
-		$oTeam = new Team( $oDb, $iTeamId );
-		
-		$aoTeamMember = $oTeam->getTeamMember( $oDb );
+		$oTeam = Teams::getTeamFromUserId( $user_id );
+        
+        // contact user id
+		$oContactUserId = TeamContact::getUserIdFromTeamId( $oTeam["team_id"] );
 		
 		$smarty = new Smarty();
 		
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
 		
-		$smarty->assign( "team_name"		, $oTeam->team_name );
-		$smarty->assign( "team_name_kana"	, $oTeam->team_name_kana );
-		$smarty->assign( "team_tag"			, $oTeam->team_tag );
-		$smarty->assign( "team_tag_kana"	, $oTeam->team_tag_kana );
-		$smarty->assign( "team_member"		, $aoTeamMember );
+		$smarty->assign( "team_name"		, $oTeam["team_name"] );
+		$smarty->assign( "team_name_kana"	, $oTeam["team_name_kana"] );
+		$smarty->assign( "team_tag"			, $oTeam["team_tag"] );
+		$smarty->assign( "team_tag_kana"	, $oTeam["team_tag_kana"] );
 		
 		$smarty->display('Team/TeamDetail.tmpl');
 	}
