@@ -3,6 +3,7 @@ require_once( PATH_CONTROLLER . 'BaseController.php' );
 require_once( PATH_MODEL . 'Teams.php' );
 require_once( PATH_MODEL . 'TeamOwner.php' );
 require_once( PATH_MODEL . 'TeamContact.php' );
+require_once( PATH_MODEL . 'TeamMembers.php' );
 // TODO 最低限の共通化、全コントローラーで共通部分はBaseControllerにまとめる
 // 特別に処理を入れる場合のみ、各Controllerに追記する形で開発する
 
@@ -42,6 +43,9 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
+
+        $user_id = $this->_user_id_tmp;
+        self::insertTeamMember($user_id, $team_id);
 
         self::insertTeamOwner($team_id);
 		
@@ -98,6 +102,17 @@ class TeamController extends BaseController{
         $oTeamOwner->save();
         $oDb->commit();
 	}
+
+	private function insertTeamMember($user_id, $team_id){
+        // add member
+        $oDb = new Db();
+        $oDb->beginTransaction();
+        $oTeamOwner = new TeamMembers( $oDb );
+        $oTeamOwner->user_id = $user_id;
+        $oTeamOwner->team_id = $team_id;
+        $oTeamOwner->save();
+        $oDb->commit();
+	}
 	
 	// 確認画面表示
 	// TODO その内共通化
@@ -146,6 +161,9 @@ class TeamController extends BaseController{
 		$oDb = new Db();
 		
 		$oTeam = Teams::getTeamFromUserId( $user_id );
+
+        // team owner user_id
+		$oOwnerUserId = TeamOwner::getUserIdFromTeamId( $oTeam["team_id"] );
         
         // contact user id
 		$oContactUserId = TeamContact::getUserIdFromTeamId( $oTeam["team_id"] );

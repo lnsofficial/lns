@@ -1,8 +1,8 @@
 <?php
 require_once( PATH_MODEL . "Base.php" );
 
-class TeamOwner extends Base{
-	const MAIN_TABLE			= "team_owner";
+class TeamContact extends Base{
+	const MAIN_TABLE			= "teams_contact";
 	const COL_ID				= "id";
 	
 	// カラム
@@ -15,13 +15,13 @@ class TeamOwner extends Base{
     function getUserIdFromTeamId( $team_id ){
         $oDb = new Db();
 
-        $sSelectUser = "SELECT user_id FROM team_owner WHERE team_id = ?";
+        $sSelectUser = "SELECT * FROM teams_contact WHERE team_id = ?";
         $ahsParameter = [ $team_id ];
         
         $oResult = $oDb->executePrepare( $sSelectUser, "s", $ahsParameter );
         
-        $oTeam = $oResult->fetch_assoc();
+        $oUsers = $oResult->fetch_assoc();
         
-        return $oTeam;
+        return $oUsers["user_id"];
     }
 }
