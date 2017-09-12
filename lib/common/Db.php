@@ -9,6 +9,7 @@ Class Db{
 	
 	public function initDb(){
 		$this->db	= new mysqli('localhost', DB_USER, DB_PASSWORD, DB_NAME);
+		$this->db->set_charset("utf8");
 		$this->db->autocommit(false);
 		
 		if( $this->db->connect_error ){
