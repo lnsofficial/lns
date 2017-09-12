@@ -155,29 +155,36 @@ class TeamController extends BaseController{
 	}
 	
 	public function detail(){
-        // get team from user_id
-        $user_id = $this->_user_id_tmp;
-		
+		// get team from user_id
+		$user_id = $this->_user_id_tmp;
+
 		$oDb = new Db();
-		
+
 		$oTeam = Teams::getTeamFromUserId( $user_id );
 
-        // team owner user_id
-		$oOwnerUserId = TeamOwner::getUserIdFromTeamId( $oTeam["team_id"] );
-        
-        // contact user id
-		$oContactUserId = TeamContact::getUserIdFromTeamId( $oTeam["team_id"] );
-		
+		// team members
+		$team_members = TeamMembers::getByTeamId( $oTeam["team_id"] );
+
+		// team owner user_id
+		$team_owner   = TeamOwner::getUserIdFromTeamId( $oTeam["team_id"] );
+
+		// contact user id
+		$team_contact = TeamContact::getUserIdFromTeamId( $oTeam["team_id"] );
+
 		$smarty = new Smarty();
-		
+
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
-		
+
 		$smarty->assign( "team_name"		, $oTeam["team_name"] );
 		$smarty->assign( "team_name_kana"	, $oTeam["team_name_kana"] );
 		$smarty->assign( "team_tag"			, $oTeam["team_tag"] );
 		$smarty->assign( "team_tag_kana"	, $oTeam["team_tag_kana"] );
-		
+
+		$smarty->assign( "team_members"     , $team_members );
+		$smarty->assign( "team_owner"       , $team_owner );
+		$smarty->assign( "team_contact"     , $team_contact );
+
 		$smarty->display('Team/TeamDetail.tmpl');
 	}
 
@@ -191,4 +198,67 @@ class TeamController extends BaseController{
         $smarty->compile_dir  = PATH_TMPL_C;
 		$smarty->display('Team/form.tmpl');
 	}
+
+
+	public function offer()
+	{
+		// バリデーション（今のとこ必須チェックだけ）
+		if( !$_REQUEST["inputTeamId"] )
+		{
+			self::displayError();
+			exit;
+		}
+
+		// 既にオファー済みだったらだめ。
+/*
+		if( false === $team_id )
+		{
+			self::displayError();
+			exit;
+		}
+*/
+		// レコードつくっておく
+/*
+		$user_id = $this->_user_id_tmp;
+		self::insertTeamMember($user_id, $team_id);
+
+		self::insertTeamOwner($team_id);
+		
+		// 画面表示
+		self::_displayCommit();
+*/
+/*
+		$user_id = $this->_user_id_tmp;
+
+		$oDb = new Db();
+
+		$oTeam = Teams::getTeamFromUserId( $user_id );
+
+		// team members
+		$team_members = TeamMembers::getByTeamId( $oTeam["team_id"] );
+
+		// team owner user_id
+		$team_owner   = TeamOwner::getUserIdFromTeamId( $oTeam["team_id"] );
+
+		// contact user id
+		$team_contact = TeamContact::getUserIdFromTeamId( $oTeam["team_id"] );
+*/
+		$smarty = new Smarty();
+
+		$smarty->template_dir = PATH_TMPL;
+		$smarty->compile_dir  = PATH_TMPL_C;
+/*
+		$smarty->assign( "team_name"		, $oTeam["team_name"] );
+		$smarty->assign( "team_name_kana"	, $oTeam["team_name_kana"] );
+		$smarty->assign( "team_tag"			, $oTeam["team_tag"] );
+		$smarty->assign( "team_tag_kana"	, $oTeam["team_tag_kana"] );
+
+		$smarty->assign( "team_members"     , $team_members );
+		$smarty->assign( "team_owner"       , $team_owner );
+		$smarty->assign( "team_contact"     , $team_contact );
+*/
+		$smarty->display('Team/TeamDetail.tmpl');
+
+	}
+
 }

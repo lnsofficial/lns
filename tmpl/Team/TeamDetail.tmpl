@@ -51,13 +51,46 @@
           <table  class="table-bordered">
             <tr>
               <th>サモナーネーム</th>
+              <th>summoner_id</th>
+              <th>main_role</th>
+              <th> main_champion</th>
             </tr>
-            {foreach from=$team_member item=member key=member_id}
+            {foreach from=$team_members item=member key=member_id}
               <tr>
                 <td>{$member.summoner_name}</td>
+                <td>{$member.summoner_id}</td>
+                <td>{$member.main_role}</td>
+                <td>{$member.main_champion}</td>
               </tr>
             {/foreach}
           </table>
+
+          <h2>team_owner</h2>
+          <table  class="table-bordered">
+            <tr>
+              <th>user_id</th>
+            </tr>
+              <tr>
+                <td>{$team_owner.user_id}</td>
+              </tr>
+          </table>
+
+          <h2>team_contact</h2>
+          <table  class="table-bordered">
+            <tr>
+              <th>user_id</th>
+            </tr>
+              <tr>
+                <td>{$team_contact.user_id}</td>
+              </tr>
+          </table>
+
+          <h3>このチームに参加する</h3>
+          <form method="post" action="/Team/offer" class="form-horizontal">
+            <input type="hidden" id="inputTeamId">
+            <button type="submit" class="btn btn-default">このチームに参加申請を送る</button>
+          </form>
+
         </div>
       </div>
     </form>
