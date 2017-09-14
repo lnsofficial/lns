@@ -35,43 +35,37 @@
             <div class="form-group">
               <label for="inputID" class="col-sm-2 control-label">ID</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="inputID" name="login_id" placeholder="ID" value="{$login_id}">
+                <input type="text" class="form-control" id="inputID" name="login_id" placeholder="ID" value="{$login_id}" disabled>
               </div>
             </div>
             <div class="form-group">
               <label for="inputPW" class="col-sm-2 control-label">Password</label>
               <div class="col-sm-10">
-                <input type="password" class="form-control" id="inputPW" name="password" placeholder="Password" value="{$password}">
+                <input type="password" class="form-control" id="inputPW" name="password" placeholder="Password" value="{$password}" disabled>
               </div>
             </div>
             <div class="form-group">
               <label for="inputSN" class="col-sm-2 control-label">サモナー名</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="inputSN" name="summoner_name" placeholder="サモナー名" value="{$summoner_name}">
+                <input type="text" class="form-control" id="inputSN" name="summoner_name" placeholder="サモナー名" value="{$summoner_name}" disabled>
               </div>
             </div>
             <div class="form-group">
               <label for="inputMainRole" class="col-sm-2 control-label">メインロール</label>
               <div class="col-sm-10">
-                <select class="form-control"  id="inputMainRole" name="main_role" placeholder="メインロール">
-                  <option value="1">Top</option>
-                  <option value="2">Jungle</option>
-                  <option value="3">Mid</option>
-                  <option value="4">Bot</option>
-                  <option value="5">Support</option>
+                <select class="form-control"  id="inputMainRole" name="main_role" placeholder="メインロール" disabled>
+                  <option value="1" {if $main_role == 1}selected{/if}>Top</option>
+                  <option value="2" {if $main_role == 2}selected{/if}>Jungle</option>
+                  <option value="3" {if $main_role == 3}selected{/if}>Mid</option>
+                  <option value="4" {if $main_role == 4}selected{/if}>Bot</option>
+                  <option value="5" {if $main_role == 5}selected{/if}>Support</option>
                 </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="inputMainChamp" class="col-sm-2 control-label">得意チャンプ</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="inputMainChamp" name="main_champion" placeholder="得意チャンプ" value="{$main_champion}">
               </div>
             </div>
             <div class="form-group">
               <label for="inputSN" class="col-sm-2 control-label">DiscordID</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="inputDiscordID" name="discord_id" placeholder="DiscordID" value="{$discord_id}">
+                <input type="text" class="form-control" id="inputDiscordID" name="discord_id" placeholder="DiscordID" value="{$discord_id}" disabled>
               </div>
             </div>
             <div class="form-group">
@@ -80,9 +74,9 @@
                 <input type="hidden" name="password" value="{$password}">
                 <input type="hidden" name="summoner_name" value="{$summoner_name}">
                 <input type="hidden" name="main_role" value="{$main_role}">
-                <input type="hidden" name="main_champion" value="{$main_champion}">
                 <input type="hidden" name="discord_id" value="{$discord_id}">
-                <button type="back" class="btn btn-default">戻る</button><button type="submit" class="btn btn-default">送信</button>
+                <button type="button" class="btn btn-default" onclick="history.back()">戻る</button>
+                <button type="submit" class="btn btn-default">送信</button>
               </div>
             </div>
           </form>
