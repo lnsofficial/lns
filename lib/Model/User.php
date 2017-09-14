@@ -18,18 +18,37 @@ class User extends Base{
 	];
 	
 	// TODO 特定カラムによる検索を共通化
-	function getUserFromLoginId( $login_id ){
+	public static function getUserFromLoginId( $login_id ){
 		$oDb = new Db();
-		
-		$sSelectUser = "SELECT * FROM users WHERE login_id = ?";
-		$ahsParameter = [ $login_id ];
-		
-		$oResult = $oDb->executePrepare( $sSelectUser, "s", $ahsParameter );
-		
 		$oUser = null;
-		while( $row = $oResult->fetch_array() ){
-			$oUser = new User( $row["id"] );
-			break;
+		
+		$ahsResult = static::getList( $oDb, [ [ "column" => "login_id",  "type" => "varchar", "value" => $login_id ] ] );
+		if( $ahsResult ){
+			$oUser = new User( $oDb, $ahsResult["id"] );
+		}
+		
+		return $oUser;
+	}
+	
+	public static function getUserFromDiscordId( $discord_id ){
+		$oDb = new Db();
+		$oUser = null;
+		
+		$ahsResult = static::getList( $oDb, [ [ "column" => "discord_id",  "type" => "varchar", "value" => $discord_id ] ] );
+		if( $ahsResult ){
+			$oUser = new User( $oDb, $ahsResult["id"] );
+		}
+		
+		return $oUser;
+	}
+	
+	public static function getUserFromSummonerName( $summoner_name ){
+		$oDb = new Db();
+		$oUser = null;
+		
+		$ahsResult = static::getList( $oDb, [ [ "column" => "summoner_name",  "type" => "varchar", "value" => $summoner_name ] ] );
+		if( $ahsResult ){
+			$oUser = new User( $oDb, $ahsResult["id"] );
 		}
 		
 		return $oUser;

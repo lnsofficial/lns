@@ -12,8 +12,8 @@
         <li><a href="/About/About.html">INFO</a></li>
         <li><a href="/Rule/Rule2.html">RULE</a></li>
         <li><a href="/LadderRanking/display">RANKING</a></li>
-        {if !$login}<li><a href="/Match/RecruitList">MATCH</a></li>{/if}
-        <li><a href="/login.html" class="login">LOGIN</a></li>
+        {if isset($login)}{if !$login}<li><a href="/Match/RecruitList">MATCH</a></li>{/if}{/if}
+        <li><a href="/User/LoginForm" class="login">LOGIN</a></li>
         </ul>
       </div>
       <!-- /.navbar-collapse -->

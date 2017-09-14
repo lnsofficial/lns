@@ -101,7 +101,7 @@ class MysqlSessionHandler implements SessionHandlerInterface {
 	function read($id){
 		$sSelectSessionSql = "SELECT * " .
 							"FROM " .
-								" t_session " .
+								" sessions " .
 							" WHERE " .
 								" id = '" . $id . "'";
 		$oSelectSesionResult = $this->oDb->execute($sSelectSessionSql);
@@ -123,14 +123,14 @@ class MysqlSessionHandler implements SessionHandlerInterface {
 	function write($id, $data){
 		$sSelectSessionSql = "SELECT * " .
 							"FROM " .
-								" t_session " .
+								" sessions " .
 							" WHERE " .
 								" id = '" . $id . "'";
 		$oSelectSesionResult = $this->oDb->execute( $sSelectSessionSql );
 		
 		if( $oSelectSesionResult->num_rows == 1){
 			$sUpdateSessionSql	= "UPDATE " .
-									" t_session " .
+									" sessions " .
 								" SET " .
 									" session = " . $data .
 								" WHERE " .
@@ -140,7 +140,7 @@ class MysqlSessionHandler implements SessionHandlerInterface {
 		} else {
 			$date = date('Y-m-d H:i:s');
 			$sInsertSessionSql	= "INSERT INTO " .
-									" t_session(id,session) " .
+									" sessions(id,session) " .
 								"VALUES('" . $id . "','" . $data . "')";
 			$oInsertResult = $this->oDb->execute( $sInsertSessionSql );
 			$this->oDb->commit();
@@ -154,7 +154,7 @@ class MysqlSessionHandler implements SessionHandlerInterface {
 	 * @return bool
 	 */
 	function destroy($id){
-		$sDeleteSessionSql	= "DELETE FROM t_session WHERE id = '" . $id . "'";
+		$sDeleteSessionSql	= "DELETE FROM sessions WHERE id = '" . $id . "'";
 		$oResult = $this->oDb->execute($sDeleteSessionSql);
 		$this->oDb->commit();
 		return true;
@@ -168,7 +168,7 @@ class MysqlSessionHandler implements SessionHandlerInterface {
 	 */
 	function gc($maxlifetime){
 		$maxlifetime = preg_replace('/[^0-9]/', '', $maxlifetime);
-		$sDeleteSessionSql = "DELETE FROM t_session WHERE (TIMESTAMP(CURRENT_TIMESTAMP) - TIMESTAMP(create_date)) > ${maxlifetime}" ;
+		$sDeleteSessionSql = "DELETE FROM sessions WHERE (TIMESTAMP(CURRENT_TIMESTAMP) - TIMESTAMP(create_date)) > ${maxlifetime}" ;
 		$oResult = $this->oDb->execute($sDeleteSessionSql);
 		$this->oDb->commit();
 		return true;
@@ -178,9 +178,9 @@ class MysqlSessionHandler implements SessionHandlerInterface {
 function require_unlogined_session(){
 	// セッション開始
 	@session_start();
-	// ログインしていれば募集一覧に遷移
+	// ログインしていればマイページに遷移
 	if (isset($_SESSION['id'])) {
-		header('Location: /Match/RecruitList');
+		header('Location: /User/MyPage');
 		exit;
 	}
 }
@@ -188,9 +188,9 @@ function require_unlogined_session(){
 function require_logined_session(){
 	// セッション開始
 	@session_start();
-	// ログインしていなければ /login.php に遷移
+	// ログインしていなければ ログイン画面 に遷移
 	if (!isset($_SESSION['id'])) {
-		header('Location: /login.html');
+		header('Location: /User/Login');
 		exit;
 	}
 }
