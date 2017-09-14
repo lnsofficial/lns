@@ -15,7 +15,7 @@ class TeamOwner extends Base{
     function getUserIdFromTeamId( $team_id ){
         $oDb = new Db();
 
-        $sSelectUser = "SELECT user_id FROM team_owner WHERE team_id = ?";
+        $sSelectUser = "SELECT * FROM team_owner WHERE team_id = ?";
         $ahsParameter = [ $team_id ];
         
         $oResult = $oDb->executePrepare( $sSelectUser, "s", $ahsParameter );
