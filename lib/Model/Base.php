@@ -148,7 +148,7 @@ class Base{
 		
 		$oResult = $this->db->execute( $sInsertSql );
 		$pk = static::COL_ID;
-		$this->$pk = $this->db->insert_id;
+		$this->$pk = $this->db->getLastInsertId();
 		return $oResult;
 	}
 }
