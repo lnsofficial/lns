@@ -17,6 +17,11 @@ class Teams extends Base{
 	];
 
 
+	const COUNT_MAX_MEMBER      = 10;        // チームに所属できるメンバーの最大数
+	const COUNT_MAX_CONTACT     =  1;        // チームに所属できる連絡者の最大数
+	const COUNT_MAX_STAFF       =  3;        // チームに所属できるアナリストの最大数
+
+
     /**
      * // 作成者で検索、だと思う。
      * 
