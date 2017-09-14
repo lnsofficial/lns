@@ -14,11 +14,13 @@ class TeamController extends BaseController{
 		
 	];
     // tmp
-    var $_user_id_tmp = 123;
 	public function __construct(){
 	}
 	
 	public function confirm(){
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+
 		// バリデーション（今のとこ必須チェックだけ）
 		if( !self::validation() ){
 			self::displayError();
@@ -30,6 +32,9 @@ class TeamController extends BaseController{
 	}
 	
 	public function register(){
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+
 		// self::displayError();
 		//TODO 一旦仮で塞ぐ、その内簡単に切り替えれるようにしたい
 		// あと、リクエストをInsertメソッドで取ってるとこもその内修正
@@ -38,18 +43,19 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
+
+        $user_id = $_SESSION["id"];
 		
 		// DBに登録
-        $team_id = self::insertTeam();
+        $team_id = self::insertTeam($user_id);
 		if( false === $team_id ){
 			self::displayError();
 			exit;
 		}
 
-        $user_id = $this->_user_id_tmp;
         self::insertTeamMember($user_id, $team_id);
 
-        self::insertTeamOwner($team_id);
+        self::insertTeamOwner($user_id, $team_id);
 		
 		// 画面表示
 		self::_displayCommit($team_id);
@@ -74,12 +80,12 @@ class TeamController extends BaseController{
         return $bResult;
 	}
 	
-	private function insertTeam(){
+	private function insertTeam( $user_id ){
         // add team
         $oDb = new Db();
         $oDb->beginTransaction();
         $oTeams = new Teams( $oDb );
-        $oTeams->user_id = $this->_user_id_tmp;
+        $oTeams->user_id = $user_id;
         $oTeams->team_name = $_REQUEST["inputTeamNm"];
         $oTeams->team_name_kana = $_REQUEST["inputTeamNmKana"];
         $oTeams->team_tag = $_REQUEST["inputTeamTag"];
@@ -94,12 +100,12 @@ class TeamController extends BaseController{
         return false;
 	}
 
-	private function insertTeamOwner($team_id){
+	private function insertTeamOwner($user_id, $team_id){
         // add owner
         $oDb = new Db();
         $oDb->beginTransaction();
         $oTeamOwner = new TeamOwner( $oDb );
-        $oTeamOwner->user_id = $this->_user_id_tmp;
+        $oTeamOwner->user_id = $user_id;
         $oTeamOwner->team_id = $team_id;
         $oTeamOwner->save();
         $oDb->commit();
@@ -158,8 +164,11 @@ class TeamController extends BaseController{
 	}
 	
 	public function detail( $team_id = 0 ){
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+
 		// get team from user_id
-		$user_id = $this->_user_id_tmp;
+        $user_id = $_SESSION["id"];
 
 		$oDb = new Db();
 
@@ -204,6 +213,9 @@ class TeamController extends BaseController{
 	}
 
 	public function form(){
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+
         self::_displayTeamForm();
 	}
 
@@ -223,6 +235,9 @@ class TeamController extends BaseController{
 	 */
 	public function apply()
 	{
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+
 		// バリデーション（今のとこ必須チェックだけ）
 		if( !$_REQUEST["team_id"] )
 		{
@@ -230,8 +245,7 @@ class TeamController extends BaseController{
 			exit;
 		}
 
-//		$user_id = $this->_user_id_tmp;
-		$user_id = 124;
+        $user_id = $_SESSION["id"];
 		$team_id = $_REQUEST["team_id"];
 
 		// 既にチーム所属済みだったらだめ。
@@ -280,6 +294,8 @@ class TeamController extends BaseController{
 	 */
 	public function accept()
 	{
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
 		// バリデーション（今のとこ必須チェックだけ）
 		if( !$_REQUEST["user_team_apply_id"] )
 		{
@@ -287,9 +303,7 @@ class TeamController extends BaseController{
 			exit;
 		}
 
-
-//		$user_id = $this->_user_id_tmp;
-		$user_id = 123;
+        $user_id = $_SESSION["id"];
 		$user_team_apply_id = $_REQUEST["user_team_apply_id"];
 
 		$user = User::info( $user_id );

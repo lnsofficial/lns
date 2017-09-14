@@ -190,7 +190,7 @@ function require_logined_session(){
 	@session_start();
 	// ログインしていなければ ログイン画面 に遷移
 	if (!isset($_SESSION['id'])) {
-		header('Location: /User/Login');
+		header('Location: /User/LoginForm');
 		exit;
 	}
 }
