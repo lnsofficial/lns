@@ -240,7 +240,7 @@ class TeamController extends BaseController{
         require_logined_session();
 
 		// バリデーション（今のとこ必須チェックだけ）
-		if( !$_REQUEST["team_id"] )
+		if( !$_REQUEST["team_id"] || !$_REQUEST["type"] )
 		{
 			self::displayError();
 			exit;
@@ -248,6 +248,7 @@ class TeamController extends BaseController{
 
         $user_id = $_SESSION["id"];
 		$team_id = $_REQUEST["team_id"];
+		$type    = $_REQUEST["type"];
 
 		// 既にチーム所属済みだったらだめ。
 		if( TeamMembers::findByUserId( $user_id ) )
@@ -257,7 +258,7 @@ class TeamController extends BaseController{
 		}
 
 		// 既にオファー済みだったらだめ。
-		if( UserTeamApply::findByUserIdTeamIdState( $user_id, $team_id, UserTeamApply::STATE_APPLY ) )
+		if( UserTeamApply::findByUserIdTeamIdTypeState( $user_id, $team_id, $type, UserTeamApply::STATE_APPLY ) )
 		{
 			self::displayError();
 			exit;
@@ -269,7 +270,7 @@ class TeamController extends BaseController{
 		$user_team_apply          = new UserTeamApply( $db );
 		$user_team_apply->user_id = $user_id;
 		$user_team_apply->team_id = $team_id;
-		$user_team_apply->type    = UserTeamApply::TYPE_MEMBER;
+		$user_team_apply->type    = $type;
 		$user_team_apply->state   = UserTeamApply::STATE_APPLY;
 		$user_team_apply->save();
 
@@ -373,9 +374,6 @@ class TeamController extends BaseController{
 				// まぁここに来ることはないでしょう・・
 				break;
 		}
-
-		// 一応最新を。
-		$user_team_apply = UserTeamApply::find( $user_team_apply_id );
 
 		$smarty = new Smarty();
 		$smarty->template_dir = PATH_TMPL;
@@ -534,4 +532,79 @@ class TeamController extends BaseController{
 		return true;
 	}
 
+
+
+	/**
+	 * // [Action]チームへの参加申請を棄却するやつ
+	 *
+	 * @require int                user_team_apply_id       // user_team_applys.id
+	 */
+	public function deny()
+	{
+		session_set_save_handler( new MysqlSessionHandler() );
+		require_logined_session();
+		// バリデーション（今のとこ必須チェックだけ）
+		if( !$_REQUEST["user_team_apply_id"] )
+		{
+			self::displayError();
+			exit;
+		}
+
+		$user_id = $_SESSION["id"];
+		$user_team_apply_id = $_REQUEST["user_team_apply_id"];
+
+		$user = User::info( $user_id );
+
+		///////////////////////////////////////////////////////
+		// 適当なuser_team_apply_idじゃないこと
+		///////////////////////////////////////////////////////
+		$user_team_apply = UserTeamApply::find( $user_team_apply_id );
+		if( empty($user_team_apply) )
+		{
+			self::displayError();
+			exit;
+		}
+
+		///////////////////////////////////////////////////////
+		// 自分がapply先のチームのownerであること
+		///////////////////////////////////////////////////////
+		if( ! $this->_isOwnerToApply( $user, $user_team_apply ) )
+		{
+			self::displayError();
+			exit;
+		}
+
+		///////////////////////////////////////////////////////
+		// $user_team_applyがstate == 申請中であること
+		///////////////////////////////////////////////////////
+		if( $user_team_apply['state'] != UserTeamApply::STATE_APPLY )
+		{
+			self::displayError();
+			exit;
+		}
+
+
+		// 申請内容で処理わけ・・る必要はない。
+		// team_membersにレコード作成してuser_team_applysのstateを更新
+		$db = new Db();
+		$db->beginTransaction();
+
+		$apply             = new UserTeamApply( $db, $user_team_apply['id'] );
+		$apply->state      = UserTeamApply::STATE_DENY;
+		$apply->deleted_at = UtilTime::now();
+		$apply->save();
+
+		$db->commit();
+
+
+		$smarty = new Smarty();
+		$smarty->template_dir = PATH_TMPL;
+		$smarty->compile_dir  = PATH_TMPL_C;
+
+		$smarty->assign( "user_team_apply"	, $user_team_apply );
+
+		$smarty->display('Team/apply_deny.tmpl');
+	}
+
 }
+

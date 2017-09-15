@@ -40,19 +40,21 @@ class UserTeamApply extends Base
      * 
      * @param  int                  $user_id                // users.id
      * @param  int                  $team_id                // teams.id
+     * @param  int                  $type
      * @param  int                  $state
      * @return UserTeamApply
      */
-    function findByUserIdTeamIdState( $user_id, $team_id, $state )
+    function findByUserIdTeamIdTypeState( $user_id, $team_id, $type, $state )
     {
         $db = new Db();
-        $prepareSql = "SELECT * FROM user_team_applys WHERE deleted_at IS NULL AND user_id = ? AND team_id = ? AND state = ?";
+        $prepareSql = "SELECT * FROM user_team_applys WHERE deleted_at IS NULL AND user_id = ? AND team_id = ? AND type = ? AND state = ?";
         $bindParam  = [
             $user_id,
             $team_id,
+            $type,
             $state,
         ];
-        return $db->executePrepare( $prepareSql, "iii", $bindParam )->fetch_assoc();
+        return $db->executePrepare( $prepareSql, "iiii", $bindParam )->fetch_assoc();
     }
 
 
