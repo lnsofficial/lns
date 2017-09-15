@@ -9,6 +9,7 @@ Class Db{
 	
 	public function initDb(){
 		$this->db	= new mysqli('localhost', DB_USER, DB_PASSWORD, DB_NAME);
+		$this->db->set_charset("utf8");
 		$this->db->autocommit(false);
 		
 		if( $this->db->connect_error ){
@@ -47,6 +48,10 @@ Class Db{
 	public function commit(){
 		$this->db->commit();
 		return true;
+	}
+
+	public function getLastInsertId(){
+		return $this->db->insert_id;
 	}
 }
 
@@ -185,7 +190,7 @@ function require_logined_session(){
 	@session_start();
 	// ログインしていなければ ログイン画面 に遷移
 	if (!isset($_SESSION['id'])) {
-		header('Location: /User/Login');
+		header('Location: /User/LoginForm');
 		exit;
 	}
 }

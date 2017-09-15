@@ -147,6 +147,8 @@ class Base{
 		$sInsertSql = "INSERT INTO " . static::MAIN_TABLE . "(" . implode( ",", $sColumn ) . ") VALUES(" . implode( ",", $sValue ) . ")";
 		
 		$oResult = $this->db->execute( $sInsertSql );
+		$pk = static::COL_ID;
+		$this->$pk = $this->db->getLastInsertId();
 		return $oResult;
 	}
 }

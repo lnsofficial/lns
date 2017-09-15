@@ -29,8 +29,15 @@ class Dispatcher{
 			
 			$sAction	= $aParameter[2];
 			
-			// 処理実行
-			$oController->$sAction();
+			if( isset($aParameter[3]) )
+			{
+				$oController->$sAction( $aParameter[3] );
+			}
+			else
+			{
+				// 処理実行
+				$oController->$sAction();
+			}
 			
 		}else{
 			// TODO エラー処理
