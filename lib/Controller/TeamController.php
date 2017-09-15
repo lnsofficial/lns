@@ -585,7 +585,7 @@ class TeamController extends BaseController{
 
 
 		// 申請内容で処理わけ・・る必要はない。
-		// team_membersにレコード作成してuser_team_applysのstateを更新
+		// user_team_applysのstateを更新
 		$db = new Db();
 		$db->beginTransaction();
 
