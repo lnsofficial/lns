@@ -337,4 +337,28 @@ class UserController extends BaseController{
 	}
 
 
+	/**
+	 * // [Action]指定ユーザーのページを表示
+	 *
+	 * @param  int                $user_id       // users.id
+	 */
+	public function show_user( $user_id )
+	{
+		session_set_save_handler( new MysqlSessionHandler() );
+		require_logined_session();
+
+		$other = User::info( $user_id );        // 指定ユーザーの情報
+		$user  = User::info( $_SESSION["id"] ); // 自分自身の情報
+
+		$smarty               = new Smarty();
+		$smarty->template_dir = PATH_TMPL;
+		$smarty->compile_dir  = PATH_TMPL_C;
+
+		$smarty->assign( "other", $other );
+		$smarty->assign( "user" , $user );
+
+		$smarty->display('User/show_user.tmpl');
+	}
+
+
 }
