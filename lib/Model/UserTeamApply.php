@@ -23,6 +23,7 @@ class UserTeamApply extends Base
 		"user_id"			=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
 		"type"				=> [ "type" => "int"		, "min" => 0	,"max" => 255			, "required" => true	, "null" => false	],
 		"state"				=> [ "type" => "int"		, "min" => 0	,"max" => 255			, "required" => true	, "null" => false	],
+		"deleted_at"		=> [ "type" => "varchar"	, "min" => 0	,"max" => 65535			, "required" => true	, "null" => false	],
 	];
 
 
@@ -83,39 +84,6 @@ class UserTeamApply extends Base
 
 
     /**
-     * // 応募レコード作成
-     * 
-     * @param  int                  $user_id                // users.id
-     * @param  int                  $team_id                // teams.id
-     * @param  int                  $type
-     * @param  int                  $state
-     * @return UserTeamApply                                // insertされたレコード返す。
-     */
-    function create( $params = [] )
-    {
-        $db = new Db();
-        $db->beginTransaction();
-        $user_team_offer = new UserTeamApply($db);
-        foreach( $params as $key=>$val )
-        {
-            $user_team_offer->$key = $val;
-        }
-        if( !$user_team_offer->insert() )
-        {
-            // エラー
-            return false;
-        }
-        else
-        {
-            $id = $db->getLastInsertId();
-            $db->commit();
-            return UserTeamApply::find($id);
-        }
-    }
-
-
-
-    /**
      * // pk検索1レコード
      * 
      * @param  int                  $id                     // user_team_offers.id
@@ -124,7 +92,7 @@ class UserTeamApply extends Base
     function find( $id )
     {
         $db = new Db();
-        $prepareSql = "SELECT * FROM user_team_applys WHERE id = ?";
+        $prepareSql = "SELECT * FROM user_team_applys WHERE id = ? AND deleted_at IS NULL";
         $bindParam  = [$id];
         return $db->executePrepare( $prepareSql, "i", $bindParam )->fetch_assoc();
     }
