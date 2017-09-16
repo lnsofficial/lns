@@ -138,11 +138,22 @@ class User extends Base{
 			$team = Teams::find( $team_member['team_id'] );
 		}
 
-		$user['team_member'] = $team_member;
-		$user['team_owners'] = $team_owners;
-		$user['team_staffs'] = $team_staffs;
-		$user['team_contacts'] = $team_contacts;
-		$user['team']        = $team;
+		// UserTeamApply
+		$prepareSql  = "SELECT * FROM user_team_applys WHERE user_id = ? AND deleted_at IS NULL";
+		$bindParam   = [ $user_id ];
+		$result      = $db->executePrepare( $prepareSql, "i", $bindParam );
+		$user_team_applys = [];
+		while( $user_team_apply = $result->fetch_assoc() )
+		{
+			$user_team_applys[] = $user_team_apply;
+		}
+
+		$user['team_member']      = $team_member;
+		$user['team_owners']      = $team_owners;
+		$user['team_staffs']      = $team_staffs;
+		$user['team_contacts']    = $team_contacts;
+		$user['team']             = $team;
+		$user['user_team_applys'] = $user_team_applys;
 
         return $user;
     }

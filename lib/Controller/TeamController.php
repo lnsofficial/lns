@@ -182,8 +182,8 @@ class TeamController extends BaseController{
 		$team_owner   = TeamOwner::getUserIdFromTeamId( $oTeam->id );
 		// contact user id
 		$team_contacts = TeamContact::getByTeamId( $oTeam->id );
-		// user_team_applys
-		$user_team_applys = UserTeamApply::getByTeamId( $oTeam->id );
+		// このチームへ届いている申請一覧
+		$applys_for_team = UserTeamApply::getByTeamId( $oTeam->id );
 		
 		// team_staffs
 		$team_staffs = TeamStaffs::getByTeamId( $oTeam->id );
@@ -205,15 +205,17 @@ class TeamController extends BaseController{
 		$smarty->assign( "team_owner"       , $team_owner );
 		$smarty->assign( "team_contacts"    , $team_contacts );
 		$smarty->assign( "team_staffs"      , $team_staffs );
-		$smarty->assign( "user_team_applys" , $user_team_applys );
+		$smarty->assign( "applys_for_team"  , $applys_for_team );
 		$smarty->assign( "user"             , $user );
 		$smarty->assign( "team"             , $oTeam );
 		$isThisTeamContact      = count( array_filter($user['team_contacts'],function($item)use($team_id){ return $item['team_id']==$team_id; }) );
 		$isThisTeamStaff        = count( array_filter($user['team_staffs'],  function($item)use($team_id){ return $item['team_id']==$team_id; }) );
-		$isThisTeamContactApply = count( array_filter($user_team_applys,function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_CONTACT && $item['team_id']==$team_id; }) );
-		$isThisTeamStaffApply   = count( array_filter($user_team_applys,function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_STAFF   && $item['team_id']==$team_id; }) );
+		$isThisTeamMemberApply  = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_MEMBER  && $item['team_id']==$team_id; }) );
+		$isThisTeamContactApply = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_CONTACT && $item['team_id']==$team_id; }) );
+		$isThisTeamStaffApply   = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_STAFF   && $item['team_id']==$team_id; }) );
 		$smarty->assign( "isThisTeamContact"      , $isThisTeamContact );
 		$smarty->assign( "isThisTeamStaff"        , $isThisTeamStaff );
+		$smarty->assign( "isThisTeamMemberApply"  , $isThisTeamMemberApply );
 		$smarty->assign( "isThisTeamContactApply" , $isThisTeamContactApply );
 		$smarty->assign( "isThisTeamStaffApply"   , $isThisTeamStaffApply );
 
