@@ -210,13 +210,13 @@ class TeamController extends BaseController{
 		$team_owner   = TeamOwner::getUserIdFromTeamId( $oTeam->id );
 
 		// contact user id
-		$team_contact = TeamContact::getUserIdFromTeamId( $oTeam->id );
+		$team_contacts = TeamContact::getByTeamId( $oTeam->id );
 
 		// user_team_applys
 		$user_team_applys = UserTeamApply::getByTeamId( $oTeam->id );
 		
 		// team_staffs
-		$team_staffs = $oTeam->getStaff();
+		$team_staffs = TeamStaffs::getByTeamId( $oTeam->id );
 
 		// users
 //		$user = new User( $oDb, $user_id );
@@ -240,7 +240,8 @@ class TeamController extends BaseController{
 
 		$smarty->assign( "team_members"     , $team_members );
 		$smarty->assign( "team_owner"       , $team_owner );
-		$smarty->assign( "team_contact"     , $team_contact );
+		$smarty->assign( "team_contacts"    , $team_contacts );
+		$smarty->assign( "team_staffs"      , $team_staffs );
 		$smarty->assign( "user_team_applys" , $user_team_applys );
 		$smarty->assign( "user"             , $user );
 		$smarty->assign( "team"             , $oTeam );
