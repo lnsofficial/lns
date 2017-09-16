@@ -24,9 +24,18 @@
       <div class="col-lg-2 about-menu">
         <ul class="nav side">
           <li role="presentation">チームへ参加</li>
+          {if $user['team_member'] && $user['team_member']['team_id']==$team->id}
+          {else}
           <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=1">メンバー申請</a></li>
+          {/if}
+          {if $isThisTeamContact}
+          {else}
           <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=2">マネージャー申請</a></li>
+          {/if}
+          {if $isThisTeamStaff}
+          {else}
           <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=3">アナリスト申請</a></li>
+          {/if}
         </ul>
       </div>
       <div class="col-lg-9">
