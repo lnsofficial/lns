@@ -197,7 +197,7 @@ class TeamController extends BaseController{
 		$user = User::info( $user_id );
 
 		// 自身のチーム所属情報
-		$my_team_member = TeamMembers::findByUserId( $user->id );
+		$my_team_member = TeamMembers::findByUserId( $user["id"] );
 
 		$smarty = new Smarty();
 
@@ -219,8 +219,8 @@ class TeamController extends BaseController{
 		$smarty->assign( "user"             , $user );
 		$smarty->assign( "team"             , $oTeam );
 
-		$smarty->assign( "isThisTeamContact" , count( array_filter($user['team_contacts'],function($item)use($team){ return $item['team_id']==$team->id; }) ) );
-		$smarty->assign( "isThisTeamStaff"   , count( array_filter($user['team_staffs'],  function($item)use($team){ return $item['team_id']==$team->id; }) ) );
+		$smarty->assign( "isThisTeamContact" , count( array_filter($user['team_contacts'],function($item)use($oTeam){ return $item['team_id']==$team->id; }) ) );
+		$smarty->assign( "isThisTeamStaff"   , count( array_filter($user['team_staffs'],  function($item)use($oTeam){ return $item['team_id']==$team->id; }) ) );
 
 		$smarty->display('Team/TeamDetail.tmpl');
 	}
@@ -244,9 +244,13 @@ class TeamController extends BaseController{
 		session_set_save_handler( new MysqlSessionHandler() );
 		require_logined_session();
 		
+		$aoTeamList = Teams::getSearchList();
+		
 		$smarty = new Smarty();
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
+		$smarty->assign( "team_list" , $aoTeamList );
+		
 		$smarty->display('Team/TeamSearch.tmpl');
 	}
 

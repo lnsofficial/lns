@@ -67,5 +67,12 @@ class Teams extends Base{
 		
 		return $ahsStaff;
 	}
-
+	
+	public function getSearchList(){
+		$oDb = new Db();
+		
+		$ahsTeams = Teams::getList( $oDb, [ [ "column" => "status",  "type" => "int", "value" => 0 ] ] );
+		
+		return $ahsTeams;
+	}
 }
