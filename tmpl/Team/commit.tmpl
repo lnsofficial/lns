@@ -29,45 +29,7 @@
         <div class="col-lg-9">
           <h2>チーム作成完了</h2>
           <p>チームを作成しました。</p>
-          <form class="form-horizontal">
-            <div class="form-group">
-              <label for="inputTeamNm" class="col-sm-3 control-label">チーム名</label>
-              <div class="col-sm-9">
-                <input type="text" class="form-control" id="inputTeamNm" value="{$inputTeamNm}" placeholder="チーム名" readonly>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="inputTeamNmKana" class="col-sm-3 control-label">チーム名（かな）</label>
-              <div class="col-sm-9">
-                <input type="text" class="form-control" id="inputTeamNmKana" value="{$inputTeamNmKana}" placeholder="チーム名（かな）" readonly>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="inputTeamTag" class="col-sm-3 control-label">チーム名略称</label>
-              <div class="col-sm-9">
-                <input type="text" class="form-control" id="inputTeamTag" value="{$inputTeamTag}" placeholder="チーム名略称" readonly>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="inputTeamTagKana" class="col-sm-3 control-label">チーム名略称（かな）</label>
-              <div class="col-sm-9">
-                <input type="text" class="form-control" id="inputTeamTagKana" value="{$inputTeamTagKana}" placeholder="チーム名略称（かな）" readonly>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="inputTeamLogo" class="col-sm-3 control-label">チームロゴ</label>
-              <div class="col-sm-9">
-                <img src="/img/ico_Xinzhao.jpg" class="img-responsive" id="inputTeamLogo" alt="チームロゴ">
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="col-sm-offset-3 col-sm-9">
-                <button type="back" class="btn btn-default">戻る</button>
-              </div>
-            </div>
-          </form>
 
-          <h3>チーム詳細画面へ</h3>
           <form method="post" action="/Team/detail/{$team_id}" class="form-horizontal">
             <button type="submit" class="btn btn-default">チーム詳細画面へ</button>
           </form>
