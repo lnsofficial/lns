@@ -24,7 +24,9 @@
       <div class="row">
         <div class="col-lg-2 about-menu">
           <ul class="nav side">
+            {if !isset($team)}
             <li role="presentation"><a href="/Team/Form">チーム作成</a></li>
+            {/if}
           </ul>
         </div>
         <div class="col-lg-9">

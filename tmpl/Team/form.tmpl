@@ -24,12 +24,10 @@
       <div class="row">
         <div class="col-lg-3">
           <div>
-            <h3>登録に際して</h3>
-            &nbsp;
           </div>
         </div>
         <div class="col-lg-9">
-          <h2>チーム登録</h2>
+          <h2>チーム作成</h2>
           <p>登録内容を入力してください。</p>
           <form method="post" action="/Team/confirm" onSubmit="return check()" class="form-horizontal">
             <div class="form-group">
@@ -59,13 +57,14 @@
             <div class="form-group">
               <label for="inputTeamLogo" class="col-sm-3 control-label">チームロゴ</label>
               <div class="col-sm-9">
-                <input type="file" id="inputTeamLogo">
-                <p class="help-block">32x32 px, 100MBまで。</p>
+                <input type="file" id="inputTeamLogo" disabled>
+                <p class="help-block">チームロゴ画像の登録はシンジャオがリメイクされる頃を目処に実装します</p>
               </div>
             </div>
             <div class="form-group">
               <div class="col-sm-offset-3 col-sm-9">
-                <button type="back" class="btn btn-default">戻る</button><button type="submit" class="btn btn-default">送信</button>
+                <button type="button" class="btn btn-default" onclick="history.back()">戻る</button>
+                <button type="submit" class="btn btn-default">確認画面へ</button>
               </div>
             </div>
           </form>
