@@ -265,19 +265,49 @@ class TeamController extends BaseController{
 		$team_id = $_REQUEST["team_id"];
 		$type    = $_REQUEST["type"];
 
-		// 既にチーム所属済みだったらだめ。
-		if( TeamMembers::findByUserId( $user_id ) )
-		{
-			self::displayError();
-			exit;
-		}
-
-		// 既にオファー済みだったらだめ。
+		// 既に同職種に申請済みだったらだめ。
 		if( UserTeamApply::findByUserIdTeamIdTypeState( $user_id, $team_id, $type, UserTeamApply::STATE_APPLY ) )
 		{
 			self::displayError();
 			exit;
 		}
+
+		switch( $type )
+		{
+			case UserTeamApply::TYPE_MEMBER:
+				// いづれかのチームにメンバーとして所属済みならだめ。
+				if( TeamMembers::findByUserId( $user_id ) )
+				{
+					self::displayError();
+					exit;
+				}
+				break;
+
+			case UserTeamApply::TYPE_CONTACT:
+				// 他のチームの連絡者であってもだいじょぶだよ
+				// このチームの連絡者だったらだめだよ
+				if( TeamContact::findByUserIdTeamId( $user_id, $team_id ) )
+				{
+					self::displayError();
+					exit;
+				}
+				break;
+
+			case UserTeamApply::TYPE_STAFF:
+				// 他のチームのアナリストであってもだいじょぶだよ
+				// このチームのアナリストだったらだめだよ
+				if( TeamStaffs::findByUserIdTeamId( $user_id, $team_id ) )
+				{
+					self::displayError();
+					exit;
+				}
+				break;
+
+			default:
+				self::displayError();
+				exit;
+		}
+
 
 		$db = new Db();
 		$db->beginTransaction();
@@ -513,7 +543,7 @@ class TeamController extends BaseController{
 	protected function _acceptAsStaff( $user_team_apply )
 	{
 		// このチームのアナリストではないこと
-		$team_staff = TeamStaff::findByUserIdTeamId( $user_team_apply['user_id'], $user_team_apply['team_id'] );
+		$team_staff = TeamStaffs::findByUserIdTeamId( $user_team_apply['user_id'], $user_team_apply['team_id'] );
 		if( $team_staff )
 		{
 			self::displayError();
@@ -521,7 +551,7 @@ class TeamController extends BaseController{
 		}
 
 		// アナリスト枠に、空きがあること
-		$team_staffs = TeamStaff::getByTeamId( $user_team_apply['team_id'] );
+		$team_staffs = TeamStaffs::getByTeamId( $user_team_apply['team_id'] );
 		if( Teams::COUNT_MAX_STAFF <= count($team_staffs) )
 		{
 			self::displayError();
@@ -532,7 +562,7 @@ class TeamController extends BaseController{
 		$db = new Db();
 		$db->beginTransaction();
 
-		$team_staff          = new TeamStaff( $db );
+		$team_staff          = new TeamStaffs( $db );
 		$team_staff->team_id = $user_team_apply['team_id'];
 		$team_staff->user_id = $user_team_apply['user_id'];
 		$team_staff->save();
