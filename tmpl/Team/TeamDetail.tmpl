@@ -66,7 +66,7 @@
           </tr>
           {foreach from=$team_members item=member key=member_id}
             <tr>
-              <td><a href="/User/show_user/{$apply.user_id}">{$apply.summoner_name}</a></td>
+              <td>{$member.summoner_name}</td>
               <td>
               {if $member.main_role == 1}Top{/if}
               {if $member.main_role == 2}Jungle{/if}
