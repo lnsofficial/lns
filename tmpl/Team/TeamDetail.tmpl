@@ -88,7 +88,8 @@
           </tr>
         </table>
 
-        {if count($team_contacts)}
+        {if isset($team_contacts)}
+          {if count($team_contacts)}
         <h2>連絡係</h2>
         <table  class="table-bordered">
           <tr>
@@ -100,9 +101,11 @@
             </tr>
             {/foreach}
         </table>
+          {/if}
         {/if}
 
-        {if count($team_staffs)}
+        {if isset($team_staffs)}
+          {if count($team_staffs)}
         <h2>アナリスト</h2>
         <table  class="table-bordered">
           <tr>
@@ -114,6 +117,7 @@
             </tr>
             {/foreach}
         </table>
+          {/if}
         {/if}
 
         {if count($user_team_applys) > 0}
