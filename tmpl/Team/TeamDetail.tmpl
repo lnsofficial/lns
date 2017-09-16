@@ -132,9 +132,13 @@
               </td>
               {if $user['id'] == $team_owner->id}
               <td>
-                <form method="post" action="/Team/accept" class="form-horizontal">
+                <form method="post" action="/Team/accept" onclick="return chkAccept()" class="form-horizontal">
                   <input type="hidden" name="user_team_apply_id" value="{$apply.id}">
                   <button type="submit" class="btn btn-default">この参加申請を承諾</button>
+                </form>
+                <form method="post" action="/Team/deny" onclick="return chkDeny()" class="form-horizontal">
+                  <input type="hidden" name="user_team_apply_id" value="{$apply.id}">
+                  <button type="submit" class="btn btn-default">この参加申請を削除</button>
                 </form>
               </td>
               {/if}
@@ -151,6 +155,26 @@
 
   </div>
   {include file='footer.tmpl'}
+
+	<script type="text/javascript"><!--
+	function chkAccept(){
+		ret = confirm("申請を承認します。よろしいですか？");
+		if ( ret == true ){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	function chkDeny(){
+		ret = confirm("申請を棄却します。よろしいですか？");
+		if ( ret == true ){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	// --></script>
+
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
   <script src="/js/jquery-1.11.3.min.js"></script>
   <!-- Include all compiled plugins (below), or include individual files as needed --> 
