@@ -46,7 +46,7 @@ class Base{
 		$asWhereSql = [];
 		
 		foreach( $ahsParameter as $value ){
-			if( $value["value"] == null ){
+			if( $value["value"] === null ){
 				break;
 			}
 			switch( $value["type"] ){
