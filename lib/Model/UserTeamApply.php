@@ -40,29 +40,31 @@ class UserTeamApply extends Base
      * 
      * @param  int                  $user_id                // users.id
      * @param  int                  $team_id                // teams.id
+     * @param  int                  $type
      * @param  int                  $state
      * @return UserTeamApply
      */
-    function findByUserIdTeamIdState( $user_id, $team_id, $state )
+    function findByUserIdTeamIdTypeState( $user_id, $team_id, $type, $state )
     {
         $db = new Db();
-        $prepareSql = "SELECT * FROM user_team_applys WHERE deleted_at IS NULL AND user_id = ? AND team_id = ? AND state = ?";
+        $prepareSql = "SELECT * FROM user_team_applys WHERE deleted_at IS NULL AND user_id = ? AND team_id = ? AND type = ? AND state = ?";
         $bindParam  = [
             $user_id,
             $team_id,
+            $type,
             $state,
         ];
-        return $db->executePrepare( $prepareSql, "iii", $bindParam )->fetch_assoc();
+        return $db->executePrepare( $prepareSql, "iiii", $bindParam )->fetch_assoc();
     }
 
 
     /**
-     * // そのチームへの応募の一覧
+     * // そのチームへの申請の一覧
      * // とりあえずSTATE_CANCELとかDENYも含める形で。
      * // 論理削除済みのdeleted_at IS NULLは含めない形で。
      * 
      * @param  int                  $team_id                // teams.id
-     * @return UserTeamApply[]
+     * @return (UserTeamApply + User)[]
      */
     function getByTeamId( $team_id )
     {
@@ -70,6 +72,33 @@ class UserTeamApply extends Base
 
         $prepareSql = "SELECT uta.id AS id,uta.team_id AS team_id,uta.user_id AS user_id,uta.type AS type,uta.state AS state,u.summoner_id AS summoner_id,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role,u. main_champion AS  main_champion FROM user_team_applys AS uta LEFT JOIN users AS u ON uta.user_id=u.id WHERE team_id = ? AND deleted_at IS NULL";
         $bindParam  = [ $team_id ];
+
+        $result = $db->executePrepare( $prepareSql, "i", $bindParam );
+
+        $user_team_offers = [];
+        while( $offer = $result->fetch_assoc() )
+        {
+            $user_team_offers[] = $offer;
+        }
+
+        return $user_team_offers;
+    }
+
+
+    /**
+     * // ユーザーの申請の一覧
+     * // とりあえずSTATE_CANCELとかDENYも含める形で。
+     * // 論理削除済みのdeleted_at IS NULLは含めない形で。
+     * 
+     * @param  int                  $user_id                // users.id
+     * @return (UserTeamApply + Team)[]
+     */
+    function getByUserId( $user_id )
+    {
+        $db = new Db();
+
+        $prepareSql = "SELECT uta.id AS id,uta.team_id AS team_id,uta.user_id AS user_id,uta.type AS type,uta.state AS state,t.team_name AS team_name,t.team_name_kana AS team_name_kana,t.team_tag AS team_tag,t.team_tag_kana AS team_tag_kana,t.status AS status FROM user_team_applys AS uta LEFT JOIN teams AS t ON uta.team_id=t.id WHERE uta.user_id = ? AND deleted_at IS NULL";
+        $bindParam  = [ $user_id ];
 
         $result = $db->executePrepare( $prepareSql, "i", $bindParam );
 

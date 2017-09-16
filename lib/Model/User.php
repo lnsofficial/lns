@@ -1,5 +1,6 @@
 <?php
 require_once( PATH_MODEL . "Base.php" );
+require_once( PATH_MODEL . 'Teams.php' );
 
 class User extends Base{
 	const MAIN_TABLE	= "users";
@@ -59,7 +60,7 @@ class User extends Base{
      * // user_idで検索。
      * 
      * @param  int                  $user_id                // users.id
-     * @return User + TeamMember + TeamOwner + TeamStaff + UserTeamApply
+     * @return User + TeamMember + TeamOwner + TeamStaff + UserTeamApply + Team
      */
 	function info( $user_id )
     {
@@ -107,9 +108,17 @@ class User extends Base{
 		}
 //var_dump($team_staffs);
 
+		// Team
+		$team = false;
+		if( !empty($team_member) )
+		{
+			$team = Teams::find( $team_member['team_id'] );
+		}
+
 		$user['team_member'] = $team_member;
 		$user['team_owners'] = $team_owners;
 		$user['team_staffs'] = $team_staffs;
+		$user['team']        = $team;
 
         return $user;
     }

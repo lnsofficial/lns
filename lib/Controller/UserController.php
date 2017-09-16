@@ -1,6 +1,8 @@
 <?php
 require_once( PATH_CONTROLLER . 'BaseController.php' );
 require_once( PATH_MODEL . 'User.php' );
+require_once( PATH_MODEL . 'UserTeamApply.php' );
+require_once( PATH_LIB . '/common/UtilTime.php');
 
 class UserController extends BaseController{
 
@@ -80,19 +82,27 @@ class UserController extends BaseController{
 	public function myPage(){
 		session_set_save_handler( new MysqlSessionHandler() );
 		require_logined_session();
-		
+		$user_id = $_SESSION["id"];
+
 		$oDb = new Db();
-		$oUser = new User( $oDb, $_SESSION["id"] );
-		
+		$oUser = new User( $oDb, $user_id );
+
+		$user             = User::info( $user_id );                 // ユーザー情報
+		$user_team_applys = UserTeamApply::getByUserId( $user_id ); // チームへの申請情報まわり
+
+
 		$smarty = new Smarty();
-		
+
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
-		
-		$smarty->assign("summoner_name", $oUser->summoner_name );
-		$smarty->assign("main_role", $oUser->main_role );
-		$smarty->assign("main_champion", $oUser->main_champion );
-		
+
+		$smarty->assign("summoner_name",    $oUser->summoner_name );
+		$smarty->assign("main_role",        $oUser->main_role );
+		$smarty->assign("main_champion",    $oUser->main_champion );
+
+		$smarty->assign("user",             $user );
+		$smarty->assign("user_team_applys", $user_team_applys );
+
 		$smarty->display('User/display.tmpl');
 	}
 
@@ -251,5 +261,104 @@ class UserController extends BaseController{
 		
 		$smarty->display('TeamRegister_err.tmpl');
 	}
+
+
+
+	/**
+	 * // [Action]チームへの参加申請をキャンセルするやつ
+	 *
+	 * @require int                user_team_apply_id       // user_team_applys.id
+	 */
+	public function apply_cancel()
+	{
+		session_set_save_handler( new MysqlSessionHandler() );
+		require_logined_session();
+		// バリデーション（今のとこ必須チェックだけ）
+		if( !$_REQUEST["user_team_apply_id"] )
+		{
+			self::displayError();
+			exit;
+		}
+
+		$user_id = $_SESSION["id"];
+		$user_team_apply_id = $_REQUEST["user_team_apply_id"];
+
+		$user = User::info( $user_id );
+
+		///////////////////////////////////////////////////////
+		// 適当なuser_team_apply_idじゃないこと
+		///////////////////////////////////////////////////////
+		$user_team_apply = UserTeamApply::find( $user_team_apply_id );
+		if( empty($user_team_apply) )
+		{
+			self::displayError();
+			exit;
+		}
+
+		///////////////////////////////////////////////////////
+		// 自分が出したapplyであること
+		///////////////////////////////////////////////////////
+		if( $user_team_apply['user_id'] != $user_id )
+		{
+			self::displayError();
+			exit;
+		}
+
+		///////////////////////////////////////////////////////
+		// $user_team_applyがstate == 申請中であること
+		///////////////////////////////////////////////////////
+		if( $user_team_apply['state'] != UserTeamApply::STATE_APPLY )
+		{
+			self::displayError();
+			exit;
+		}
+
+
+		// 申請内容で処理わけ・・る必要はない。
+		// user_team_applysのstateを更新
+		$db = new Db();
+		$db->beginTransaction();
+
+		$apply             = new UserTeamApply( $db, $user_team_apply['id'] );
+		$apply->state      = UserTeamApply::STATE_CANCEL;
+		$apply->deleted_at = UtilTime::now();
+		$apply->save();
+
+		$db->commit();
+
+
+		$smarty = new Smarty();
+		$smarty->template_dir = PATH_TMPL;
+		$smarty->compile_dir  = PATH_TMPL_C;
+
+		$smarty->assign( "user_team_apply"	, $user_team_apply );
+
+		$smarty->display('User/apply_cancel.tmpl');
+	}
+
+
+	/**
+	 * // [Action]指定ユーザーのページを表示
+	 *
+	 * @param  int                $user_id       // users.id
+	 */
+	public function show_user( $user_id )
+	{
+		session_set_save_handler( new MysqlSessionHandler() );
+		require_logined_session();
+
+		$other = User::info( $user_id );        // 指定ユーザーの情報
+		$user  = User::info( $_SESSION["id"] ); // 自分自身の情報
+
+		$smarty               = new Smarty();
+		$smarty->template_dir = PATH_TMPL;
+		$smarty->compile_dir  = PATH_TMPL_C;
+
+		$smarty->assign( "other", $other );
+		$smarty->assign( "user" , $user );
+
+		$smarty->display('User/show_user.tmpl');
+	}
+
 
 }

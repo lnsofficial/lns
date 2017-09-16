@@ -114,9 +114,22 @@
     </form>
 
 
-    <h3>このチームに参加する</h3>
+    <h3>このチームにメンバーとして参加する</h3>
     <form method="post" action="/Team/apply" class="form-horizontal">
       <input type="hidden" name="team_id" value="{$team_owner.team_id}">
+      <input type="hidden" name="type"    value="1">
+      <button type="submit" class="btn btn-default">このチームに参加申請を送る</button>
+    </form>
+    <h3>このチームに連絡者として参加する</h3>
+    <form method="post" action="/Team/apply" class="form-horizontal">
+      <input type="hidden" name="team_id" value="{$team_owner.team_id}">
+      <input type="hidden" name="type"    value="2">
+      <button type="submit" class="btn btn-default">このチームに参加申請を送る</button>
+    </form>
+    <h3>このチームにアナリストとして参加する</h3>
+    <form method="post" action="/Team/apply" class="form-horizontal">
+      <input type="hidden" name="team_id" value="{$team_owner.team_id}">
+      <input type="hidden" name="type"    value="3">
       <button type="submit" class="btn btn-default">このチームに参加申請を送る</button>
     </form>
 
@@ -141,11 +154,15 @@
           <td>{$apply.state}</td>
           {if $user->id == $team_owner.user_id}
           <td>
-			<form method="post" action="/Team/accept" class="form-horizontal">
-			  <input type="hidden" name="user_team_apply_id" value="{$apply.id}">
-			  <button type="submit" class="btn btn-default">この参加申請を承諾</button>
-			</form>
-		  </td>
+            <form method="post" action="/Team/accept" class="form-horizontal">
+              <input type="hidden" name="user_team_apply_id" value="{$apply.id}">
+              <button type="submit" class="btn btn-default">○</button>
+            </form>
+            <form method="post" action="/Team/deny" class="form-horizontal">
+              <input type="hidden" name="user_team_apply_id" value="{$apply.id}">
+              <button type="submit" class="btn btn-default">×</button>
+            </form>
+            </td>
           {/if}
         </tr>
       {/foreach}
