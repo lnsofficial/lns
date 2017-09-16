@@ -118,7 +118,7 @@
           <tr>
             <th>サモナーネーム</th>
             <th>種別</th>
-            {if $user['id'] == $team_owner->id}
+            {if $user.id == $team_owner->id}
             <th>動作</th>
             {/if}
           </tr>
@@ -130,7 +130,7 @@
               {if $apply.type == 2}マネージャー{/if}
               {if $apply.type == 3}アナリスト{/if}
               </td>
-              {if $user['id'] == $team_owner->id}
+              {if $user.id == $team_owner->id}
               <td>
                 <form method="post" action="/Team/accept" class="form-horizontal">
                   <input type="hidden" name="user_team_apply_id" value="{$apply.id}">

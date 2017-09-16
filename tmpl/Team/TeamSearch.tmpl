@@ -43,6 +43,18 @@
               </div>
             </div>
           </form>
+          {if ( count($team_list) > 0 )}
+          <table class="table">
+            <tr>
+              <th>チーム名</th>
+            </tr>
+            {foreach from=$team_list item=team key=id}
+            <tr>
+              <th><a href="/Team/Detail/{$team.id}">{$team.team_name}</a></th>
+            </tr>
+            {/foreach}
+          </table>
+          {/if}
         </div>
       </div>
     </div>
