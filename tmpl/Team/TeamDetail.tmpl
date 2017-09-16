@@ -88,27 +88,31 @@
           </tr>
         </table>
 
-        {if isset($team_contact)}
-        <h2>マネージャー</h2>
+        {if count($team_contacts)}
+        <h2>連絡係</h2>
         <table  class="table-bordered">
           <tr>
             <th>サモナーネーム</th>
           </tr>
+            {foreach from=$team_contacts item=contact key=idx}
             <tr>
-              <td>{$team_contact.summoner_name}</td>
+              <td>{$contact.summoner_name}</td>
             </tr>
+            {/foreach}
         </table>
         {/if}
 
-        {if isset($team_contact)}
+        {if isset($team_staffs)}
         <h2>アナリスト</h2>
         <table  class="table-bordered">
           <tr>
             <th>サモナーネーム</th>
           </tr>
+            {foreach from=$team_staffs item=staff key=idx}
             <tr>
-              <td>{$team_contact.summoner_name}</td>
+              <td>{$staff.summoner_name}</td>
             </tr>
+            {/foreach}
         </table>
         {/if}
 
@@ -127,7 +131,7 @@
               <td><a href="/User/show_user/{$apply.user_id}">{$apply.summoner_name}</a></td>
               <td>
               {if $apply.type == 1}メンバー{/if}
-              {if $apply.type == 2}マネージャー{/if}
+              {if $apply.type == 2}連絡係{/if}
               {if $apply.type == 3}アナリスト{/if}
               </td>
               {if $user.id == $team_owner->id}
