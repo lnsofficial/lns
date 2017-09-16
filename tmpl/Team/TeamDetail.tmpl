@@ -124,7 +124,7 @@
           </tr>
           {foreach from=$user_team_applys item=apply key=idx}
             <tr>
-              <td>{$apply.summoner_name}</td>
+              <td><a href="/User/show_user/{$apply.user_id}">{$apply.summoner_name}</a></td>
               <td>
               {if $apply.type == 1}メンバー{/if}
               {if $apply.type == 2}マネージャー{/if}
