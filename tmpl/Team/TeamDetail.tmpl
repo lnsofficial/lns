@@ -82,9 +82,11 @@
         <table  class="table-bordered">
           <tr>
             <th>サモナーネーム</th>
+            <th>DiscordID</th>
           </tr>
           <tr>
             <td>{$team_owner->summoner_name}</td>
+            <td>{$team_owner->discord_id}</td>
           </tr>
         </table>
 
@@ -94,10 +96,12 @@
         <table  class="table-bordered">
           <tr>
             <th>サモナーネーム</th>
+            <th>DiscordID</th>
           </tr>
             {foreach from=$team_contacts item=contact key=idx}
             <tr>
               <td>{$contact.summoner_name}</td>
+              <td>{$contact.discord_id}</td>
             </tr>
             {/foreach}
         </table>
