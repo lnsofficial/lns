@@ -174,19 +174,23 @@ class TeamController extends BaseController{
 		$oDb = new Db();
 
 //		$oTeam = Teams::getTeamFromUserId( $user_id );
-		$oTeam = Teams::find( $team_id );
+//		$oTeam = Teams::find( $team_id );
+		$oTeam = new Teams( $oDb, $team_id );
 
 		// team members
-		$team_members = TeamMembers::getByTeamId( $oTeam["id"] );
+		$team_members = TeamMembers::getByTeamId( $oTeam->id );
 
 		// team owner user_id
-		$team_owner   = TeamOwner::getUserIdFromTeamId( $oTeam["id"] );
+		$team_owner   = TeamOwner::getUserIdFromTeamId( $oTeam->id );
 
 		// contact user id
-		$team_contact = TeamContact::getUserIdFromTeamId( $oTeam["id"] );
+		$team_contact = TeamContact::getUserIdFromTeamId( $oTeam->id );
 
 		// user_team_applys
-		$user_team_applys = UserTeamApply::getByTeamId( $oTeam["id"] );
+		$user_team_applys = UserTeamApply::getByTeamId( $oTeam->id );
+		
+		// team_staffs
+		$team_staffs = $oTeam->getStaff();
 
 		// users
 		$user = new User( $oDb, $user_id );
@@ -198,10 +202,11 @@ class TeamController extends BaseController{
 
 		$smarty->assign( "login"            , false );
 
-		$smarty->assign( "team_name"		, $oTeam["team_name"] );
-		$smarty->assign( "team_name_kana"	, $oTeam["team_name_kana"] );
-		$smarty->assign( "team_tag"			, $oTeam["team_tag"] );
-		$smarty->assign( "team_tag_kana"	, $oTeam["team_tag_kana"] );
+		$smarty->assign( "team_id"			, $oTeam->id );
+		$smarty->assign( "team_name"		, $oTeam->team_name );
+		$smarty->assign( "team_name_kana"	, $oTeam->team_name_kana );
+		$smarty->assign( "team_tag"			, $oTeam->team_tag );
+		$smarty->assign( "team_tag_kana"	, $oTeam->team_tag_kana );
 
 		$smarty->assign( "team_members"     , $team_members );
 		$smarty->assign( "team_owner"       , $team_owner );
@@ -227,6 +232,16 @@ class TeamController extends BaseController{
 		$smarty->display('Team/form.tmpl');
 	}
 
+	
+	public function searchList(){
+		session_set_save_handler( new MysqlSessionHandler() );
+		require_logined_session();
+		
+		$smarty = new Smarty();
+		$smarty->template_dir = PATH_TMPL;
+		$smarty->compile_dir  = PATH_TMPL_C;
+		$smarty->display('Team/TeamSearch.tmpl');
+	}
 
 
 	/**

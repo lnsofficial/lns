@@ -1,6 +1,7 @@
 <?php
 require_once( PATH_MODEL . "Base.php" );
-require_once( PATH_MODEL . 'Teams.php' );
+require_once( PATH_MODEL . "Teams.php" );
+require_once( PATH_MODEL . "TeamMembers.php" );
 
 class User extends Base{
 	const MAIN_TABLE	= "users";
@@ -25,7 +26,7 @@ class User extends Base{
 		
 		$ahsResult = static::getList( $oDb, [ [ "column" => "login_id",  "type" => "varchar", "value" => $login_id ] ] );
 		if( $ahsResult ){
-			$oUser = new User( $oDb, $ahsResult["id"] );
+			$oUser = new User( $oDb, $ahsResult[0]["id"] );
 		}
 		
 		return $oUser;
@@ -37,7 +38,7 @@ class User extends Base{
 		
 		$ahsResult = static::getList( $oDb, [ [ "column" => "discord_id",  "type" => "varchar", "value" => $discord_id ] ] );
 		if( $ahsResult ){
-			$oUser = new User( $oDb, $ahsResult["id"] );
+			$oUser = new User( $oDb, $ahsResult[0]["id"] );
 		}
 		
 		return $oUser;
@@ -49,10 +50,22 @@ class User extends Base{
 		
 		$ahsResult = static::getList( $oDb, [ [ "column" => "summoner_name",  "type" => "varchar", "value" => $summoner_name ] ] );
 		if( $ahsResult ){
-			$oUser = new User( $oDb, $ahsResult["id"] );
+			$oUser = new User( $oDb, $ahsResult[0]["id"] );
 		}
 		
 		return $oUser;
+	}
+	
+	public function getTeam(){
+		$oDb = new Db();
+		$oTeam = null;
+		
+		$ahsResult = TeamMembers::getList( $oDb, [ [ "column" => "user_id",  "type" => "int", "value" => $this->id ] ] );
+		
+		if( $ahsResult ){
+			$oTeam = new Teams( $oDb, $ahsResult[0]["team_id"] );
+		}
+		return $oTeam;
 	}
 
 
