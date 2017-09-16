@@ -9,7 +9,6 @@ require_once( PATH_MODEL . 'User.php' );
 require_once( PATH_LIB . '/common/UtilTime.php');
 // TODO 最低限の共通化、全コントローラーで共通部分はBaseControllerにまとめる
 // 特別に処理を入れる場合のみ、各Controllerに追記する形で開発する
-
 class TeamController extends BaseController{
 	const INPUT_DATA = [
 		
@@ -21,7 +20,6 @@ class TeamController extends BaseController{
 	public function confirm(){
         session_set_save_handler( new MysqlSessionHandler() );
         require_logined_session();
-
 		// バリデーション（今のとこ必須チェックだけ）
 		if( !self::validation() ){
 			self::displayError();
@@ -35,7 +33,6 @@ class TeamController extends BaseController{
 	public function register(){
         session_set_save_handler( new MysqlSessionHandler() );
         require_logined_session();
-
 		// self::displayError();
 		//TODO 一旦仮で塞ぐ、その内簡単に切り替えれるようにしたい
 		// あと、リクエストをInsertメソッドで取ってるとこもその内修正
@@ -44,19 +41,21 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
-
         $user_id = $_SESSION["id"];
 		
+        $oDb = new Db();
+        $oDb->beginTransaction();
+		
 		// DBに登録
-        $team_id = self::insertTeam($user_id);
+        $team_id = self::insertTeam( $oDb, $user_id );
 		if( false === $team_id ){
 			self::displayError();
 			exit;
 		}
-
-        self::insertTeamMember($user_id, $team_id);
-
-        self::insertTeamOwner($user_id, $team_id);
+		
+        self::insertTeamMember( $oDb, $user_id, $team_id );
+        self::insertTeamOwner( $oDb, $user_id, $team_id );
+		$oDb->commit();
 		
 		// 画面表示
 		self::_displayCommit($team_id);
@@ -81,10 +80,8 @@ class TeamController extends BaseController{
         return $bResult;
 	}
 	
-	private function insertTeam( $user_id ){
+	private function insertTeam( $oDb, $user_id ){
         // add team
-        $oDb = new Db();
-        $oDb->beginTransaction();
         $oTeams = new Teams( $oDb );
         $oTeams->user_id = $user_id;
         $oTeams->team_name = $_REQUEST["inputTeamNm"];
@@ -92,35 +89,22 @@ class TeamController extends BaseController{
         $oTeams->team_tag = $_REQUEST["inputTeamTag"];
         $oTeams->team_tag_kana = $_REQUEST["inputTeamTagKana"];
         $oTeams->save();
-        $team_id = $oDb->getLastInsertId();
-        $oDb->commit();
     
-        if (isset($team_id)) {
-            return $team_id;
-        }
-        return false;
+        return $oTeams->id;
 	}
-
-	private function insertTeamOwner($user_id, $team_id){
+	private function insertTeamOwner($oDb, $user_id, $team_id){
         // add owner
-        $oDb = new Db();
-        $oDb->beginTransaction();
         $oTeamOwner = new TeamOwner( $oDb );
         $oTeamOwner->user_id = $user_id;
         $oTeamOwner->team_id = $team_id;
         $oTeamOwner->save();
-        $oDb->commit();
 	}
-
-	private function insertTeamMember($user_id, $team_id){
+	private function insertTeamMember($oDb, $user_id, $team_id){
         // add member
-        $oDb = new Db();
-        $oDb->beginTransaction();
         $oTeamOwner = new TeamMembers( $oDb );
         $oTeamOwner->user_id = $user_id;
         $oTeamOwner->team_id = $team_id;
         $oTeamOwner->save();
-        $oDb->commit();
 	}
 	
 	// 確認画面表示
@@ -138,13 +122,11 @@ class TeamController extends BaseController{
 		
 		$smarty->display('Team/confirm.tmpl');
 	}
-
 	private function _displayCommit($team_id){
 		$smarty = new Smarty();
 		
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
-
 		$smarty->assign("inputTeamNm", $_REQUEST["inputTeamNm"]);
 		$smarty->assign("inputTeamNmKana", $_REQUEST["inputTeamNmKana"]);
 		$smarty->assign("inputTeamTag", $_REQUEST["inputTeamTag"]);
@@ -163,7 +145,6 @@ class TeamController extends BaseController{
 		
 		$smarty->display('TeamRegister_err.tmpl');
 	}
-
 	/**
 	 * // [SubFunction]汎用エラー画面だすやつ
 	 *
@@ -180,76 +161,56 @@ class TeamController extends BaseController{
 			],
 		];
 		$error = array_merge( $param_org, $param );
-
 		$smarty = new Smarty();
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
-
 		$smarty->assign("error", $error);
-
 		$smarty->display('commonError.tmpl');
 	}
-
 	public function detail( $team_id = 0 ){
         session_set_save_handler( new MysqlSessionHandler() );
         require_logined_session();
-
 		// get team from user_id
         $user_id = $_SESSION["id"];
-
 		$oDb = new Db();
-
 //		$oTeam = Teams::getTeamFromUserId( $user_id );
 //		$oTeam = Teams::find( $team_id );
 		$oTeam = new Teams( $oDb, $team_id );
-
 		// team members
 		$team_members = TeamMembers::getByTeamId( $oTeam->id );
-
 		// team owner user_id
 		$team_owner   = TeamOwner::getUserIdFromTeamId( $oTeam->id );
-
 		// contact user id
 		$team_contact = TeamContact::getUserIdFromTeamId( $oTeam->id );
-
 		// user_team_applys
 		$user_team_applys = UserTeamApply::getByTeamId( $oTeam->id );
 		
 		// team_staffs
 		$team_staffs = $oTeam->getStaff();
-
 		// users
 //		$user = new User( $oDb, $user_id );
 		$user = User::info( $user_id );
-
 		// 自身のチーム所属情報
 		$my_team_member = TeamMembers::findByUserId( $user["id"] );
-
 		$smarty = new Smarty();
-
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
-
 		$smarty->assign( "login"            , false );
-
 		$smarty->assign( "team_id"			, $oTeam->id );
 		$smarty->assign( "team_name"		, $oTeam->team_name );
 		$smarty->assign( "team_name_kana"	, $oTeam->team_name_kana );
 		$smarty->assign( "team_tag"			, $oTeam->team_tag );
 		$smarty->assign( "team_tag_kana"	, $oTeam->team_tag_kana );
-
 		$smarty->assign( "team_members"     , $team_members );
 		$smarty->assign( "team_owner"       , $team_owner );
 		$smarty->assign( "team_contact"     , $team_contact );
 		$smarty->assign( "user_team_applys" , $user_team_applys );
 		$smarty->assign( "user"             , $user );
 		$smarty->assign( "team"             , $oTeam );
-
 		$isThisTeamContact      = count( array_filter($user['team_contacts'],function($item)use($team_id){ return $item['team_id']==$team_id; }) );
 		$isThisTeamStaff        = count( array_filter($user['team_staffs'],  function($item)use($team_id){ return $item['team_id']==$team_id; }) );
 		$isThisTeamContactApply = count( array_filter($user_team_applys,function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_CONTACT && $item['team_id']==$team_id; }) );
 		$isThisTeamStaffApply   = count( array_filter($user_team_applys,function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_STAFF   && $item['team_id']==$team_id; }) );
-
 		$smarty->assign( "isThisTeamContact"      , $isThisTeamContact );
 		$smarty->assign( "isThisTeamStaff"        , $isThisTeamStaff );
 		$smarty->assign( "isThisTeamContactApply" , $isThisTeamContactApply );
@@ -257,37 +218,37 @@ class TeamController extends BaseController{
 
 		$smarty->display('Team/TeamDetail.tmpl');
 	}
-
 	public function form(){
         session_set_save_handler( new MysqlSessionHandler() );
         require_logined_session();
-
         self::_displayTeamForm();
 	}
-
 	private function _displayTeamForm(){
 		$smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
 		$smarty->display('Team/form.tmpl');
 	}
-
 	
 	public function searchList(){
 		session_set_save_handler( new MysqlSessionHandler() );
 		require_logined_session();
 		
+		$oDb = new Db();
+		$iUserId = $_SESSION["id"];
+		
 		$aoTeamList = Teams::getSearchList();
+		$oUser = new User( $oDb, $iUserId );
+		$oTeam = $oUser->getTeam();
 		
 		$smarty = new Smarty();
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
 		$smarty->assign( "team_list" , $aoTeamList );
+		$smarty->assign( "team", $oTeam );
 		
 		$smarty->display('Team/TeamSearch.tmpl');
 	}
-
-
 	/**
 	 * // [Action]チームへ参加申請するやつ
 	 *
@@ -297,25 +258,21 @@ class TeamController extends BaseController{
 	{
         session_set_save_handler( new MysqlSessionHandler() );
         require_logined_session();
-
 		// バリデーション（今のとこ必須チェックだけ）
 		if( !$_REQUEST["team_id"] || !$_REQUEST["type"] )
 		{
 			self::displayError();
 			exit;
 		}
-
         $user_id = $_SESSION["id"];
 		$team_id = $_REQUEST["team_id"];
 		$type    = $_REQUEST["type"];
-
 		// 既に同職種に申請済みだったらだめ。
 		if( UserTeamApply::findByUserIdTeamIdTypeState( $user_id, $team_id, $type, UserTeamApply::STATE_APPLY ) )
 		{
 			self::displayError();
 			exit;
 		}
-
 		switch( $type )
 		{
 			case UserTeamApply::TYPE_MEMBER:
@@ -326,7 +283,6 @@ class TeamController extends BaseController{
 					exit;
 				}
 				break;
-
 			case UserTeamApply::TYPE_CONTACT:
 				// 他のチームの連絡者であってもだいじょぶだよ
 				// このチームの連絡者だったらだめだよ
@@ -336,7 +292,6 @@ class TeamController extends BaseController{
 					exit;
 				}
 				break;
-
 			case UserTeamApply::TYPE_STAFF:
 				// 他のチームのアナリストであってもだいじょぶだよ
 				// このチームのアナリストだったらだめだよ
@@ -346,45 +301,30 @@ class TeamController extends BaseController{
 					exit;
 				}
 				break;
-
 			default:
 				self::displayError();
 				exit;
 		}
-
-
 		$db = new Db();
 		$db->beginTransaction();
-
 		$user_team_apply          = new UserTeamApply( $db );
 		$user_team_apply->user_id = $user_id;
 		$user_team_apply->team_id = $team_id;
 		$user_team_apply->type    = $type;
 		$user_team_apply->state   = UserTeamApply::STATE_APPLY;
 		$user_team_apply->save();
-
 		$db->commit();
-
-
-
 		if( ! $user_team_apply )
 		{
 			self::displayError();
 			exit;
 		}
-
 		$smarty = new Smarty();
-
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
-
 		$smarty->assign( "user_team_apply"	, $user_team_apply );
-
 		$smarty->display('Team/apply_complete.tmpl');
-
 	}
-
-
 	/**
 	 * // [Action]チームへの参加申請を承認するやつ
 	 *
@@ -400,12 +340,9 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
-
 		$user_id = $_SESSION["id"];
 		$user_team_apply_id = $_REQUEST["user_team_apply_id"];
-
 		$user = User::info( $user_id );
-
 		///////////////////////////////////////////////////////
 		// 適当なuser_team_apply_idじゃないこと
 		///////////////////////////////////////////////////////
@@ -415,7 +352,6 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
-
 		///////////////////////////////////////////////////////
 		// 自分がapply先のチームのownerであること
 		///////////////////////////////////////////////////////
@@ -424,7 +360,6 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
-
 		///////////////////////////////////////////////////////
 		// $user_team_applyがstate == 申請中であること
 		///////////////////////////////////////////////////////
@@ -433,8 +368,6 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
-
-
 		// 申請内容で処理わけ
 		switch( $user_team_apply['type'] )
 		{
@@ -444,32 +377,26 @@ class TeamController extends BaseController{
 				// applyのtype先に、空きがあること
 				$this->_acceptAsMember( $user_team_apply );
 				break;
-
 			// 連絡者としての参加申請の場合
 			case UserTeamApply::TYPE_CONTACT:
 				// このチームの連絡者ではないこと
 				// applyのtype先に、空きがあること
 				$this->_acceptAsContact( $user_team_apply );
 				break;
-
 			// アナリストとしての参加申請の場合
 			case UserTeamApply::TYPE_STAFF:
 				// このチームのアナリストではないこと
 				// applyのtype先に、空きがあること
 				$this->_acceptAsStaff( $user_team_apply );
 				break;
-
 			default:
 				// まぁここに来ることはないでしょう・・
 				break;
 		}
-
 		$smarty = new Smarty();
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
-
 		$smarty->assign( "user_team_apply"	, $user_team_apply );
-
 		$smarty->display('Team/apply_accept.tmpl');
 	}
 	/**
@@ -509,7 +436,6 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
-
 		// メンバー枠に、空きがあること
 		$team_members = TeamMembers::getByTeamId( $user_team_apply['team_id'] );
 		if( Teams::COUNT_MAX_MEMBER <= count($team_members) )
@@ -523,23 +449,18 @@ class TeamController extends BaseController{
 			]);
 			exit;
 		}
-
 		// team_membersにレコード作成してuser_team_applysのstateを更新
 		$db = new Db();
 		$db->beginTransaction();
-
 		$team_member          = new TeamMembers( $db );
 		$team_member->team_id = $user_team_apply['team_id'];
 		$team_member->user_id = $user_team_apply['user_id'];
 		$team_member->save();
-
 		$apply             = new UserTeamApply( $db, $user_team_apply['id'] );
 		$apply->state      = UserTeamApply::STATE_ACCEPT;
 		$apply->deleted_at = UtilTime::now();
 		$apply->save();
-
 		$db->commit();
-
 		return true;
 	}
 	/**
@@ -557,7 +478,6 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
-
 		// 連絡者枠に、空きがあること
 		$team_contacts = TeamContact::getByTeamId( $user_team_apply['team_id'] );
 		if( Teams::COUNT_MAX_CONTACT <= count($team_contacts) )
@@ -565,23 +485,18 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
-
 		// team_membersにレコード作成してuser_team_applysのstateを更新
 		$db = new Db();
 		$db->beginTransaction();
-
 		$team_contact          = new TeamContact( $db );
 		$team_contact->team_id = $user_team_apply['team_id'];
 		$team_contact->user_id = $user_team_apply['user_id'];
 		$team_contact->save();
-
 		$apply             = new UserTeamApply( $db, $user_team_apply['id'] );
 		$apply->state      = UserTeamApply::STATE_ACCEPT;
 		$apply->deleted_at = UtilTime::now();
 		$apply->save();
-
 		$db->commit();
-
 		return true;
 	}
 	/**
@@ -599,7 +514,6 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
-
 		// アナリスト枠に、空きがあること
 		$team_staffs = TeamStaffs::getByTeamId( $user_team_apply['team_id'] );
 		if( Teams::COUNT_MAX_STAFF <= count($team_staffs) )
@@ -607,28 +521,20 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
-
 		// team_membersにレコード作成してuser_team_applysのstateを更新
 		$db = new Db();
 		$db->beginTransaction();
-
 		$team_staff          = new TeamStaffs( $db );
 		$team_staff->team_id = $user_team_apply['team_id'];
 		$team_staff->user_id = $user_team_apply['user_id'];
 		$team_staff->save();
-
 		$apply             = new UserTeamApply( $db, $user_team_apply['id'] );
 		$apply->state      = UserTeamApply::STATE_ACCEPT;
 		$apply->deleted_at = UtilTime::now();
 		$apply->save();
-
 		$db->commit();
-
 		return true;
 	}
-
-
-
 	/**
 	 * // [Action]チームへの参加申請を棄却するやつ
 	 *
@@ -644,12 +550,9 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
-
 		$user_id = $_SESSION["id"];
 		$user_team_apply_id = $_REQUEST["user_team_apply_id"];
-
 		$user = User::info( $user_id );
-
 		///////////////////////////////////////////////////////
 		// 適当なuser_team_apply_idじゃないこと
 		///////////////////////////////////////////////////////
@@ -659,7 +562,6 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
-
 		///////////////////////////////////////////////////////
 		// 自分がapply先のチームのownerであること
 		///////////////////////////////////////////////////////
@@ -668,7 +570,6 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
-
 		///////////////////////////////////////////////////////
 		// $user_team_applyがstate == 申請中であること
 		///////////////////////////////////////////////////////
@@ -677,29 +578,19 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
-
-
 		// 申請内容で処理わけ・・る必要はない。
 		// user_team_applysのstateを更新
 		$db = new Db();
 		$db->beginTransaction();
-
 		$apply             = new UserTeamApply( $db, $user_team_apply['id'] );
 		$apply->state      = UserTeamApply::STATE_DENY;
 		$apply->deleted_at = UtilTime::now();
 		$apply->save();
-
 		$db->commit();
-
-
 		$smarty = new Smarty();
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
-
 		$smarty->assign( "user_team_apply"	, $user_team_apply );
-
 		$smarty->display('Team/apply_deny.tmpl');
 	}
-
 }
-
