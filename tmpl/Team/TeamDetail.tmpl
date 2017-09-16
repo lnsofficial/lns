@@ -24,9 +24,18 @@
       <div class="col-lg-2 about-menu">
         <ul class="nav side">
           <li role="presentation">チームへ参加</li>
+          {if $user['team_member'] && $user['team_member']['team_id']==$team->id}
+          {else}
           <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=1">メンバー申請</a></li>
+          {/if}
+          {if $isThisTeamContact}
+          {else}
           <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=2">マネージャー申請</a></li>
+          {/if}
+          {if $isThisTeamStaff}
+          {else}
           <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=3">アナリスト申請</a></li>
+          {/if}
         </ul>
       </div>
       <div class="col-lg-9">
@@ -109,19 +118,19 @@
           <tr>
             <th>サモナーネーム</th>
             <th>種別</th>
-            {if $user->id == $team_owner->id}
+            {if $user['id'] == $team_owner->id}
             <th>動作</th>
             {/if}
           </tr>
           {foreach from=$user_team_applys item=apply key=idx}
             <tr>
-              <td>{$apply.summoner_name}</td>
+              <td><a href="/User/show_user/{$apply.user_id}">{$apply.summoner_name}</a></td>
               <td>
               {if $apply.type == 1}メンバー{/if}
               {if $apply.type == 2}マネージャー{/if}
               {if $apply.type == 3}アナリスト{/if}
               </td>
-              {if $user->id == $team_owner->id}
+              {if $user['id'] == $team_owner->id}
               <td>
                 <form method="post" action="/Team/accept" class="form-horizontal">
                   <input type="hidden" name="user_team_apply_id" value="{$apply.id}">
