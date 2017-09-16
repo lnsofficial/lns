@@ -17,6 +17,138 @@ class UserController extends BaseController{
 		$smarty->display('User/form.tmpl');
 	}
 	
+	public function editForm(){
+		session_set_save_handler( new MysqlSessionHandler() );
+		require_logined_session();
+		
+		$oDb = new Db();
+		$oUser = new User( $oDb, $_SESSION["id"] );
+		
+		$smarty = new Smarty();
+		
+		$smarty->template_dir = PATH_TMPL;
+		$smarty->compile_dir  = PATH_TMPL_C;
+		
+		$smarty->assign("summoner_name", $oUser->summoner_name );
+		$smarty->assign("main_role", $oUser->main_role );
+		$smarty->assign("discord_id", $oUser->discord_id );
+		
+		$smarty->display('User/edit_form.tmpl');
+	}
+	
+	public function editConfirm(){
+		session_set_save_handler( new MysqlSessionHandler() );
+		require_logined_session();
+		
+		$oDb = new Db();
+		$oLoginUser = new User( $oDb, $_SESSION["id"] );
+		
+		$sErrorMessage = "";
+		
+		// TODO 共通化
+		if( !$_REQUEST["discord_id"] ){
+			$sErrorMessage = "DiscordIDが空です";
+		}
+		if( !$_REQUEST["summoner_name"] ){
+			$sErrorMessage = "サモナー名が空です";
+		}
+		
+		// DiscordIDの重複チェック
+		$oUser = User::getUserFromDiscordId( $_REQUEST["discord_id"] );
+		if( $oUser ){
+			if( $oUser->id != $oLoginUser->id ){
+				$sErrorMessage = "そのDiscordIDは既に利用されています";
+			}
+		}
+		
+		// サモネの重複チェック
+		$oUser = User::getUserFromSummonerName( $_REQUEST["summoner_name"] );
+		if( $oUser ){
+			if( $oUser->id != $oLoginUser->id ){
+				$sErrorMessage = "そのサモナーネームは既に利用されています";
+			}
+		}
+		
+		// 画面表示
+		if( $sErrorMessage ){
+			$smarty = new Smarty();
+			$smarty->template_dir = PATH_TMPL;
+			$smarty->compile_dir  = PATH_TMPL_C;
+			
+			$smarty->assign("error_message", $sErrorMessage);
+			$smarty->assign("summoner_name", $_REQUEST["summoner_name"]);
+			$smarty->assign("main_role", $_REQUEST["main_role"]);
+			$smarty->assign("discord_id", $_REQUEST["discord_id"]);
+			
+			$smarty->display('User/edit_form.tmpl');
+		} else {
+			self::displayEditConfirm();
+		}
+	}
+	
+	public function edit(){
+		session_set_save_handler( new MysqlSessionHandler() );
+		require_logined_session();
+		
+		$oDb = new Db();
+		$oDb->beginTransaction();
+		
+		$oLoginUser = new User( $oDb, $_SESSION["id"] );
+		
+		$sErrorMessage = "";
+		
+		// TODO 共通化
+		if( !$_REQUEST["discord_id"] ){
+			self::displayError();
+			exit;
+		}
+		if( !$_REQUEST["summoner_name"] ){
+			self::displayError();
+			exit;
+		}
+		
+		// DiscordIDの重複チェック
+		$oUser = User::getUserFromDiscordId( $_REQUEST["discord_id"] );
+		if( $oUser ){
+			if( $oUser->id != $oLoginUser->id ){
+				self::displayError();
+				exit;
+			}
+		}
+		
+		// サモネの重複チェック
+		$oUser = User::getUserFromSummonerName( $_REQUEST["summoner_name"] );
+		if( $oUser ){
+			if( $oUser->id != $oLoginUser->id ){
+				self::displayError();
+				exit;
+			}
+		}
+		
+		// 画面表示
+		if( $sErrorMessage ){
+			$smarty = new Smarty();
+			$smarty->template_dir = PATH_TMPL;
+			$smarty->compile_dir  = PATH_TMPL_C;
+			
+			$smarty->assign("error_message", $sErrorMessage);
+			$smarty->assign("summoner_name", $_REQUEST["summoner_name"]);
+			$smarty->assign("main_role", $_REQUEST["main_role"]);
+			$smarty->assign("discord_id", $_REQUEST["discord_id"]);
+			
+			$smarty->display('User/edit_form.tmpl');
+		} else {
+			$oLoginUser->summoner_name = $_REQUEST["summoner_name"];
+			$oLoginUser->main_role = $_REQUEST["main_role"];
+			$oLoginUser->discord_id = $_REQUEST["discord_id"];
+			$oLoginUser->save();
+			
+			$oDb->commit();
+			
+			header('Location: /User/MyPage');
+		}
+	}
+	
 	public function display(){
 		$iUserId = $_REQUEST["user_id"];
 		
@@ -30,8 +162,7 @@ class UserController extends BaseController{
 		
 		$smarty->assign("summoner_name", $oUser->summoner_name );
 		$smarty->assign("main_role", $oUser->main_role );
-		$smarty->assign("main_champion", $oUser->main_champion );
-		//$smarty->assign("discord_id", $oUser->discord_id );
+		$smarty->assign("discord_id", $oUser->discord_id );
 		
 		$smarty->display('User/display.tmpl');
 	}
@@ -89,21 +220,20 @@ class UserController extends BaseController{
 
 		$user             = User::info( $user_id );                 // ユーザー情報
 		$user_team_applys = UserTeamApply::getByUserId( $user_id ); // チームへの申請情報まわり
-
+		
+		$oTeam = $oUser->getTeam();
 
 		$smarty = new Smarty();
 
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
 
-		$smarty->assign("summoner_name",    $oUser->summoner_name );
-		$smarty->assign("main_role",        $oUser->main_role );
-		$smarty->assign("main_champion",    $oUser->main_champion );
+		$smarty->assign("user",	$oUser );
+		$smarty->assign("team",	$oTeam );
 
-		$smarty->assign("user",             $user );
-		$smarty->assign("user_team_applys", $user_team_applys );
+		$smarty->assign("user_team_applys",	$user_team_applys );
 
-		$smarty->display('User/display.tmpl');
+		$smarty->display('User/mypage.tmpl');
 	}
 
 	public function confirm(){
@@ -250,6 +380,20 @@ class UserController extends BaseController{
 		$smarty->assign("discord_id", $_REQUEST["discord_id"]);
 		
 		$smarty->display('User/confirm.tmpl');
+	}
+	
+	// 確認画面表示
+	public function displayEditConfirm(){
+		$smarty = new Smarty();
+		
+		$smarty->template_dir = PATH_TMPL;
+		$smarty->compile_dir  = PATH_TMPL_C;
+		
+		$smarty->assign("summoner_name", $_REQUEST["summoner_name"]);
+		$smarty->assign("main_role", $_REQUEST["main_role"]);
+		$smarty->assign("discord_id", $_REQUEST["discord_id"]);
+		
+		$smarty->display('User/edit_confirm.tmpl');
 	}
 	
 	// 正常系とエラー系とで画面表示はBaseControllerあたりに共通化

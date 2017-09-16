@@ -72,7 +72,10 @@ class Base{
 		
 		$oResult = $oDb->executePrepare( $sSelectSql, $sType, $asParameter );
 		
-		$list = $oResult->fetch_array();
+		$list = [];
+		while( $res = $oResult->fetch_assoc() ){
+			$list[] = $res;
+		}
 		
 		return $list;
 	}

@@ -1,5 +1,6 @@
 <?php
 require_once( PATH_MODEL . "Base.php" );
+require_once( PATH_MODEL . "TeamStaffs.php" );
 
 class Teams extends Base{
 	const MAIN_TABLE			= "teams";
@@ -57,5 +58,14 @@ class Teams extends Base{
         $bindParam  = [$id];
         return $db->executePrepare( $prepareSql, "i", $bindParam )->fetch_assoc();
     }
+    
+	// スタッフ取得
+	public function getStaff(){
+		$oDb = new Db();
+		
+		$ahsStaff = TeamStaffs::getList( $oDb, [ [ "column" => "team_id",  "type" => "varchar", "value" => $this->id ] ] );
+		
+		return $ahsStaff;
+	}
 
 }
