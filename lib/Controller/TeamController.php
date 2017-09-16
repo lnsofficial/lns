@@ -163,7 +163,33 @@ class TeamController extends BaseController{
 		
 		$smarty->display('TeamRegister_err.tmpl');
 	}
-	
+
+	/**
+	 * // [SubFunction]汎用エラー画面だすやつ
+	 *
+	 * @param  array                 $param       // []
+	 */
+	public function displayCommonError( $param = [] )
+	{
+		$param_org = [
+			'title'   => "エラーが発生しました。",
+			'message' => "もう一度やり直してください。",
+			'button'   => [
+				'href'      => "/index.html",
+				'name'      => "戻る",
+			],
+		];
+		$error = array_merge( $param_org, $param );
+
+		$smarty = new Smarty();
+		$smarty->template_dir = PATH_TMPL;
+		$smarty->compile_dir  = PATH_TMPL_C;
+
+		$smarty->assign("error", $error);
+
+		$smarty->display('commonError.tmpl');
+	}
+
 	public function detail( $team_id = 0 ){
         session_set_save_handler( new MysqlSessionHandler() );
         require_logined_session();
@@ -481,7 +507,13 @@ class TeamController extends BaseController{
 		$team_members = TeamMembers::getByTeamId( $user_team_apply['team_id'] );
 		if( Teams::COUNT_MAX_MEMBER <= count($team_members) )
 		{
-			self::displayError();
+			self::displayCommonError([
+				'message' => "チームメンバー数オーバーです。",
+				'button'   => [
+					'href'      => "/Team/detail/" . $user_team_apply['team_id'],
+					'name'      => "チーム詳細へ戻る",
+				],
+			]);
 			exit;
 		}
 
