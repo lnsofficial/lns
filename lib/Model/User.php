@@ -111,7 +111,7 @@ class User extends Base{
 
 		// TeamStaff
 //      $db = new Db();
-        $prepareSql  = "SELECT * FROM team_owner WHERE user_id = ?";
+        $prepareSql  = "SELECT * FROM team_staffs WHERE user_id = ?";
         $bindParam   = [ $user_id ];
 		$result      = $db->executePrepare( $prepareSql, "i", $bindParam );
         $team_staffs = [];
@@ -120,6 +120,16 @@ class User extends Base{
 			$team_staffs[] = $team_staff;
 		}
 //var_dump($team_staffs);
+
+		// TeamContact
+        $prepareSql  = "SELECT * FROM teams_contact WHERE user_id = ?";
+        $bindParam   = [ $user_id ];
+		$result      = $db->executePrepare( $prepareSql, "i", $bindParam );
+        $team_contacts = [];
+		while( $team_staff = $result->fetch_assoc() )
+		{
+			$team_contacts[] = $team_contact;
+		}
 
 		// Team
 		$team = false;
@@ -131,6 +141,7 @@ class User extends Base{
 		$user['team_member'] = $team_member;
 		$user['team_owners'] = $team_owners;
 		$user['team_staffs'] = $team_staffs;
+		$user['team_contacts'] = $team_contacts;
 		$user['team']        = $team;
 
         return $user;

@@ -193,7 +193,11 @@ class TeamController extends BaseController{
 		$team_staffs = $oTeam->getStaff();
 
 		// users
-		$user = new User( $oDb, $user_id );
+//		$user = new User( $oDb, $user_id );
+		$user = User::info( $user_id );
+
+		// 自身のチーム所属情報
+		$my_team_member = TeamMembers::findByUserId( $user->id );
 
 		$smarty = new Smarty();
 
@@ -214,6 +218,9 @@ class TeamController extends BaseController{
 		$smarty->assign( "user_team_applys" , $user_team_applys );
 		$smarty->assign( "user"             , $user );
 		$smarty->assign( "team"             , $oTeam );
+
+		$smarty->assign( "isThisTeamContact" , count( array_filter($user['team_contacts'],function($item)use($team){ return $item['team_id']==$team->id; }) ) );
+		$smarty->assign( "isThisTeamStaff"   , count( array_filter($user['team_staffs'],  function($item)use($team){ return $item['team_id']==$team->id; }) ) );
 
 		$smarty->display('Team/TeamDetail.tmpl');
 	}
