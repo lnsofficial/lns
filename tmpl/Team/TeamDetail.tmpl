@@ -28,7 +28,7 @@
           {else}
           <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=1">メンバー申請</a></li>
           {/if}
-          {if $isThisTeamContact || $isThisTeamContactApply || count($team_contact) >= Teams::COUNT_MAX_CONTACT}
+          {if $isThisTeamContact || $isThisTeamContactApply || count($team_contacts) >= Teams::COUNT_MAX_CONTACT}
           {else}
           <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=2">連絡係申請</a></li>
           {/if}
