@@ -24,7 +24,7 @@
       <div class="col-lg-2 about-menu">
         <ul class="nav side">
           <li role="presentation">チームへ参加</li>
-          {if $user['team_member'] || count($team_members) >= Teams::COUNT_MAX_MEMBER}
+          {if $user['team_member'] || $isThisTeamMemberApply || count($team_members) >= Teams::COUNT_MAX_MEMBER}
           {else}
           <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=1">メンバー申請</a></li>
           {/if}
@@ -120,7 +120,7 @@
           {/if}
         {/if}
 
-        {if count($user_team_applys) > 0}
+        {if count($applys_for_team) > 0}
           {if $user.id == $team_owner->id}
         <h3>応募一覧</h3>
         <table  class="table-bordered">
@@ -131,9 +131,9 @@
             <th>動作</th>
             {/if}
           </tr>
-          {foreach from=$user_team_applys item=apply key=idx}
+          {foreach from=$applys_for_team item=apply key=idx}
             <tr>
-              <td><a href="/User/show_user/{$apply.user_id}">{$apply.summoner_name}</a></td>
+              <td>{$apply.summoner_name}</td>
               <td>
               {if $apply.type == 1}メンバー{/if}
               {if $apply.type == 2}連絡係{/if}
