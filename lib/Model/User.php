@@ -126,7 +126,7 @@ class User extends Base{
         $bindParam   = [ $user_id ];
 		$result      = $db->executePrepare( $prepareSql, "i", $bindParam );
         $team_contacts = [];
-		while( $team_staff = $result->fetch_assoc() )
+		while( $team_contact = $result->fetch_assoc() )
 		{
 			$team_contacts[] = $team_contact;
 		}
