@@ -24,15 +24,15 @@
       <div class="col-lg-2 about-menu">
         <ul class="nav side">
           <li role="presentation">チームへ参加</li>
-          {if $user['team_member'] && $user['team_member']['team_id']==$team->id}
+          {if ($user['team_member'] && $user['team_member']['team_id']==$team->id) || count($team_members) >= Teams::COUNT_MAX_MEMBER}
           {else}
           <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=1">メンバー申請</a></li>
           {/if}
-          {if $isThisTeamContact}
+          {if $isThisTeamContact || $isThisTeamContactApply || count($team_contact) >= Teams::COUNT_MAX_CONTACT}
           {else}
-          <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=2">マネージャー申請</a></li>
+          <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=2">連絡係申請</a></li>
           {/if}
-          {if $isThisTeamStaff}
+          {if $isThisTeamStaff   || $isThisTeamStaffApply   || count($team_staffs)  >= Teams::COUNT_MAX_STAFF}
           {else}
           <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=3">アナリスト申請</a></li>
           {/if}
