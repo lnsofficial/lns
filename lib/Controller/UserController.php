@@ -6,10 +6,6 @@ require_once( PATH_LIB . '/common/UtilTime.php');
 
 class UserController extends BaseController{
 
-	public function form(){
-		self::displayUserForm();
-	}
-
 	public function displayUserForm(){
 		$smarty = new Smarty();
 		$smarty->template_dir = PATH_TMPL;
@@ -187,12 +183,7 @@ class UserController extends BaseController{
 		
 		$oUser = User::getUserFromLoginId( $sLoginId );
 		
-		// ログインIDの存在確認
-		if( !$oUser ){
-			self::displayError();
-			exit;
-		}
-		if( password_verify( $sPassword, $oUser->password ) ){
+		if( $oUser && password_verify( $sPassword, $oUser->password ) ){
 			session_regenerate_id(true);
 			$_SESSION["id"] = $oUser->id;
 			// ログイン後の最初の画面どこにする？
@@ -208,6 +199,17 @@ class UserController extends BaseController{
 			$smarty->display('User/login.tmpl');
 			exit;
 		}
+	}
+	
+	public function logout(){
+		session_set_save_handler( new MysqlSessionHandler() );
+		require_logined_session();
+		$iUserId = $_SESSION["id"];
+		
+		setcookie(session_name(), '', 1);
+		session_destroy();
+		
+		header('location: /index.html' );
 	}
 	
 	public function myPage(){
@@ -236,7 +238,16 @@ class UserController extends BaseController{
 		$smarty->display('User/mypage.tmpl');
 	}
 
+	public function form(){
+		session_set_save_handler( new MysqlSessionHandler() );
+		require_unlogined_session();
+		self::displayUserForm();
+	}
+
 	public function confirm(){
+		session_set_save_handler( new MysqlSessionHandler() );
+		require_unlogined_session();
+		
 		$sErrorMessage = "";
 		// バリデーション（今のとこ必須チェックだけ）
 		if( !self::checkRequire() ){
@@ -276,6 +287,9 @@ class UserController extends BaseController{
 	}
 	
 	public function register(){
+		session_set_save_handler( new MysqlSessionHandler() );
+		require_unlogined_session();
+		
 		if( !self::checkRequire() ){
 			self::displayError();
 			exit;
@@ -323,19 +337,19 @@ class UserController extends BaseController{
 	// 必須項目チェック
 	private function checkRequire(){
 		$bResult	= true;
-		if(!$_REQUEST["login_id"]){
+		if( empty( $_REQUEST["login_id"] ) ){
 			$bResult = false;
 		}
-		if(!$_REQUEST["password"]){
+		if( empty( $_REQUEST["password"] ) ){
 			$bResult = false;
 		}
-		if(!$_REQUEST["summoner_name"]){
+		if( empty( $_REQUEST["summoner_name"] ) ){
 			$bResult = false;
 		}
-		if(!$_REQUEST["main_role"]){
+		if( empty( $_REQUEST["main_role"] ) ){
 			$bResult = false;
 		}
-		if(!$_REQUEST["discord_id"]){
+		if( empty( $_REQUEST["discord_id"] ) ){
 			$bResult = false;
 		}
 		
