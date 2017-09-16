@@ -25,8 +25,6 @@
 		<div class="row">
 			<div class="col-lg-3">
 				<div>
-					<h3>登録に際して</h3>
-					&nbsp;
 				</div>
 			</div>
 			<div class="col-lg-9">
@@ -35,6 +33,7 @@
 				<dl class="dl-horizontal">
 					<dt>ID</dt><dd id="id">{$other.summoner_id}</dd>
 					<dt>サモナー名</dt><dd id="SN">{$other.summoner_name}</dd>
+					<dt>DiscordId</dt><dd id="DiscordId">{$other.discord_id}</dd>
 					<dt>メインロール</dt>
 					<dd id="mainRole">
 						{if $other.main_role == 1}Top
@@ -59,8 +58,7 @@
 					<a class="navbar-brand" href="/index.html"><input type="button" class="btn btn-default" value="チーム招待"></a>
 				</div>
 				<div class="col-sm-offset-2 col-sm-10">
-<!-- ここもあとで実装する -->
-					<a class="navbar-brand" href="/index.html"><input type="button" class="btn btn-default" value="戻る"></a>
+					<a class="navbar-brand" href="javascript:history.back()"><input type="button" class="btn btn-default" value="戻る"></a>
 				</div>
 			</div>
 		</div>
