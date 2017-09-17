@@ -35,15 +35,15 @@
             <div class="form-group">
               <label for="inputID" class="col-sm-3 control-label">ID（必須）</label>
               <div class="col-sm-9">
-                <input type="text" pattern="^[0-9A-Za-z]+$" class="form-control" id="inputID" name="login_id" placeholder="ID" value="{if isset($login_id)}{$login_id}{/if}">
-                <p>※半角英数字で入力してください</p>
+                <input type="text" pattern="^[0-9A-Za-z]+$" class="form-control" maxlength="20" id="inputID" name="login_id" placeholder="ID" value="{if isset($login_id)}{$login_id}{/if}">
+                <p>※半角英数字で20文字以内で入力してください</p>
               </div>
             </div>
             <div class="form-group">
               <label for="inputPW" class="col-sm-3 control-label">Password（必須）</label>
               <div class="col-sm-9">
-                <input type="password" class="form-control" id="inputPW" name="password" placeholder="Password">
-                <p>※半角英数字で入力してください</p>
+                <input type="password" class="form-control" maxlength="20" id="inputPW" name="password" placeholder="Password">
+                <p>※半角英数字で20文字以内で入力してください</p>
               </div>
             </div>
             <div class="form-group">
@@ -59,7 +59,7 @@
                   <option value="1" {if isset($main_role)}{if $main_role == 1}selected{/if}{/if}>Top</option>
                   <option value="2" {if isset($main_role)}{if $main_role == 2}selected{/if}{/if}>Jungle</option>
                   <option value="3" {if isset($main_role)}{if $main_role == 3}selected{/if}{/if}>Mid</option>
-                  <option value="4" {if isset($main_role)}{if $main_role == 4}selected{/if}{/if}>Bot</option>
+                  <option value="4" {if isset($main_role)}{if $main_role == 4}selected{/if}{/if}>ADC</option>
                   <option value="5" {if isset($main_role)}{if $main_role == 5}selected{/if}{/if}>Support</option>
                 </select>
               </div>
