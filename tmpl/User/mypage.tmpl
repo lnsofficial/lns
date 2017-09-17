@@ -56,7 +56,7 @@
         {if isset($team)}
         <h2>所属チーム</h2>
         <div class="form-group">
-          <div class="col-sm-10"><h4><a href="/Team/detail/{$team->id}">{$team->team_name}</a></h4></div>
+          <h4><a href="/Team/detail/{$team->id}">{$team->team_name}</a></h4>
         </div>
         {/if}
         {if ( count($user_team_applys) > 0 )}
