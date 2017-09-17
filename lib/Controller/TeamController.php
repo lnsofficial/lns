@@ -41,6 +41,13 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
 		}
+		// どこかへメンバー申請中は、チーム作成だめ。
+		if( UserTeamApply::findByUserIdTypeState( $_SESSION["id"], UserTeamApply::TYPE_MEMBER, UserTeamApply::STATE_APPLY ) )
+		{
+			self::displayError();
+			exit;
+		}
+
         $user_id = $_SESSION["id"];
 		
         $oDb = new Db();
@@ -224,6 +231,14 @@ class TeamController extends BaseController{
 	public function form(){
         session_set_save_handler( new MysqlSessionHandler() );
         require_logined_session();
+
+		// どこかへメンバー申請中は、チーム作成だめ。
+		if( UserTeamApply::findByUserIdTypeState( $_SESSION["id"], UserTeamApply::TYPE_MEMBER, UserTeamApply::STATE_APPLY ) )
+		{
+			self::displayError();
+			exit;
+		}
+
         self::_displayTeamForm();
 	}
 	private function _displayTeamForm(){
