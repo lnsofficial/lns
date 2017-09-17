@@ -39,19 +39,20 @@
             <div class="form-group">
               <label for="inputTeamNmKana" class="col-sm-3 control-label">チーム名（かな）</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" pattern="^[ぁ-ん]+$" id="inputTeamNmKana" name="inputTeamNmKana" placeholder="チーム名（かな）">
+                <input type="text" class="form-control" pattern="^[ぁ-んー]+$" id="inputTeamNmKana" name="inputTeamNmKana" placeholder="チーム名（かな）">
               </div>
             </div>
             <div class="form-group">
               <label for="inputTeamTag" class="col-sm-3 control-label">チーム名略称</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" id="inputTeamTag" name="inputTeamTag" placeholder="チーム名略称">
+                <input type="text" class="form-control" pattern="^([a-zA-Z0-9])$" maxlength="4" id="inputTeamTag" name="inputTeamTag" placeholder="チーム名略称">
+                <p>※英数字で4文字以下で入力してください</p>
               </div>
             </div>
             <div class="form-group">
               <label for="inputTeamTagKana" class="col-sm-3 control-label">チーム名略称（かな）</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" pattern="^[ぁ-ん]+$" id="inputTeamTagKana" name="inputTeamTagKana" placeholder="チーム名略称（かな）">
+                <input type="text" class="form-control" pattern="^[ぁ-んー]+$" id="inputTeamTagKana" name="inputTeamTagKana" placeholder="チーム名略称（かな）">
               </div>
             </div>
             <div class="form-group">
