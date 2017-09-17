@@ -113,6 +113,7 @@ class Base{
 					break;
 				case "date":
 				case "varchar":
+					if( $this->$key === null ) continue;
 					$sColumn[] = $key . " = '" . $this->$key . "'";
 					break;
 			}
