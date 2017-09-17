@@ -147,7 +147,14 @@
               <td>
                 <form method="post" action="/Team/accept" onclick="return chkAccept()" class="form-horizontal">
                   <input type="hidden" name="user_team_apply_id" value="{$apply.id}">
-                  <button type="submit" class="btn btn-default">この参加申請を承諾</button>
+                  <button type="submit" class="btn btn-default"
+{if $apply.type == 1}
+  {if count($team_members)  >= Teams::COUNT_MAX_MEMBER}disabled{/if}
+{elseif $apply.type == 2}
+  {if count($team_contacts) >= Teams::COUNT_MAX_CONTACT}disabled{/if}
+{elseif $apply.type == 3}
+  {if count($team_staffs)   >= Teams::COUNT_MAX_STAFF}disabled{/if}
+{/if}>この参加申請を承諾</button>
                 </form>
                 <form method="post" action="/Team/deny" onclick="return chkDeny()" class="form-horizontal">
                   <input type="hidden" name="user_team_apply_id" value="{$apply.id}">
