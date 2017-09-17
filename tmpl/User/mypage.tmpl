@@ -70,7 +70,7 @@
             </tr>
             {foreach from=$user_team_applys item=apply key=idx}
               <tr>
-                <td>{$apply.team_name}</td>
+                <td><a href="/Team/Detail/{$apply.team_id}">{$apply.team_name}</a></td>
                 <td>
                 {if ($apply.type == 1)}選手{/if}
                 {if ($apply.type == 2)}連絡係{/if}
