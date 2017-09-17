@@ -26,7 +26,7 @@
           <li role="presentation">チームへ参加</li>
           {if $user['team_member'] || $isTeamMemberApply    || count($team_members) >= Teams::COUNT_MAX_MEMBER}
           {else}
-          <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=1">メンバー申請</a></li>
+          <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=1">選手申請</a></li>
           {/if}
           {if $isThisTeamContact || $isThisTeamContactApply || count($team_contacts) >= Teams::COUNT_MAX_CONTACT}
           {else}
@@ -58,7 +58,7 @@
             <td>{$team_tag_kana}</td>
           </tr>
         </table>
-        <h2>メンバー一覧</h2>
+        <h2>選手一覧</h2>
         <table  class="table-bordered">
           <tr>
             <th>サモナーネーム</th>
@@ -139,7 +139,7 @@
             <tr>
               <td>{$apply.summoner_name}</td>
               <td>
-              {if $apply.type == 1}メンバー{/if}
+              {if $apply.type == 1}選手{/if}
               {if $apply.type == 2}連絡係{/if}
               {if $apply.type == 3}アナリスト{/if}
               </td>
