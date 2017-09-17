@@ -125,8 +125,6 @@ class Base{
 		
 		$id = static::COL_ID;
 		$ahsParameter = [ $this->$id ];
-		var_dump($sUpdateSql);
-		exit;
 		
 		$oResult = $this->db->executePrepare( $sUpdateSql, "i", $ahsParameter );
 		
