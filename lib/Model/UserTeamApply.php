@@ -36,7 +36,7 @@ class UserTeamApply extends Base
 
 
     /**
-     * // 3つ指定かつdeleted_atがNULLじゃないやつ。
+     * // 4つ指定かつdeleted_atがNULLじゃないやつ。
      * 
      * @param  int                  $user_id                // users.id
      * @param  int                  $team_id                // teams.id
@@ -55,6 +55,27 @@ class UserTeamApply extends Base
             $state,
         ];
         return $db->executePrepare( $prepareSql, "iiii", $bindParam )->fetch_assoc();
+    }
+
+
+    /**
+     * // 3つ指定かつdeleted_atがNULLじゃないやつ。
+     * 
+     * @param  int                  $user_id                // users.id
+     * @param  int                  $type
+     * @param  int                  $state
+     * @return UserTeamApply
+     */
+    function findByUserIdTypeState( $user_id, $type, $state )
+    {
+        $db = new Db();
+        $prepareSql = "SELECT * FROM user_team_applys WHERE deleted_at IS NULL AND user_id = ? AND type = ? AND state = ?";
+        $bindParam  = [
+            $user_id,
+            $type,
+            $state,
+        ];
+        return $db->executePrepare( $prepareSql, "iii", $bindParam )->fetch_assoc();
     }
 
 

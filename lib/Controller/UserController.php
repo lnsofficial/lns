@@ -552,10 +552,6 @@ class UserController extends BaseController{
 		$sql = "TRUNCATE user_team_applys";
 		$db->execute( $sql );
 
-		$sql = "TRUNCATE sessions";
-		$db->execute( $sql );
-
-
 		header('location: /index.html' );
 		exit;
 	}

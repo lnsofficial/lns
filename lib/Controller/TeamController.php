@@ -210,12 +210,12 @@ class TeamController extends BaseController{
 		$smarty->assign( "team"             , $oTeam );
 		$isThisTeamContact      = count( array_filter($user['team_contacts'],function($item)use($team_id){ return $item['team_id']==$team_id; }) );
 		$isThisTeamStaff        = count( array_filter($user['team_staffs'],  function($item)use($team_id){ return $item['team_id']==$team_id; }) );
-		$isThisTeamMemberApply  = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_MEMBER  && $item['team_id']==$team_id; }) );
+		$isTeamMemberApply      = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_MEMBER; }) );
 		$isThisTeamContactApply = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_CONTACT && $item['team_id']==$team_id; }) );
 		$isThisTeamStaffApply   = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_STAFF   && $item['team_id']==$team_id; }) );
 		$smarty->assign( "isThisTeamContact"      , $isThisTeamContact );
 		$smarty->assign( "isThisTeamStaff"        , $isThisTeamStaff );
-		$smarty->assign( "isThisTeamMemberApply"  , $isThisTeamMemberApply );
+		$smarty->assign( "isTeamMemberApply"      , $isTeamMemberApply );
 		$smarty->assign( "isThisTeamContactApply" , $isThisTeamContactApply );
 		$smarty->assign( "isThisTeamStaffApply"   , $isThisTeamStaffApply );
 
@@ -281,6 +281,12 @@ class TeamController extends BaseController{
 			case UserTeamApply::TYPE_MEMBER:
 				// いづれかのチームにメンバーとして所属済みならだめ。
 				if( TeamMembers::findByUserId( $user_id ) )
+				{
+					self::displayError();
+					exit;
+				}
+				// ここ含む、どこかのチームにメンバー申請を既に出していたらだめ。
+				if( UserTeamApply::findByUserIdTypeState( $user_id, UserTeamApply::TYPE_MEMBER, UserTeamApply::STATE_APPLY ) )
 				{
 					self::displayError();
 					exit;

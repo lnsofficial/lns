@@ -24,7 +24,7 @@
       <div class="col-lg-2 about-menu">
         <ul class="nav side">
           <li role="presentation">チームへ参加</li>
-          {if $user['team_member'] || $isThisTeamMemberApply || count($team_members) >= Teams::COUNT_MAX_MEMBER}
+          {if $user['team_member'] || $isTeamMemberApply    || count($team_members) >= Teams::COUNT_MAX_MEMBER}
           {else}
           <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=1">メンバー申請</a></li>
           {/if}
