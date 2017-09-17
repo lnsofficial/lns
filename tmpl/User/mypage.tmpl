@@ -56,7 +56,7 @@
         {if isset($team)}
         <h2>所属チーム</h2>
         <div class="form-group">
-          <div class="col-sm-10"><h4><a href="/Team/detail/{$team->id}">{$team->team_name}</a></h4></div>
+          <h4><a href="/Team/detail/{$team->id}">{$team->team_name}</a></h4>
         </div>
         {/if}
         {if ( count($user_team_applys) > 0 )}
@@ -70,7 +70,7 @@
             </tr>
             {foreach from=$user_team_applys item=apply key=idx}
               <tr>
-                <td>{$apply.team_name}</td>
+                <td><a href="/Team/Detail/{$apply.team_id}">{$apply.team_name}</a></td>
                 <td>
                 {if ($apply.type == 1)}選手{/if}
                 {if ($apply.type == 2)}連絡係{/if}
