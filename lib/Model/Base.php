@@ -113,6 +113,7 @@ class Base{
 					break;
 				case "date":
 				case "varchar":
+					if( $this->$key === null ) continue;
 					$sColumn[] = $key . " = '" . $this->$key . "'";
 					break;
 			}
@@ -124,6 +125,8 @@ class Base{
 		
 		$id = static::COL_ID;
 		$ahsParameter = [ $this->$id ];
+		var_dump($sUpdateSql);
+		exit;
 		
 		$oResult = $this->db->executePrepare( $sUpdateSql, "i", $ahsParameter );
 		
