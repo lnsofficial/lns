@@ -31,7 +31,7 @@ if( !empty( $_SESSION ) ){
         <?php if( !empty($bLogin) ){ ?><li><a href="/Team/SearchList">TEAM</a></li><?php } ?>
         <?php if( !empty($bLogin) ){ ?><li><a href="/User/MyPage">MYPAGE</a></li><?php } ?>
         <li>
-          <?php if( $bLogin ){ ?>
+          <?php if( isset($bLogin) ){ ?>
             <a href="/User/Logout" class="login">LOGOUT</a>
           <?php }else{ ?>
             <a href="/User/LoginForm" class="login">LOGIN</a>
