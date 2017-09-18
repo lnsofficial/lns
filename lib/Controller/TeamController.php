@@ -177,12 +177,9 @@ class TeamController extends BaseController{
 	public function detail( $team_id = 0 ){
         session_set_save_handler( new MysqlSessionHandler() );
         require_logined_session();
-		// get team from user_id
-        $user_id = $_SESSION["id"];
 		$oDb = new Db();
-//		$oTeam = Teams::getTeamFromUserId( $user_id );
-//		$oTeam = Teams::find( $team_id );
 		$oTeam = new Teams( $oDb, $team_id );
+
 		// team members
 		$team_members = TeamMembers::getByTeamId( $oTeam->id );
 		// team owner user_id
@@ -195,7 +192,7 @@ class TeamController extends BaseController{
 		// team_staffs
 		$team_staffs = TeamStaffs::getByTeamId( $oTeam->id );
 		// users
-//		$user = new User( $oDb, $user_id );
+        $user_id = $_SESSION["id"];
 		$user = User::info( $user_id );
 		// 自身のチーム所属情報
 		$my_team_member = TeamMembers::findByUserId( $user["id"] );
@@ -228,6 +225,7 @@ class TeamController extends BaseController{
 
 		$smarty->display('Team/TeamDetail.tmpl');
 	}
+
 	public function form(){
         session_set_save_handler( new MysqlSessionHandler() );
         require_logined_session();
@@ -241,6 +239,7 @@ class TeamController extends BaseController{
 
         self::_displayTeamForm();
 	}
+
 	private function _displayTeamForm(){
 		$smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
@@ -267,6 +266,7 @@ class TeamController extends BaseController{
 		
 		$smarty->display('Team/TeamSearch.tmpl');
 	}
+
 	/**
 	 * // [Action]チームへ参加申請するやつ
 	 *
