@@ -519,43 +519,5 @@ class UserController extends BaseController{
 	}
 
 
-/////////////////////////////////////////////////////////////////// ↓↓↓masterへのマージ前に消すこと ★★★
-	/**
-	 * // [Action]指定ユーザーのページを表示
-	 *
-	 */
-	public function db_clear()
-	{
-		session_set_save_handler( new MysqlSessionHandler() );
-		require_logined_session();
-
-		$db = new Db();
-
-		$sql = "TRUNCATE users";
-		$db->execute( $sql );
-
-		$sql = "TRUNCATE teams";
-		$db->execute( $sql );
-
-		$sql = "TRUNCATE team_members";
-		$db->execute( $sql );
-
-		$sql = "TRUNCATE teams_contact";
-		$db->execute( $sql );
-
-		$sql = "TRUNCATE team_staffs";
-		$db->execute( $sql );
-
-		$sql = "TRUNCATE team_owner";
-		$db->execute( $sql );
-
-		$sql = "TRUNCATE user_team_applys";
-		$db->execute( $sql );
-
-		header('location: /index.html' );
-		exit;
-	}
-/////////////////////////////////////////////////////////////////// ↑↑↑masterへのマージ前に消すこと ★★★
-
 
 }
