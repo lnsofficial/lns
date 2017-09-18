@@ -8,6 +8,7 @@
     <!-- Bootstrap -->
     <link href="/css/bootstrap.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet" type="text/css">
+    <link href="/css/form.css" rel="stylesheet" type="text/css">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -21,19 +22,25 @@
     {include file='header.tmpl' login=true}
     <div class="container-fluid">
       <div class="row">
-        <h1>エラーが発生しました。</h1>
-        <p>もう一度やり直してください。<br>
-        </p>
-        <div class="col-md-2 col-md-offset-5">
-          <a class="navbar-brand" href="/index.html"><input type="button" class="btn btn-default" value="戻る"></a>
+        <div class="col-lg-3">
+          <div>
+          </div>
         </div>
-        <div class="col-lg-12 back"></div>
+        <div class="col-lg-9">
+          <h2>チーム作成完了</h2>
+          <p>チームを作成しました。</p>
+
+          <form method="post" action="/Team/detail/{$team_id}" class="form-horizontal">
+            <button type="submit" class="btn btn-default">チーム詳細画面へ</button>
+          </form>
+
+        </div>
       </div>
     </div>
-    {include file='footer.tmpl'}
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="/js/jquery-1.11.3.min.js"></script>
 
+    {include file='footer.tmpl'}
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+    <script src="/js/jquery-1.11.3.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed --> 
     <script src="/js/bootstrap.js"></script>
   </body>

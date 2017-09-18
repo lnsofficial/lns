@@ -38,6 +38,47 @@ class Base{
 			}
 		}
 	}
+	
+	public static function getList( $oDb, $ahsParameter ){
+		$sSelectSql = "SELECT * FROM " . static::MAIN_TABLE . " WHERE ";
+		$asParameter = [];
+		$sType = "";
+		$asWhereSql = [];
+		
+		foreach( $ahsParameter as $value ){
+			if( $value["value"] === null ){
+				break;
+			}
+			switch( $value["type"] ){
+				case "int":
+					$asWhereSql[] = $value["column"] . " = ? ";
+					$asParameter[] = $value["value"];
+					$sType .= "i";
+					break;
+				case "varchar":
+					$asWhereSql[] = $value["column"] . " = ? ";
+					$asParameter[] = $value["value"];
+					$sType .= "s";
+					break;
+				case "date":
+					$asWhereSql[] = $value["column"] . " " . $value["operator"] . " ? ";
+					$asParameter[] = $value["value"];
+					$sType .= "s";
+					break;
+			}
+		}
+		
+		$sSelectSql .= implode( " AND ", $asWhereSql );
+		
+		$oResult = $oDb->executePrepare( $sSelectSql, $sType, $asParameter );
+		
+		$list = [];
+		while( $res = $oResult->fetch_assoc() ){
+			$list[] = $res;
+		}
+		
+		return $list;
+	}
 
 	public function __get( $key ){
 		return $this->get( $key );
@@ -72,6 +113,7 @@ class Base{
 					break;
 				case "date":
 				case "varchar":
+					if( $this->$key === null ) continue;
 					$sColumn[] = $key . " = '" . $this->$key . "'";
 					break;
 			}
@@ -99,6 +141,7 @@ class Base{
 					break;
 				case "date":
 				case "varchar":
+					if( $this->$key === null ) continue;
 					$sColumn[] = $key;
 					$sValue[] = "'" . $this->$key . "'";
 					break;
@@ -108,6 +151,8 @@ class Base{
 		$sInsertSql = "INSERT INTO " . static::MAIN_TABLE . "(" . implode( ",", $sColumn ) . ") VALUES(" . implode( ",", $sValue ) . ")";
 		
 		$oResult = $this->db->execute( $sInsertSql );
+		$pk = static::COL_ID;
+		$this->$pk = $this->db->getLastInsertId();
 		return $oResult;
 	}
 }
