@@ -624,12 +624,27 @@ class TeamController extends BaseController{
 		session_set_save_handler( new MysqlSessionHandler() );
 		require_logined_session();
 
+        // check team id
+        if (empty($_REQUEST["team_id"])) {
+			self::displayError();
+			exit;
+        }
+
+        // check is owner
+		$user_id = $_SESSION["id"];
+		$team_owner = TeamOwner::getUserIdFromTeamId( $_REQUEST["team_id"] );
+        if ($user_id != $team_owner->id) {
+			self::displayError();
+			exit;
+        }
+
         // check uploaded file
         if (!isset($_FILES["inputTeamLogo"])) {
 			self::displayError();
 			exit;
         }
-        move_uploaded_file($_FILES['inputTeamLogo']['tmp_name'], './img/test.jpg');
+        
+        move_uploaded_file($_FILES['inputTeamLogo']['tmp_name'], "./img/logo/" . $_REQUEST["team_id"] . "_logo.jpg");
 
         exit;
 	}
