@@ -643,6 +643,10 @@ class TeamController extends BaseController{
 			self::displayError();
 			exit;
         }
+        if ($_FILES["inputTeamLogo"]["size"] == 0) {
+			self::displayError();
+			exit;
+        }
         
         move_uploaded_file($_FILES['inputTeamLogo']['tmp_name'], "./img/logo/" . $_REQUEST["team_id"] . "_logo.jpg");
 
