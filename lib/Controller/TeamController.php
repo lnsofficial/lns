@@ -349,6 +349,7 @@ class TeamController extends BaseController{
 		$smarty->assign( "user_team_apply"	, $user_team_apply );
 		$smarty->display('Team/apply_complete.tmpl');
 	}
+
 	/**
 	 * // [Action]チームへの参加申請を承認するやつ
 	 *
@@ -616,5 +617,20 @@ class TeamController extends BaseController{
 		$smarty->compile_dir  = PATH_TMPL_C;
 		$smarty->assign( "user_team_apply"	, $user_team_apply );
 		$smarty->display('Team/apply_deny.tmpl');
+	}
+
+	public function uploadTeamLogo()
+	{
+		session_set_save_handler( new MysqlSessionHandler() );
+		require_logined_session();
+
+        // check uploaded file
+        if (!isset($_FILES["inputTeamLogo"])) {
+			self::displayError();
+			exit;
+        }
+        move_uploaded_file($_FILES['inputTeamLogo']['tmp_name'], './img/test.jpg');
+
+        exit;
 	}
 }

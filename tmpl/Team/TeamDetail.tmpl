@@ -168,12 +168,18 @@
           {/if}
         {/if}
 
+        <h2>チームロゴ</h2>
+        <form method="post" action="/Team/uploadTeamLogo" class="form-horizontal" enctype="multipart/form-data">
+            <div class="form-group">
+              <div class="col-sm-9">
+                <input type="file" id="inputTeamLogo" name="inputTeamLogo">
+                <input type="submit" value="チームロゴをアップロードする">
+              </div>
+            </div>
+        </form>
+
       </div>
     </div>
-
-
-
-
   </div>
   {include file='footer.tmpl'}
 
