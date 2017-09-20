@@ -188,6 +188,11 @@ class TeamController extends BaseController{
 		$team_contacts = TeamContact::getByTeamId( $oTeam->id );
 		// このチームへ届いている申請一覧
 		$applys_for_team = UserTeamApply::getByTeamId( $oTeam->id );
+        // team logo
+        $logo_path = "/img/logo/" . $oTeam->id . "_logo.jpg";
+        if (!file_exists(".".$logo_path)) {
+            $logo_path = false;
+        }
 		
 		// team_staffs
 		$team_staffs = TeamStaffs::getByTeamId( $oTeam->id );
@@ -212,6 +217,7 @@ class TeamController extends BaseController{
 		$smarty->assign( "applys_for_team"  , $applys_for_team );
 		$smarty->assign( "user"             , $user );
 		$smarty->assign( "team"             , $oTeam );
+	    $smarty->assign( "logo_path"        , $logo_path );
 		$isThisTeamContact      = count( array_filter($user['team_contacts'],function($item)use($team_id){ return $item['team_id']==$team_id; }) );
 		$isThisTeamStaff        = count( array_filter($user['team_staffs'],  function($item)use($team_id){ return $item['team_id']==$team_id; }) );
 		$isTeamMemberApply      = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_MEMBER; }) );
