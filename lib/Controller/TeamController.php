@@ -648,8 +648,19 @@ class TeamController extends BaseController{
 			exit;
         }
         
-        move_uploaded_file($_FILES['inputTeamLogo']['tmp_name'], "./img/logo/" . $_REQUEST["team_id"] . "_logo.jpg");
+        $path = "/img/logo/" . $_REQUEST["team_id"] . "_logo.jpg";
+        move_uploaded_file($_FILES['inputTeamLogo']['tmp_name'], ".".$path);
+        
+        $this->_displayUploaded($path);
+	}
 
-        exit;
+	private function _displayUploaded($path){
+		$smarty = new Smarty();
+		
+		$smarty->template_dir = PATH_TMPL;
+		$smarty->compile_dir  = PATH_TMPL_C;
+		
+		$smarty->assign( "logo_path" , $path);
+		$smarty->display('Team/LogoUploaded.tmpl');
 	}
 }
