@@ -24,7 +24,7 @@
       <div class="col-lg-12">
         <div class="header-image">
           <div>
-            <a href="/User/form" class="touroku">ユーザ登録</a>
+            <?php if( !$bLogin ){ ?><a href="/User/form" class="touroku">ユーザ登録</a><?php } ?>
           </div>
           <div class="ssn">
             <a href="http://ch.nicovideo.jp/LNS?ref=search_tag_ch"><img src="../img/nc102647.gif" alt=""width="41" height="38" class="ssnicons"/></a>
@@ -46,7 +46,6 @@
         <div class="news">
           <h1 class="submidashi news">NEWS</h1>
           <ul class="nav">
-            <li role="presentation">2017/09/18 第3期の募集を開始しました</li>
             <li role="presentation">2017/06/01 第2期を開始しました</li>
             <li role="presentation">2017/05/01 第2期の募集を開始しました</li>
             <li role="presentation">2017/03/12 リーグ表を更新しました</li>
