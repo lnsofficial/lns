@@ -6,7 +6,7 @@ require_once( PATH_LIB . '/common/Db.php');
 $handler = new MysqlSessionHandler();
 
 @session_start();
-
+$bLogin = false;
 if( !empty( $_SESSION ) ){
   if( $_SESSION["id"] ){
     $bLogin = true;
