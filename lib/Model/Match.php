@@ -2,7 +2,7 @@
 require_once( PATH_MODEL . "Base.php" );
 
 class Match extends Base{
-	const MAIN_TABLE	= "match_recruit_list";
+	const MAIN_TABLE	= "matches";
 	const COL_ID		= "id";
 	
 	// カラム
@@ -33,7 +33,7 @@ class Match extends Base{
 	const MAX_MATCH_RECRUIT_COUNT = 4;
 	
 	public function getMatchLastWeek( $oDb ){
-		$sSelectMatchSql = "SELECT * FROM match_recruit_list WHERE state IN(?,?) AND match_date BETWEEN DATE_FORMAT(NOW() - INTERVAL " . INTERVAL_BATCH_TIME . ", '%Y-%m-%d 06:00:00') AND DATE_FORMAT(NOW() , '%Y-%m-%d 06:00:00') ORDER BY match_date ASC";
+		$sSelectMatchSql = "SELECT * FROM " . self::MAIN_TABLE . " WHERE state IN(?,?) AND match_date BETWEEN DATE_FORMAT(NOW() - INTERVAL " . INTERVAL_BATCH_TIME . ", '%Y-%m-%d 06:00:00') AND DATE_FORMAT(NOW() , '%Y-%m-%d 06:00:00') ORDER BY match_date ASC";
 		$ahsParameter = [ self::MATCH_STATE_FINISHED, self::MATCH_STATE_ABSTAINED ];
 		
 		$oResult = $oDb->executePrepare( $sSelectMatchSql, "ii", $ahsParameter );
@@ -42,7 +42,7 @@ class Match extends Base{
 	}
 	
 	public function getMatchList( $oDb, $ahsSearchOption ){
-		$sSelectMatchSql = "SELECT * FROM match_recruit_list WHERE ";
+		$sSelectMatchSql = "SELECT * FROM " . self::MAIN_TABLE . " WHERE ";
 		$ahsParameter = [];
 		$sType = "";
 		$asWhereSql = [];
@@ -84,7 +84,7 @@ class Match extends Base{
 		}
 		
 		$sSelectMatchSql .= implode( " AND ", $asWhereSql );
-		$sSelectMatchSql .= " ORDER BY create_date DESC";
+		$sSelectMatchSql .= " ORDER BY created_at DESC";
 		
 		$oResult = $oDb->executePrepare( $sSelectMatchSql, $sType, $ahsParameter );
 		

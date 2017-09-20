@@ -1,10 +1,10 @@
 <?php
 require_once( PATH_CONTROLLER . 'BaseController.php' );
 require_once( PATH_MODEL . 'Match.php' );
-require_once( PATH_MODEL . 'Team.php' );
+require_once( PATH_MODEL . 'User.php' );
+require_once( PATH_MODEL . 'Teams.php' );
 require_once( PATH_MODEL . 'LadderRanking.php' );
 require_once( PATH_MODEL . 'League.php' );
-require_once( PATH_MODEL . 'LoginAccount.php' );
 
 class MatchController extends BaseController{
 	const DISPLAY_DIR_PATH	= "Match";
@@ -248,22 +248,26 @@ class MatchController extends BaseController{
 		
 		$oDb = new Db();
 		
-		// TODO その内共通化
-		$iState = $_REQUEST["search_option"]["state"];
 		$ahsSearchOption = [];
-		if( !empty( $iState ) ){
-			$ahsSearchOption[] = [ "column" => "state",  "type" => "int", "value" => $iState ];
+		
+		// TODO その内共通化
+		if( isset( $_REQUEST["search_option"] ) ){
+			$iState = $_REQUEST["search_option"]["state"];
+			if( !empty( $iState ) ){
+				$ahsSearchOption[] = [ "column" => "state",  "type" => "int", "value" => $iState ];
+			}
+			
+			$sStartDate = $_REQUEST["search_option"]["start_date"];
+			if( !empty( $sStartDate ) ){
+				$ahsSearchOption[] = [ "column" => "match_date", "type" => "date", "operator" => ">=", "value" => $sStartDate ];
+			}
+			
+			$sEndDate = $_REQUEST["search_option"]["end_date"];
+			if( !empty( $sEndDate ) ){
+				$ahsSearchOption[] = [ "column" => "match_date", "type" => "date", "operator" => "<=", "value" => $sEndDate ];
+			}
 		}
 		
-		$sStartDate = $_REQUEST["search_option"]["start_date"];
-		if( !empty( $sStartDate ) ){
-			$ahsSearchOption[] = [ "column" => "match_date", "type" => "date", "operator" => ">=", "value" => $sStartDate ];
-		}
-		
-		$sEndDate = $_REQUEST["search_option"]["end_date"];
-		if( !empty( $sEndDate ) ){
-			$ahsSearchOption[] = [ "column" => "match_date", "type" => "date", "operator" => "<=", "value" => $sEndDate ];
-		}
 		$oMatchList = Match::getMatchList( $oDb, $ahsSearchOption );
 		
 		$ahsMatchList = [];
@@ -302,8 +306,8 @@ class MatchController extends BaseController{
 			$ahsMatchList[] = $ahsMatch;
 		}
 		
-		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
-		$oLoginTeam = new Team( $oDb, $oLoginAccount->team_id );
+		$oUser = new User( $oDb, $_SESSION["id"] );
+		$oLoginTeam = $oUser->getTeam();
 		$oLatestLastJoin = $oLoginTeam->getLastJoin( $oDb );
 		
 		$smarty = new Smarty();
@@ -312,10 +316,18 @@ class MatchController extends BaseController{
 		$smarty->compile_dir  = PATH_TMPL_C;
 		
 		$smarty->assign( "match_recruit_list"	, $ahsMatchList );
-		$smarty->assign( "last_join_date"		, $oLatestLastJoin->join_date );
-		$smarty->assign( "state"				, $iState );
-		$smarty->assign( "start_date"			, $sStartDate );
-		$smarty->assign( "end_date"				, $sEndDate );
+		if( $oLatestLastJoin ){
+			$smarty->assign( "last_join_date"		, $oLatestLastJoin->joined_at );
+		}
+		if( isset( $iState ) ){
+			$smarty->assign( "state"				, $iState );
+		}
+		if( isset( $sStartDate ) ){
+			$smarty->assign( "start_date"			, $sStartDate );
+		}
+		if( isset( $sEndDate ) ){
+			$smarty->assign( "end_date"				, $sEndDate );
+		}
 		
 		$smarty->display('Match/MatchRecruitList.tmpl');
 	}

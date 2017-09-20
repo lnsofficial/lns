@@ -1,6 +1,7 @@
 <?php
 require_once( PATH_MODEL . "Base.php" );
 require_once( PATH_MODEL . "TeamStaffs.php" );
+require_once( PATH_MODEL . "TeamJoin.php" );
 
 class Teams extends Base{
 	const MAIN_TABLE			= "teams";
@@ -74,5 +75,21 @@ class Teams extends Base{
 		$ahsTeams = Teams::getList( $oDb, [ [ "column" => "status",  "type" => "int", "value" => 0 ] ] );
 		
 		return $ahsTeams;
+	}
+	
+	public function getLastJoin( $oDb ){
+		$sSelectLastJoin = "SELECT id FROM " . TeamJoin::MAIN_TABLE . " WHERE team_id = ? AND state = ? ORDER BY joined_at DESC";
+		$ahsParameter = [ $this->team_id, TeamJoin::STATE_ENABLE ];
+		
+		$oResult = $this->db->executePrepare( $sSelectLastJoin, "ii", $ahsParameter );
+		
+		$oLastJoin = null;
+		while( $row = $oResult->fetch_array() ){
+			$iLastJoinId = $row["id"];
+			$oLastJoin = new LastJoin( $oDb, $iLastJoinId );
+			break;
+		}
+		
+		return $oLastJoin;
 	}
 }
