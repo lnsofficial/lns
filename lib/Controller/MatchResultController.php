@@ -1,8 +1,8 @@
 <?php
 require_once( PATH_CONTROLLER . 'BaseController.php' );
 require_once( PATH_MODEL . 'Match.php' );
-require_once( PATH_MODEL . 'Team.php' );
-require_once( PATH_MODEL . 'LoginAccount.php' );
+require_once( PATH_MODEL . 'Teams.php' );
+require_once( PATH_MODEL . 'User.php' );
 
 class MatchResultController extends BaseController{
 	const DISPLAY_DIR_PATH	= "Match";
@@ -19,14 +19,15 @@ class MatchResultController extends BaseController{
 		$oDb = new Db();
 		
 		$iMatchId = intval( $_REQUEST["match_id"] );
-		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
-		$iCurTeamId = $oLoginAccount->team_id;
+		$oLoginUser = new User( $oDb, $_SESSION["id"] );
+		$oLoginTeam = $oLoginUser->getTeam();
+		$iCurTeamId = $oLoginTeam->id;
 		
 		// マッチ情報取得
 		$oMatch = new Match( $oDb, $iMatchId );
 		
-		$oHostTeam = new Team( $oDb, $oMatch->host_team_id );
-		$oApplyTeam = new Team( $oDb, $oMatch->apply_team_id );
+		$oHostTeam = new Teams( $oDb, $oMatch->host_team_id );
+		$oApplyTeam = new Teams( $oDb, $oMatch->apply_team_id );
 		
 		// 試合のホスト・ゲスト以外はエラー
 		if( ( $iCurTeamId != $oMatch->host_team_id && $iCurTeamId != $oMatch->apply_team_id ) ){
@@ -47,9 +48,9 @@ class MatchResultController extends BaseController{
 		
 		$smarty->assign( "match_id", $iMatchId );
 		$smarty->assign( "host_team_name", $oHostTeam->team_name );
-		$smarty->assign( "host_team_id", $oHostTeam->team_id );
+		$smarty->assign( "host_team_id", $oHostTeam->id );
 		$smarty->assign( "apply_team_name", $oApplyTeam->team_name );
-		$smarty->assign( "apply_team_id", $oApplyTeam->team_id );
+		$smarty->assign( "apply_team_id", $oApplyTeam->id );
 		
 		$smarty->display( 'Match/MatchResult_form.tmpl' );
 	}
@@ -63,8 +64,9 @@ class MatchResultController extends BaseController{
 		
 		$iMatchId = intval( $_REQUEST["match_id"] );
 		$iWinnerTeamId = intval( $_REQUEST["winner_team"] );
-		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
-		$iCurTeamId = $oLoginAccount->team_id;
+		$oLoginUser = new User( $oDb, $_SESSION["id"] );
+		$oLoginTeam = $oLoginUser->getTeam();
+		$iCurTeamId = $oLoginTeam->id;
 		
 		// マッチ情報取得
 		$oMatch = new Match( $oDb, $iMatchId );
@@ -81,15 +83,14 @@ class MatchResultController extends BaseController{
 			exit;
 		}
 		
-		$oHostTeam = new Team( $oDb, $oMatch->host_team_id );
-		$oApplyTeam = new Team( $oDb, $oMatch->apply_team_id );
-		
+		$oHostTeam = new Teams( $oDb, $oMatch->host_team_id );
+		$oApplyTeam = new Teams( $oDb, $oMatch->apply_team_id );
 		$oWinnerTeam = null;
 		switch( $iWinnerTeamId ){
-			case $oHostTeam->team_id:
+			case $oHostTeam->id:
 				$oWinnerTeam = $oHostTeam;
 				break;
-			case $oApplyTeam->team_id:
+			case $oApplyTeam->id:
 				$oWinnerTeam = $oApplyTeam;
 				break;
 			default:
@@ -134,8 +135,9 @@ class MatchResultController extends BaseController{
 		
 		$iMatchId = intval( $_REQUEST["match_id"] );
 		$iWinnerTeamId = intval( $_REQUEST["winner_team"] );
-		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
-		$iCurTeamId = $oLoginAccount->team_id;
+		$oLoginUser = new User( $oDb, $_SESSION["id"] );
+		$oLoginTeam = $oLoginUser->getTeam();
+		$iCurTeamId = $oLoginTeam->id;
 		$sResultImageName = $_REQUEST["result_image_name"];
 		
 		// マッチ情報取得

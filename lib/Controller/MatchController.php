@@ -4,6 +4,7 @@ require_once( PATH_MODEL . 'Match.php' );
 require_once( PATH_MODEL . 'User.php' );
 require_once( PATH_MODEL . 'Teams.php' );
 require_once( PATH_MODEL . 'Ladder.php' );
+require_once( PATH_MODEL . 'TeamJoin.php' );
 require_once( PATH_MODEL . 'League.php' );
 
 class MatchController extends BaseController{
@@ -26,14 +27,15 @@ class MatchController extends BaseController{
 		$oMatch = new Match( $oDb, $iMatchId );
 		
 		$iHostTeamId = $oMatch->host_team_id;
-		$oHostTeam = new Team( $oDb, $iHostTeamId );
+		$oHostTeam = new Teams( $oDb, $iHostTeamId );
 		
-		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
+		$oLoginUser = new User( $oDb, $_SESSION["id"] );
+		$oLoginTeam = $oLoginUser->getTeam();
 		
 		$showJoin = false;
 		$showCancel = false;
 		$showRegsiterResult = false;
-		switch( $oLoginAccount->team_id ){
+		switch( $oLoginTeam->id ){
 			case $iHostTeamId:
 				// ホスト
 				switch( $oMatch->state ){
@@ -109,7 +111,6 @@ class MatchController extends BaseController{
 		
 		$iMatchId = intval( $_REQUEST["match_id"] );
 		$oDb = new Db();
-		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
 		
 		// マッチ情報取得
 		$oMatch = new Match( $oDb, $iMatchId );
@@ -120,8 +121,11 @@ class MatchController extends BaseController{
 			exit;
 		}
 		
-		$oHostTeam = new Team( $oDb, $oMatch->host_team_id );
-		$oApplyTeam = new Team( $oDb, $oLoginAccount->team_id );
+		$oLoginUser = new User( $oDb, $_SESSION["id"] );
+		$oLoginTeam = $oLoginUser->getTeam();
+		
+		$oHostTeam = new Teams( $oDb, $oMatch->host_team_id );
+		$oApplyTeam = new Teams( $oDb, $oLoginTeam->id );
 		// TODO エラー処理
 		// TODO その内チームに所属リーグの情報引っ張ってくる関数作成
 		$oHostTeamLadder = $oHostTeam->getCurrentLadder( $oDb );
@@ -131,7 +135,7 @@ class MatchController extends BaseController{
 		$oApplyTeamLeague = new League( $oDb, $oApplyTeamLadder->league_id );
 		
 		// ホストとゲストが同じチームはエラ－
-		if( $oHostTeam->team_id == $oApplyTeam->team_id ){
+		if( $oHostTeam->id == $oApplyTeam->id ){
 			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_HOST_EQ_GUEST );
 			exit;
 		}
@@ -174,20 +178,20 @@ class MatchController extends BaseController{
 			$showJoin = true;
 		}
 		
-		$oLastJoin = new LastJoin( $oDb );
+		$oTeamJoin = new TeamJoin( $oDb );
 		
 		// トランザクション開始
 		$oDb->beginTransaction();
 		
-		$oMatch->apply_team_id = $oApplyTeam->team_id;
+		$oMatch->apply_team_id = $oApplyTeam->id;
 		$oMatch->state = Match::MATCH_STATE_MATCHED;
 		$oMatch->save();
 		
-		$oLastJoin->join_date = date('Y-m-d H:i:s');
-		$oLastJoin->team_id = $oApplyTeam->team_id;
-		$oLastJoin->match_id = $oMatch->id;
-		$oLastJoin->state = LastJoin::STATE_ENABLE;
-		$oLastJoin->save();
+		$oTeamJoin->join_date = date('Y-m-d H:i:s');
+		$oTeamJoin->team_id = $oApplyTeam->id;
+		$oTeamJoin->match_id = $oMatch->id;
+		$oTeamJoin->state = TeamJoin::STATE_ENABLE;
+		$oTeamJoin->save();
 		
 		$oDb->commit();
 		
@@ -202,8 +206,9 @@ class MatchController extends BaseController{
 		$iMatchId = intval( $_REQUEST["match_id"] );
 		
 		$oDb = new Db();
-		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
-		$iCurTeamId = $oLoginAccount->team_id;
+		$oLoginUser = new User( $oDb, $_SESSION["id"] );
+		$oLoginTeam = $oLoginUser->getTeam();
+		$iCurTeamId = $oLoginTeam->id;
 		
 		// マッチ情報取得
 		$oMatch = new Match( $oDb, $iMatchId );
@@ -279,7 +284,7 @@ class MatchController extends BaseController{
 			$oApplyTeam = null;
 			$oApplyLeague = null;
 			if( $row["apply_team_id"] != 0 ){
-				$oApplyTeam = new Team( $oDb, $row["apply_team_id"] );
+				$oApplyTeam = new Teams( $oDb, $row["apply_team_id"] );
 				$oApplyLeague = $oApplyTeam->getLeague( $oDb );
 			}
 			
