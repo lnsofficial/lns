@@ -39,18 +39,8 @@
         </ul>
       </div>
       <div class="col-lg-9">
-        <h2>チーム情報</h2>
+        <h2>チーム情報&nbsp;<img src="{$logo_path}" width="70px" /></h2>
         <table class="table-bordered">
-          <tr>
-            <th>チームロゴ</th>
-            <td>
-                {if $logo_path == false}
-                    No Logo
-                {else}
-                    <img src="{$logo_path}" width="100px" />
-                {/if}
-            </td>
-          </tr>
           <tr>
             <th>チーム名</th>
             <td>{$team_name}</td>
