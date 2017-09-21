@@ -3,7 +3,7 @@ require_once( PATH_CONTROLLER . 'BaseController.php' );
 require_once( PATH_MODEL . 'Match.php' );
 require_once( PATH_MODEL . 'User.php' );
 require_once( PATH_MODEL . 'Teams.php' );
-require_once( PATH_MODEL . 'LadderRanking.php' );
+require_once( PATH_MODEL . 'Ladder.php' );
 require_once( PATH_MODEL . 'League.php' );
 
 class MatchController extends BaseController{
@@ -273,7 +273,7 @@ class MatchController extends BaseController{
 		$ahsMatchList = [];
 		
 		while( $row = $oMatchList->fetch_assoc() ) {
-			$oHostTeam = new Team( $oDb, $row["host_team_id"] );
+			$oHostTeam = new Teams( $oDb, $row["host_team_id"] );
 			$oHostLeague = $oHostTeam->getLeague( $oDb );
 			
 			$oApplyTeam = null;
@@ -342,15 +342,16 @@ class MatchController extends BaseController{
 		}
 
 		$oDb = new Db();
-		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
-		$this->checkRecruitEnable( $oLoginAccount->team_id );
+		$oUser = new User( $oDb, $_SESSION["id"] );
+		$oLoginTeam = $oUser->getTeam();
+		$this->checkRecruitEnable( $_REQUEST["match_date"], $oLoginTeam->id );
 
 		// DBに登録
 		$oDb = new Db();
 		$oDb->beginTransaction();
 		
 		$oMatch = new Match( $oDb );
-		$oMatch->host_team_id		= $oLoginAccount->team_id;
+		$oMatch->host_team_id		= $oLoginTeam->id;
 		$oMatch->match_date			= $_REQUEST["match_date"];
 		$oMatch->recruit_start_date	= date( 'Y-m-d H:i:s' );
 		$oMatch->type				= $_REQUEST["type"];
@@ -373,9 +374,10 @@ class MatchController extends BaseController{
 		}
 
 		$oDb = new Db();
-		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
+		$oUser = new User( $oDb, $_SESSION["id"] );
+		$oLoginTeam = $oUser->getTeam();
 		
-		$this->checkRecruitEnable( $_REQUEST["match_date"], $oLoginAccount->team_id );
+		$this->checkRecruitEnable( $_REQUEST["match_date"], $oLoginTeam->id );
 		
 		$dtMatchDate = date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) );
 
@@ -396,7 +398,7 @@ class MatchController extends BaseController{
 		$start_month	= date("Y-m-01", strtotime( $sMatchDate ) );
 		$end_month		= date("Y-m-01", strtotime( $sMatchDate . " +1 month"));
 		
-		$sSelectSql		= "SELECT count(*) as cnt FROM match_recruit_list WHERE host_team_id = ? and ? <= match_date and match_date < ? AND state <> ?";
+		$sSelectSql		= "SELECT count(*) as cnt FROM matches WHERE host_team_id = ? and ? <= match_date and match_date < ? AND state <> ?";
 		$ahsParameter	= [ $host_id, $start_month, $end_month, Match::MATCH_STATE_CANCEL ];
 		
 		$oDb = new Db();
