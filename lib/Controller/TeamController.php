@@ -189,8 +189,9 @@ class TeamController extends BaseController{
 		// このチームへ届いている申請一覧
 		$applys_for_team = UserTeamApply::getByTeamId( $oTeam->id );
         // team logo
-        $logo_path = "/img/logo/" . $oTeam->id . "_logo.jpg";
-        if (!file_exists(".".$logo_path)) {
+        $logo_file = $oTeam->id . "_logo.jpg";
+        $logo_path = PATH_TEAM_LOGO . $logo_file;
+        if (!file_exists($logo_path)) {
             $logo_path = false;
         }
 		
@@ -217,7 +218,7 @@ class TeamController extends BaseController{
 		$smarty->assign( "applys_for_team"  , $applys_for_team );
 		$smarty->assign( "user"             , $user );
 		$smarty->assign( "team"             , $oTeam );
-	    $smarty->assign( "logo_path"        , $logo_path );
+	    $smarty->assign( "logo_file"        , $logo_file );
 		$isThisTeamContact      = count( array_filter($user['team_contacts'],function($item)use($team_id){ return $item['team_id']==$team_id; }) );
 		$isThisTeamStaff        = count( array_filter($user['team_staffs'],  function($item)use($team_id){ return $item['team_id']==$team_id; }) );
 		$isTeamMemberApply      = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_MEMBER; }) );
@@ -654,19 +655,20 @@ class TeamController extends BaseController{
 			exit;
         }
         
-        $path = "/img/logo/" . $_REQUEST["team_id"] . "_logo.jpg";
-        move_uploaded_file($_FILES['inputTeamLogo']['tmp_name'], ".".$path);
+        $logo_file = $_REQUEST["team_id"] . "_logo.jpg";
+        $logo_path = PATH_TEAM_LOGO . $logo_file;
+        move_uploaded_file($_FILES['inputTeamLogo']['tmp_name'], $logo_path);
         
-        $this->_displayUploaded($path);
+        $this->_displayUploaded($logo_file);
 	}
 
-	private function _displayUploaded($path){
+	private function _displayUploaded($logo_file){
 		$smarty = new Smarty();
 		
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
 		
-		$smarty->assign( "logo_path" , $path);
+		$smarty->assign( "logo_file" , $logo_file);
 		$smarty->display('Team/LogoUploaded.tmpl');
 	}
 }
