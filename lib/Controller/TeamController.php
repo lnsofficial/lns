@@ -632,15 +632,16 @@ class TeamController extends BaseController{
 		require_logined_session();
 
         // check team id
-        if (empty($_REQUEST["team_id"])) {
+        $team_id = $_REQUEST["team_id"];
+        if (empty($team_id)) {
 			self::displayError();
 			exit;
         }
 
         // check is owner
 		$user_id = $_SESSION["id"];
-		$team_owner = TeamOwner::getUserIdFromTeamId( $_REQUEST["team_id"] );
-        if ($user_id != $team_owner->id) {
+		$team_owner = TeamOwner::getUserIdFromTeamId( $team_id );
+        if (empty($team_owner) || $user_id != $team_owner->id) {
 			self::displayError();
 			exit;
         }
@@ -655,7 +656,7 @@ class TeamController extends BaseController{
 			exit;
         }
         
-        $logo_file = $_REQUEST["team_id"] . "_logo.jpg";
+        $logo_file = $team_id . "_logo.jpg";
         $logo_path = PATH_TEAM_LOGO . $logo_file;
         move_uploaded_file($_FILES['inputTeamLogo']['tmp_name'], $logo_path);
         
