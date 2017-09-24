@@ -39,12 +39,12 @@
           <div class="row" id="search_option">
             <div class="col-md-3">
               <select id="state" name="search_option[state]" class="form-control">
-                <option value="" {if isset( $state ) }{if $state == null}selected{/if}{/if}>募集状態</option>
-                <option value="1" {if isset( $state ) }{if $state == 1}selected{/if}{/if}>募集中</option>
-                <option value="2" {if isset( $state ) }{if $state == 2}selected{/if}{/if}>結果登録待ち</option>
-                <option value="3" {if isset( $state ) }{if $state == 3}selected{/if}{/if}>取り消し</option>
-                <option value="5" {if isset( $state ) }{if $state == 5}selected{/if}{/if}>不戦勝</option>
-                <option value="4" {if isset( $state ) }{if $state == 4}selected{/if}{/if}>終了</option>
+                <option value="" {if isset( $state ) && $state == null}selected{/if}>募集状態</option>
+                <option value="1" {if isset( $state ) && $state == 1}selected{/if}>募集中</option>
+                <option value="2" {if isset( $state ) && $state == 2}selected{/if}>結果登録待ち</option>
+                <option value="3" {if isset( $state ) && $state == 3}selected{/if}>取り消し</option>
+                <option value="5" {if isset( $state ) && $state == 5}selected{/if}>不戦勝</option>
+                <option value="4" {if isset( $state ) && $state == 4}selected{/if}>終了</option>
               </select>
             </div>
             <div class="col-md-2">
