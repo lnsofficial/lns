@@ -80,14 +80,14 @@ class Teams extends Base{
 	
 	public function getLastJoin( $oDb ){
 		$sSelectLastJoin = "SELECT id FROM " . TeamJoin::MAIN_TABLE . " WHERE team_id = ? AND state = ? ORDER BY joined_at DESC";
-		$ahsParameter = [ $this->team_id, TeamJoin::STATE_ENABLE ];
+		$ahsParameter = [ $this->id, TeamJoin::STATE_ENABLE ];
 		
 		$oResult = $this->db->executePrepare( $sSelectLastJoin, "ii", $ahsParameter );
 		
 		$oLastJoin = null;
 		while( $row = $oResult->fetch_array() ){
 			$iLastJoinId = $row["id"];
-			$oLastJoin = new LastJoin( $oDb, $iLastJoinId );
+			$oLastJoin = new TeamJoin( $oDb, $iLastJoinId );
 			break;
 		}
 		
@@ -113,5 +113,19 @@ class Teams extends Base{
 		}
 		
 		return $oLadder;
+	}
+	
+	public function getTeamMembers( $oDb ){
+	    $sSelectTeamMember = "SELECT tm.team_id,us.id,us.summoner_id,us.tier,us.rank FROM team_members tm LEFT JOIN users us ON tm.user_id = us.id  WHERE team_id = ?";
+	    $ahsParameter = [ $this->id ];
+	    
+	    $oResult = $oDb->executePrepare( $sSelectTeamMember, "i", $ahsParameter );
+	    
+	    $ahsTeamMembers = null;
+	    while( $row = $oResult->fetch_assoc() ){
+	        $ahsTeamMembers[] = $row;
+	    }
+	    
+	    return $ahsTeamMembers;
 	}
 }
