@@ -70,7 +70,7 @@ class UpdateUser extends QueueBase
 			$from = $user->toArray();
 			// サモナー情報更新して、
 			$user->summoner_name = $json['name'];
-//			$user->account_id    = $json['accountId'];
+			$user->account_id    = $json['accountId'];
 			$user->save();
 			$dest = $user->toArray();
 			// キューを完了にする
