@@ -30,7 +30,7 @@ class Match extends Base{
 	const MATCH_STATE_FINISHED	= 4;
 	const MATCH_STATE_ABSTAINED	= 5;
 	
-	const MAX_MATCH_RECRUIT_COUNT = 4;
+	const MAX_MATCH_RECRUIT_COUNT = 5;
 	
 	public function getMatchLastWeek( $oDb ){
 		$sSelectMatchSql = "SELECT * FROM " . self::MAIN_TABLE . " WHERE state IN(?,?) AND match_date BETWEEN DATE_FORMAT(NOW() - INTERVAL " . INTERVAL_BATCH_TIME . ", '%Y-%m-%d 06:00:00') AND DATE_FORMAT(NOW() , '%Y-%m-%d 06:00:00') ORDER BY match_date ASC";
@@ -116,5 +116,24 @@ class Match extends Base{
 		}
 		
 		return $bResult;
+	}
+
+	public function getMatchCountAtMonthByDate( $host_team_id, $date, $include_abstained = false ){
+        $start_month    = date("Y-m-01", strtotime( $date ) );
+        $end_month      = date("Y-m-01", strtotime( $date . " +1 month"));
+
+        if ($include_abstained) {
+		    $sSelectMatchSql = "SELECT * FROM " . self::MAIN_TABLE . " WHERE host_team_id = ? and ? <= match_date and match_date < ? AND state <> ?";
+            $ahsParameter   = [ $host_team_id, $start_month, $end_month, self::MATCH_STATE_CANCEL];
+        } else {
+		    $sSelectMatchSql = "SELECT * FROM " . self::MAIN_TABLE . " WHERE host_team_id = ? and ? <= match_date and match_date < ? AND state not in (?, ?)";
+            $ahsParameter   = [ $host_team_id, $start_month, $end_month, self::MATCH_STATE_CANCEL,  self::MATCH_STATE_ABSTAINED];
+        }
+        $sType .= "issii";
+		
+		$result = $this->oDb->executePrepare( $sSelectMatchSql, $sType, $ahsParameter );
+		$row = $result->fetch_assoc();
+		
+		return $row["cnt"];
 	}
 }
