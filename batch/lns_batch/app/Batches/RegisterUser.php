@@ -9,6 +9,7 @@ use App\Models\LnsDB;
 
 // ↓バッチによって可変
 use App\Libs\RiotApi\SummonersByName;
+use App\Libs\RiotApi\PositionsBySummoner;
 use App\Models\User;
 
 /**
@@ -36,32 +37,63 @@ class RegisterUser extends QueueBase
 			return false;
 		}
 
-		// RiotApiからsummoner_nameを元にデータひっぱってくる
+		// RiotApiからsummoner_nameを元にサモナー情報データひっぱってくる
 		$sm_api     = new SummonersByName();
 		$sm_api->setParams(['name'=>$user->summoner_name]);
-		$json = $sm_api->execApi();
+		$sm_json    = $sm_api->execApi();
 
 		// 取れなかったら失敗ということで。
 		if( !$sm_api->isSuccess() )
 		{
 			// キューを失敗にして次へ。
-			$this->log('失敗。RiotApiでデータ見つからなかった系。$json:'.json_encode($json, JSON_UNESCAPED_UNICODE));
-			$queue->result = '失敗。RiotApiでデータ見つからなかった系。$json:'.json_encode($json, JSON_UNESCAPED_UNICODE);
+			$this->log('失敗。RiotApiでデータ見つからなかった系。$json:'.json_encode($sm_json, JSON_UNESCAPED_UNICODE));
+			$queue->result = '失敗。RiotApiでデータ見つからなかった系。$json:'.json_encode($sm_json, JSON_UNESCAPED_UNICODE);
 			$queue->state  = ApiQueue::STATE_FAILED;
 			$queue->save();
 			return false;
 		}
-		\Log::debug('$json = '.print_r($json,true));
+		\Log::debug('$json = '.print_r($sm_json,true));
+
+		// RiotApiからsummoner_idを元にランク情報データひっぱってくる
+		$sr_api     = new PositionsBySummoner();
+		$sr_api->setParams(['summonerId'=>$sm_json['id']]);
+		$sr_json    = $sr_api->execApi();
+
+		// 取れなかったら失敗ということで。
+		if( !$sr_api->isSuccess() )
+		{
+			// キューを失敗にして次へ。
+			$this->log('失敗。RiotApiでデータ見つからなかった系。$json:'.json_encode($sr_json, JSON_UNESCAPED_UNICODE));
+			$queue->result = '失敗。RiotApiでデータ見つからなかった系。$json:'.json_encode($sr_json, JSON_UNESCAPED_UNICODE);
+			$queue->state  = ApiQueue::STATE_FAILED;
+			$queue->save();
+			return false;
+		}
+		\Log::debug('$json = '.print_r($sr_json,true));
+
 
 
 		// ちゃんと取れたので更新
-		LnsDB::transaction(function()use(&$user, &$queue, $json)
+		LnsDB::transaction(function()use(&$user, &$queue, $sm_json, $sr_json)
 		{
 			$from = $user->toArray();
 			// サモナー情報更新して、
-			$user->summoner_name = $json['name'];
-			$user->summoner_id   = $json['id'];
-			$user->account_id    = $json['accountId'];
+			$user->summoner_name = $sm_json['name'];
+			$user->summoner_id   = $sm_json['id'];
+			$user->account_id    = $sm_json['accountId'];
+
+			// Unrankの場合は空配列で帰ってくる。
+			$rank = 'UNRANK';
+			$tier = 'UNRANK';
+			if( !empty($sr_json) )
+			{
+				$rank = $sr_json[0]['rank'];
+				$tier = $sr_json[0]['tier'];
+			}
+			$user->rank    = $rank;
+			$user->tier    = $tier;
+
+
 			$user->save();
 			$dest = $user->toArray();
 			// キューを完了にする
