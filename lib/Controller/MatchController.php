@@ -1,10 +1,11 @@
 <?php
 require_once( PATH_CONTROLLER . 'BaseController.php' );
 require_once( PATH_MODEL . 'Match.php' );
-require_once( PATH_MODEL . 'Team.php' );
-require_once( PATH_MODEL . 'LadderRanking.php' );
+require_once( PATH_MODEL . 'User.php' );
+require_once( PATH_MODEL . 'Teams.php' );
+require_once( PATH_MODEL . 'Ladder.php' );
+require_once( PATH_MODEL . 'TeamJoin.php' );
 require_once( PATH_MODEL . 'League.php' );
-require_once( PATH_MODEL . 'LoginAccount.php' );
 
 class MatchController extends BaseController{
 	const DISPLAY_DIR_PATH	= "Match";
@@ -26,14 +27,15 @@ class MatchController extends BaseController{
 		$oMatch = new Match( $oDb, $iMatchId );
 		
 		$iHostTeamId = $oMatch->host_team_id;
-		$oHostTeam = new Team( $oDb, $iHostTeamId );
+		$oHostTeam = new Teams( $oDb, $iHostTeamId );
 		
-		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
+		$oLoginUser = new User( $oDb, $_SESSION["id"] );
+		$oLoginTeam = $oLoginUser->getTeam();
 		
 		$showJoin = false;
 		$showCancel = false;
 		$showRegsiterResult = false;
-		switch( $oLoginAccount->team_id ){
+		switch( $oLoginTeam->id ){
 			case $iHostTeamId:
 				// ホスト
 				switch( $oMatch->state ){
@@ -109,7 +111,6 @@ class MatchController extends BaseController{
 		
 		$iMatchId = intval( $_REQUEST["match_id"] );
 		$oDb = new Db();
-		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
 		
 		// マッチ情報取得
 		$oMatch = new Match( $oDb, $iMatchId );
@@ -120,8 +121,11 @@ class MatchController extends BaseController{
 			exit;
 		}
 		
-		$oHostTeam = new Team( $oDb, $oMatch->host_team_id );
-		$oApplyTeam = new Team( $oDb, $oLoginAccount->team_id );
+		$oLoginUser = new User( $oDb, $_SESSION["id"] );
+		$oLoginTeam = $oLoginUser->getTeam();
+		
+		$oHostTeam = new Teams( $oDb, $oMatch->host_team_id );
+		$oApplyTeam = new Teams( $oDb, $oLoginTeam->id );
 		// TODO エラー処理
 		// TODO その内チームに所属リーグの情報引っ張ってくる関数作成
 		$oHostTeamLadder = $oHostTeam->getCurrentLadder( $oDb );
@@ -131,7 +135,7 @@ class MatchController extends BaseController{
 		$oApplyTeamLeague = new League( $oDb, $oApplyTeamLadder->league_id );
 		
 		// ホストとゲストが同じチームはエラ－
-		if( $oHostTeam->team_id == $oApplyTeam->team_id ){
+		if( $oHostTeam->id == $oApplyTeam->id ){
 			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_HOST_EQ_GUEST );
 			exit;
 		}
@@ -174,20 +178,20 @@ class MatchController extends BaseController{
 			$showJoin = true;
 		}
 		
-		$oLastJoin = new LastJoin( $oDb );
+		$oTeamJoin = new TeamJoin( $oDb );
 		
 		// トランザクション開始
 		$oDb->beginTransaction();
 		
-		$oMatch->apply_team_id = $oApplyTeam->team_id;
+		$oMatch->apply_team_id = $oApplyTeam->id;
 		$oMatch->state = Match::MATCH_STATE_MATCHED;
 		$oMatch->save();
 		
-		$oLastJoin->join_date = date('Y-m-d H:i:s');
-		$oLastJoin->team_id = $oApplyTeam->team_id;
-		$oLastJoin->match_id = $oMatch->id;
-		$oLastJoin->state = LastJoin::STATE_ENABLE;
-		$oLastJoin->save();
+		$oTeamJoin->join_date = date('Y-m-d H:i:s');
+		$oTeamJoin->team_id = $oApplyTeam->id;
+		$oTeamJoin->match_id = $oMatch->id;
+		$oTeamJoin->state = TeamJoin::STATE_ENABLE;
+		$oTeamJoin->save();
 		
 		$oDb->commit();
 		
@@ -202,8 +206,9 @@ class MatchController extends BaseController{
 		$iMatchId = intval( $_REQUEST["match_id"] );
 		
 		$oDb = new Db();
-		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
-		$iCurTeamId = $oLoginAccount->team_id;
+		$oLoginUser = new User( $oDb, $_SESSION["id"] );
+		$oLoginTeam = $oLoginUser->getTeam();
+		$iCurTeamId = $oLoginTeam->id;
 		
 		// マッチ情報取得
 		$oMatch = new Match( $oDb, $iMatchId );
@@ -248,34 +253,38 @@ class MatchController extends BaseController{
 		
 		$oDb = new Db();
 		
-		// TODO その内共通化
-		$iState = $_REQUEST["search_option"]["state"];
 		$ahsSearchOption = [];
-		if( !empty( $iState ) ){
-			$ahsSearchOption[] = [ "column" => "state",  "type" => "int", "value" => $iState ];
+		
+		// TODO その内共通化
+		if( isset( $_REQUEST["search_option"] ) ){
+			$iState = $_REQUEST["search_option"]["state"];
+			if( !empty( $iState ) ){
+				$ahsSearchOption[] = [ "column" => "state",  "type" => "int", "value" => $iState ];
+			}
+			
+			$sStartDate = $_REQUEST["search_option"]["start_date"];
+			if( !empty( $sStartDate ) ){
+				$ahsSearchOption[] = [ "column" => "match_date", "type" => "date", "operator" => ">=", "value" => $sStartDate ];
+			}
+			
+			$sEndDate = $_REQUEST["search_option"]["end_date"];
+			if( !empty( $sEndDate ) ){
+				$ahsSearchOption[] = [ "column" => "match_date", "type" => "date", "operator" => "<=", "value" => $sEndDate ];
+			}
 		}
 		
-		$sStartDate = $_REQUEST["search_option"]["start_date"];
-		if( !empty( $sStartDate ) ){
-			$ahsSearchOption[] = [ "column" => "match_date", "type" => "date", "operator" => ">=", "value" => $sStartDate ];
-		}
-		
-		$sEndDate = $_REQUEST["search_option"]["end_date"];
-		if( !empty( $sEndDate ) ){
-			$ahsSearchOption[] = [ "column" => "match_date", "type" => "date", "operator" => "<=", "value" => $sEndDate ];
-		}
 		$oMatchList = Match::getMatchList( $oDb, $ahsSearchOption );
 		
 		$ahsMatchList = [];
 		
 		while( $row = $oMatchList->fetch_assoc() ) {
-			$oHostTeam = new Team( $oDb, $row["host_team_id"] );
+			$oHostTeam = new Teams( $oDb, $row["host_team_id"] );
 			$oHostLeague = $oHostTeam->getLeague( $oDb );
 			
 			$oApplyTeam = null;
 			$oApplyLeague = null;
 			if( $row["apply_team_id"] != 0 ){
-				$oApplyTeam = new Team( $oDb, $row["apply_team_id"] );
+				$oApplyTeam = new Teams( $oDb, $row["apply_team_id"] );
 				$oApplyLeague = $oApplyTeam->getLeague( $oDb );
 			}
 			
@@ -302,8 +311,8 @@ class MatchController extends BaseController{
 			$ahsMatchList[] = $ahsMatch;
 		}
 		
-		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
-		$oLoginTeam = new Team( $oDb, $oLoginAccount->team_id );
+		$oUser = new User( $oDb, $_SESSION["id"] );
+		$oLoginTeam = $oUser->getTeam();
 		$oLatestLastJoin = $oLoginTeam->getLastJoin( $oDb );
 		
 		$smarty = new Smarty();
@@ -312,10 +321,18 @@ class MatchController extends BaseController{
 		$smarty->compile_dir  = PATH_TMPL_C;
 		
 		$smarty->assign( "match_recruit_list"	, $ahsMatchList );
-		$smarty->assign( "last_join_date"		, $oLatestLastJoin->join_date );
-		$smarty->assign( "state"				, $iState );
-		$smarty->assign( "start_date"			, $sStartDate );
-		$smarty->assign( "end_date"				, $sEndDate );
+		if( $oLatestLastJoin ){
+			$smarty->assign( "last_join_date"		, $oLatestLastJoin->joined_at );
+		}
+		if( isset( $iState ) ){
+			$smarty->assign( "state"				, $iState );
+		}
+		if( isset( $sStartDate ) ){
+			$smarty->assign( "start_date"			, $sStartDate );
+		}
+		if( isset( $sEndDate ) ){
+			$smarty->assign( "end_date"				, $sEndDate );
+		}
 		
 		$smarty->display('Match/MatchRecruitList.tmpl');
 	}
@@ -330,15 +347,16 @@ class MatchController extends BaseController{
 		}
 
 		$oDb = new Db();
-		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
-		$this->checkRecruitEnable( $oLoginAccount->team_id );
+		$oUser = new User( $oDb, $_SESSION["id"] );
+		$oLoginTeam = $oUser->getTeam();
+		$this->checkRecruitEnable( $_REQUEST["match_date"], $oLoginTeam->id );
 
 		// DBに登録
 		$oDb = new Db();
 		$oDb->beginTransaction();
 		
 		$oMatch = new Match( $oDb );
-		$oMatch->host_team_id		= $oLoginAccount->team_id;
+		$oMatch->host_team_id		= $oLoginTeam->id;
 		$oMatch->match_date			= $_REQUEST["match_date"];
 		$oMatch->recruit_start_date	= date( 'Y-m-d H:i:s' );
 		$oMatch->type				= $_REQUEST["type"];
@@ -361,9 +379,10 @@ class MatchController extends BaseController{
 		}
 
 		$oDb = new Db();
-		$oLoginAccount = new LoginAccount( $oDb, $_SESSION["id"] );
+		$oUser = new User( $oDb, $_SESSION["id"] );
+		$oLoginTeam = $oUser->getTeam();
 		
-		$this->checkRecruitEnable( $_REQUEST["match_date"], $oLoginAccount->team_id );
+		$this->checkRecruitEnable( $_REQUEST["match_date"], $oLoginTeam->id );
 		
 		$dtMatchDate = date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) );
 
@@ -384,7 +403,7 @@ class MatchController extends BaseController{
 		$start_month	= date("Y-m-01", strtotime( $sMatchDate ) );
 		$end_month		= date("Y-m-01", strtotime( $sMatchDate . " +1 month"));
 		
-		$sSelectSql		= "SELECT count(*) as cnt FROM match_recruit_list WHERE host_team_id = ? and ? <= match_date and match_date < ? AND state <> ?";
+		$sSelectSql		= "SELECT count(*) as cnt FROM matches WHERE host_team_id = ? and ? <= match_date and match_date < ? AND state <> ?";
 		$ahsParameter	= [ $host_id, $start_month, $end_month, Match::MATCH_STATE_CANCEL ];
 		
 		$oDb = new Db();

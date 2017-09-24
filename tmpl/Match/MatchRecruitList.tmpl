@@ -20,7 +20,7 @@
   <!--The following script tag downloads a font from the Adobe Edge Web Fonts server for use within the web page. We recommend that you do not modify it.--><script>var __adobewebfontsappname__="dreamweaver"</script><script src="http://use.edgefonts.net/open-sans:n3,n8,n4:default;overlock:n4:default;poiret-one:n4:default;paytone-one:n4:default.js" type="text/javascript"></script>
 </head>
   <body>
-  {include file='header.tmpl'}
+  {include file='header.tmpl' login=true}
   <div class="container-fluid">
     <style>
     </style>
@@ -29,7 +29,8 @@
         <div class="col-lg-2 about-menu">
           <ul class="nav side">
             <li role="presentation">最終試合応募日時</li>
-            <li role="presentation">{$last_join_date}</li>
+            <li role="presentation">{if isset( $last_join_date )}{$last_join_date}{/if}</li>
+            <li role="presentation"><a href="/Match/form">試合を募集</a></li>
           </ul>
         </div>
         <div class="col-lg-10" id="tabbox">
@@ -38,19 +39,19 @@
           <div class="row" id="search_option">
             <div class="col-md-3">
               <select id="state" name="search_option[state]" class="form-control">
-                <option value="" {if $state == null}selected{/if}>募集状態</option>
-                <option value="1" {if $state == 1}selected{/if}>募集中</option>
-                <option value="2" {if $state == 2}selected{/if}>結果登録待ち</option>
-                <option value="3" {if $state == 3}selected{/if}>取り消し</option>
-                <option value="5" {if $state == 5}selected{/if}>不戦勝</option>
-                <option value="4" {if $state == 4}selected{/if}>終了</option>
+                <option value="" {if isset( $state ) && $state == null}selected{/if}>募集状態</option>
+                <option value="1" {if isset( $state ) && $state == 1}selected{/if}>募集中</option>
+                <option value="2" {if isset( $state ) && $state == 2}selected{/if}>結果登録待ち</option>
+                <option value="3" {if isset( $state ) && $state == 3}selected{/if}>取り消し</option>
+                <option value="5" {if isset( $state ) && $state == 5}selected{/if}>不戦勝</option>
+                <option value="4" {if isset( $state ) && $state == 4}selected{/if}>終了</option>
               </select>
             </div>
             <div class="col-md-2">
-              <input type="text" id="search_start_date" name="search_option[start_date]" class="form-control datepicker" placeholder="検索開始日時" value="{$start_date}">
+              <input type="text" id="search_start_date" name="search_option[start_date]" class="form-control datepicker" placeholder="検索開始日時" value="{if isset($start_date)}{$start_date}{/if}">
             </div>
             <div class="col-md-2">
-              <input type="text" id="search_end_date" name="search_option[end_date]" class="form-control datepicker" placeholder="検索終了日時" value="{$end_date}">
+              <input type="text" id="search_end_date" name="search_option[end_date]" class="form-control datepicker" placeholder="検索終了日時" value="{if isset($end_date)}{$end_date}{/if}">
             </div>
           </div>
           <h2>試合募集一覧</h2>
