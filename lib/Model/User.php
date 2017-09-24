@@ -2,6 +2,7 @@
 require_once( PATH_MODEL . "Base.php" );
 require_once( PATH_MODEL . "Teams.php" );
 require_once( PATH_MODEL . "TeamMembers.php" );
+require_once( PATH_MODEL . "ApiQueues.php" );
 
 class User extends Base{
 	const MAIN_TABLE	= "users";
@@ -12,7 +13,10 @@ class User extends Base{
 		"id"			=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
 		"login_id"		=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
 		"password"		=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
-		"summoner_id"	=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
+		"summoner_id"	=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
+		"account_id"	=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
+		"tier"	        => [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
+		"rank"	        => [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
 		"summoner_name"	=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
 		"discord_id"	=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
 		"main_role"		=> [ "type" => "int"		, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
@@ -66,6 +70,21 @@ class User extends Base{
 			$oTeam = new Teams( $oDb, $ahsResult[0]["team_id"] );
 		}
 		return $oTeam;
+	}
+	
+	function getLastApiQueue(){
+		$oDb = new Db();
+		$oApiQueue = null;
+		
+		// TODO 複数ユーザーまとめて動かすバッチになってきたら手直しいるかも
+		$ahsParameter = [ [ "column" => "payload",  "type" => "varchar", "value" => json_encode( [ "user_id" => $this->id ] ) ] ];
+		$ahsOrder     = [ [ "column" => "id", "sort_order" => "DESC" ] ];
+		$ahsResult = ApiQueues::getList( $oDb, $ahsParameter, $ahsOrder );
+		
+		if( $ahsResult ){
+			$oApiQueue = new ApiQueues( $oDb, $ahsResult[0]["id"] );
+		}
+		return $oApiQueue;
 	}
 
 
@@ -138,22 +157,11 @@ class User extends Base{
 			$team = Teams::find( $team_member['team_id'] );
 		}
 
-		// UserTeamApply
-		$prepareSql  = "SELECT * FROM user_team_applys WHERE user_id = ? AND deleted_at IS NULL";
-		$bindParam   = [ $user_id ];
-		$result      = $db->executePrepare( $prepareSql, "i", $bindParam );
-		$user_team_applys = [];
-		while( $user_team_apply = $result->fetch_assoc() )
-		{
-			$user_team_applys[] = $user_team_apply;
-		}
-
-		$user['team_member']      = $team_member;
-		$user['team_owners']      = $team_owners;
-		$user['team_staffs']      = $team_staffs;
-		$user['team_contacts']    = $team_contacts;
-		$user['team']             = $team;
-		$user['user_team_applys'] = $user_team_applys;
+		$user['team_member'] = $team_member;
+		$user['team_owners'] = $team_owners;
+		$user['team_staffs'] = $team_staffs;
+		$user['team_contacts'] = $team_contacts;
+		$user['team']        = $team;
 
         return $user;
     }
