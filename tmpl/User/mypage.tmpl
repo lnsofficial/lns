@@ -29,6 +29,7 @@
       </div>
       <div class="col-lg-9">
         <h2>ユーザ情報</h2>
+        {if isset( $error_message )}<div class="alert alert-danger" role="alert">{$error_message}</div>{/if}
         <div class="form-group">
           <label for="inputSN" class="col-sm-2 control-label">サモナー名</label>
           <div class="col-sm-10">
@@ -54,6 +55,8 @@
           </div>
           <img src="/img/discord-register-icon.png" class="img-responsive" width="32" height="32" align="left">Discordは<a href="https://discord.gg/Tc4PqJE" target="_blank">こちら</a>
         </div>
+        <p>LNSリーグ参加者各位</p>
+        <p>本Discordサーバでは所属チームをわかるようにするため、お手数ですがDiscord名を[チーム名]@[サモナーネーム]にしていただきたく、よろしくお願いします。</p>
         {if isset($team)}
         <h2>所属チーム</h2>
         <div class="form-group">

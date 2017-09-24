@@ -61,7 +61,7 @@ class RegisterUser extends QueueBase
 			// サモナー情報更新して、
 			$user->summoner_name = $json['name'];
 			$user->summoner_id   = $json['id'];
-//			$user->account_id    = $json['accountId'];
+			$user->account_id    = $json['accountId'];
 			$user->save();
 			$dest = $user->toArray();
 			// キューを完了にする
