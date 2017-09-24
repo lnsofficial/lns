@@ -39,7 +39,7 @@
         </ul>
       </div>
       <div class="col-lg-9">
-        <h2>チーム情報</h2>
+        <h2>チーム情報&nbsp;<img src="/img/logo/{$logo_file}" width="70px" /></h2>
         <table class="table-bordered">
           <tr>
             <th>チーム名</th>
@@ -168,12 +168,22 @@
           {/if}
         {/if}
 
+        {if $user.id == $team_owner->id}
+          <h2>チームロゴ</h2>
+          <form method="post" action="/Team/uploadTeamLogo" class="form-horizontal" enctype="multipart/form-data">
+              <div class="form-group">
+                <div class="col-sm-9">
+                  <input type="hidden" id="team_id" name="team_id" value="{$team_id}">
+                  <input type="hidden" name="MAX_FILE_SIZE" value="1000000" />
+                  <input type="file" id="inputTeamLogo" name="inputTeamLogo">
+                  <input type="submit" value="チームロゴをアップロードする" onclick="return isImageFile(document.getElementById('inputTeamLogo').value)">
+                </div>
+              </div>
+          </form>
+        {/if}
+
       </div>
     </div>
-
-
-
-
   </div>
   {include file='footer.tmpl'}
 
@@ -194,6 +204,26 @@
 			return false;
 		}
 	}
+    function getExtension(fileName) {
+        var ret;
+        if (!fileName) {
+          return ret;
+        }
+        var fileTypes = fileName.split(".");
+        var len = fileTypes.length;
+        if (len === 0) {
+          return ret;
+        }
+        ret = fileTypes[len - 1];
+        return ret;
+    }
+    function isImageFile(fileName) {
+        var Extension = getExtension(fileName);
+        if (Extension.toLowerCase() != "png" && Extension.toLowerCase() != "jpg" && Extension.toLowerCase() != "jpeg" && Extension.toLowerCase() != "gif") {
+            alert("適切な形式ではありません。png, jpeg, jpg, gifでアップロードしてください。");
+            return false;
+        }
+    }
 	// --></script>
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 

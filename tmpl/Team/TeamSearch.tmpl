@@ -48,10 +48,12 @@
           {if ( count($team_list) > 0 )}
           <table class="table">
             <tr>
+              <th width="50px">ロゴ</th>
               <th>チーム名</th>
             </tr>
             {foreach from=$team_list item=team key=id}
             <tr>
+              <th><img src="/img/logo/{$team.id}_logo.jpg" width="40px"></th>
               <th><a href="/Team/Detail/{$team.id}">{$team.team_name}</a></th>
             </tr>
             {/foreach}
