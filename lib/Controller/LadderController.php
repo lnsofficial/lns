@@ -87,7 +87,7 @@ class LadderController extends BaseController{
             exit;
 		}
 		
-		if( count($ahsTeamMembers) < 5 ){
+		if( count($ahsTeamMembers) < Teams::COUNT_MIN_JOIN_LADDER ){
             self::displayError();
             exit;
 		}
