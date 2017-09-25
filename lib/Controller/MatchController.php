@@ -187,7 +187,7 @@ class MatchController extends BaseController{
 		$oMatch->state = Match::MATCH_STATE_MATCHED;
 		$oMatch->save();
 		
-		$oTeamJoin->join_date = date('Y-m-d H:i:s');
+		$oTeamJoin->joined_at = date('Y-m-d H:i:s');
 		$oTeamJoin->team_id = $oApplyTeam->id;
 		$oTeamJoin->match_id = $oMatch->id;
 		$oTeamJoin->state = TeamJoin::STATE_ENABLE;
@@ -314,6 +314,7 @@ class MatchController extends BaseController{
 		$oUser = new User( $oDb, $_SESSION["id"] );
 		$oLoginTeam = $oUser->getTeam();
 		$oLatestLastJoin = $oLoginTeam->getLastJoin( $oDb );
+		$ahsUserInfo = User::info( $oUser->id );
 		
 		$smarty = new Smarty();
 		

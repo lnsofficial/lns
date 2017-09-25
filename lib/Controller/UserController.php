@@ -352,7 +352,7 @@ class UserController extends BaseController{
         
         $oApiQueues->action  = ApiQueues::ACTION_REGISTER_SUMMONER;
         $oApiQueues->state   = ApiQueues::STATE_UNTREATED;
-        $oApiQueues->payload = json_encode( [ "user_id" => $oLoginUser->id ] );
+        $oApiQueues->payload = json_encode( [ "user_id" => $oUser->id ] );
         
         $oApiQueues->save();
         

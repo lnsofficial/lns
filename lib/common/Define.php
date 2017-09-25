@@ -7,6 +7,7 @@
 	define( "PATH_IMAGE"		, PATH_BASE . "htdocs/img/result/" );
 	define( "PATH_TMPL"			, PATH_BASE . "tmpl/" );
 	define( "PATH_TMPL_C"		, PATH_BASE . "tmpl_c/" );
+	define( "PATH_TEAM_LOGO"	, PATH_BASE . "htdocs/img/logo/" );
 	define( "PATH_SMARTY"		, PATH_LIB . "smarty-3.1.30/" );
 	define( "LIB_SMARTY"		, PATH_SMARTY . "libs/Smarty.class.php" );
 	
