@@ -123,17 +123,19 @@ class Match extends Base{
         $end_month      = date("Y-m-01", strtotime( $date . " +1 month"));
 
         if ($include_abstained) {
-		    $sSelectMatchSql = "SELECT * FROM " . self::MAIN_TABLE . " WHERE host_team_id = ? and ? <= match_date and match_date < ? AND state <> ?";
-            $ahsParameter   = [ $host_team_id, $start_month, $end_month, self::MATCH_STATE_CANCEL];
-        } else {
-		    $sSelectMatchSql = "SELECT * FROM " . self::MAIN_TABLE . " WHERE host_team_id = ? and ? <= match_date and match_date < ? AND state not in (?, ?)";
+		    $sSelectMatchSql = "SELECT count(1) as cnt FROM " . self::MAIN_TABLE . " WHERE host_team_id = ? and ? <= match_date and match_date < ? AND state not in (?, ?)";
             $ahsParameter   = [ $host_team_id, $start_month, $end_month, self::MATCH_STATE_CANCEL,  self::MATCH_STATE_ABSTAINED];
+            $sType = "issii";
+        } else {
+		    $sSelectMatchSql = "SELECT count(1) as cnt FROM " . self::MAIN_TABLE . " WHERE host_team_id = ? and ? <= match_date and match_date < ? AND state <> ?";
+            $ahsParameter   = [ $host_team_id, $start_month, $end_month, self::MATCH_STATE_CANCEL];
+            $sType = "issi";
         }
-        $sType .= "issii";
 		
-		$result = $this->oDb->executePrepare( $sSelectMatchSql, $sType, $ahsParameter );
+        $oDb = new Db();
+		$result = $oDb->executePrepare( $sSelectMatchSql, $sType, $ahsParameter );
 		$row = $result->fetch_assoc();
-		
+
 		return $row["cnt"];
 	}
 }

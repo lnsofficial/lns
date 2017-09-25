@@ -392,16 +392,11 @@ class MatchController extends BaseController{
 
 	public function checkRecruitEnable( $sMatchDate, $host_id ){
 		// 5 regist in a month
-		$count = $this->getMatchCountInMonth( $sMatchDate, $host_id );
+        $count = Match::getMatchCountAtMonthByDate( $host_id, $sMatchDate, true);
 		if ($count >= Match::MAX_MATCH_RECRUIT_COUNT) {
 			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_OVER_REGIST );
 			exit;
 		}
-	}
-
-	public function getMatchCountInMonth( $sMatchDate, $host_id ){
-        $count = Match::getMatchCountAtMonthByDate( $host_id, $sMatchDate, true);
-        return $count;
 	}
 	
 	private function validation(){
