@@ -26,6 +26,18 @@ class Teams extends Base{
 
 
     /**
+     * // ロゴファイル名はここから取る感じで。
+     * 
+     * @param  int                  $team_id                // teams.id
+     * @return string
+     */
+    static function getLogoFileName( $team_id )
+    {
+        return $team_id . '_logo.jpg';
+    }
+
+
+    /**
      * // 作成者で検索、だと思う。
      * 
      * @param  int                  $user_id                // users.id
@@ -60,7 +72,39 @@ class Teams extends Base{
         $bindParam  = [$id];
         return $db->executePrepare( $prepareSql, "i", $bindParam )->fetch_assoc();
     }
-    
+    /**
+     * // pk検索複数レコード
+     * 
+     * @param  array                $ids                     // [teams.id, ...]
+     * @return Teams[]
+     */
+    function getById( $ids )
+    {
+        $db = new Db();
+        $prepareSql = "SELECT * FROM teams WHERE id IN (";
+        $hatenas = '';
+        $types   = '';
+        foreach( $ids as $tid )
+        {
+            if( !empty($hatenas) )
+            {
+                $hatenas .= ',';
+            }
+            $hatenas .= '?';
+            $types   .= 'i';
+            $bindParam[]  = $tid;
+        }
+        $hatenas .= ')';
+        $prepareSql .= $hatenas;
+        $result = $db->executePrepare( $prepareSql, $types, $bindParam );
+        $teams = [];
+        while( $team = $result->fetch_assoc() )
+        {
+            $teams[] = $team;
+        }
+
+        return $teams;
+    }
 	// スタッフ取得
 	public function getStaff(){
 		$oDb = new Db();
