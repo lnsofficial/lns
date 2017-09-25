@@ -36,6 +36,9 @@
           {else}
           <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=3">アナリスト申請</a></li>
           {/if}
+          {if $isThisTeamJoinLadder }
+          <li role="presentation"><a href="/Ladder/Join/?team_id={$team_id}">大会へ参加</a></li>
+          {/if}
         </ul>
       </div>
       <div class="col-lg-9">

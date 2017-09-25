@@ -51,7 +51,8 @@ class Base{
 			}
 			switch( $value["type"] ){
 				case "int":
-					$asWhereSql[] = $value["column"] . " = ? ";
+				    $sOperator = isset( $value["operator"] ) ? $value["operator"] : "=";
+					$asWhereSql[] = $value["column"] . " " . $sOperator . " ? ";
 					$asParameter[] = $value["value"];
 					$sType .= "i";
 					break;
@@ -67,8 +68,6 @@ class Base{
 					break;
 			}
 		}
-		
-		//$sSelectSql .= implode( " AND ", $asWhereSql );
 		
 		$asOrderSql = [];
 		if( isset( $ahsOrder ) ){

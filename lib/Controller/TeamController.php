@@ -200,6 +200,27 @@ class TeamController extends BaseController{
 		// users
         $user_id = $_SESSION["id"];
 		$user = User::info( $user_id );
+		
+		$ahsTeamMembers = $oTeam->getTeamMembers( $oDb );
+		
+		$isThisTeamJoinLadder = false;
+		if( $team_owner->id == $user["id"] ){
+		    $isThisTeamJoinLadder = true;
+		}
+		
+		if( $oTeam->getCurrentLadder( $oDb ) ){
+		    $isThisTeamJoinLadder = false;
+		}
+		
+		if( count( $ahsTeamMembers ) ){
+		    foreach( $ahsTeamMembers as $asMember ){
+		        if( !isset( $asMember["summoner_id"] ) || !isset( $asMember["tier"] ) || !isset( $asMember["rank"] ) ){
+		            $isThisTeamJoinLadder = false;
+		            break;
+		        }
+		    }
+		}
+		
 		// 自身のチーム所属情報
 		$my_team_member = TeamMembers::findByUserId( $user["id"] );
 		$smarty = new Smarty();
@@ -229,6 +250,7 @@ class TeamController extends BaseController{
 		$smarty->assign( "isTeamMemberApply"      , $isTeamMemberApply );
 		$smarty->assign( "isThisTeamContactApply" , $isThisTeamContactApply );
 		$smarty->assign( "isThisTeamStaffApply"   , $isThisTeamStaffApply );
+		$smarty->assign( "isThisTeamJoinLadder", $isThisTeamJoinLadder );
 
 		$smarty->display('Team/TeamDetail.tmpl');
 	}
@@ -246,7 +268,6 @@ class TeamController extends BaseController{
 
         self::_displayTeamForm();
 	}
-
 	private function _displayTeamForm(){
 		$smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
