@@ -189,7 +189,7 @@ class TeamController extends BaseController{
 		// このチームへ届いている申請一覧
 		$applys_for_team = UserTeamApply::getByTeamId( $oTeam->id );
         // team logo
-        $logo_file = $oTeam->id . "_logo.jpg";
+        $logo_file = Teams::getLogoFileName( $oTeam->id );
         $logo_path = PATH_TEAM_LOGO . $logo_file;
         if (!file_exists($logo_path)) {
             $logo_path = false;
