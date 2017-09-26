@@ -391,29 +391,12 @@ class MatchController extends BaseController{
 	}
 
 	public function checkRecruitEnable( $sMatchDate, $host_id ){
-		// 4 regist in a month
-		$count = $this->getMatchCountInMonth( $sMatchDate, $host_id );
+		// 5 regist in a month
+        $count = Match::getMatchCountAtMonthByDate( $host_id, $sMatchDate, true);
 		if ($count >= Match::MAX_MATCH_RECRUIT_COUNT) {
 			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_OVER_REGIST );
 			exit;
 		}
-	}
-
-	public function getMatchCountInMonth( $sMatchDate, $host_id ){
-		// 4 regist in a month
-		$start_month	= date("Y-m-01", strtotime( $sMatchDate ) );
-		$end_month		= date("Y-m-01", strtotime( $sMatchDate . " +1 month"));
-		
-		$sSelectSql		= "SELECT count(*) as cnt FROM matches WHERE host_team_id = ? and ? <= match_date and match_date < ? AND state <> ?";
-		$ahsParameter	= [ $host_id, $start_month, $end_month, Match::MATCH_STATE_CANCEL ];
-		
-		$oDb = new Db();
-		
-		$result = $oDb->executePrepare( $sSelectSql, "issi", $ahsParameter );
-		
-		$row = $result->fetch_assoc();
-		
-		return $row["cnt"];
 	}
 	
 	private function validation(){
@@ -438,13 +421,21 @@ class MatchController extends BaseController{
 	public function form(){
 		session_set_save_handler( new MysqlSessionHandler() );
 		require_logined_session();
+
+
 		self::displayMatchingForm();
 	}
 
 	public function displayMatchingForm(){
+		$isLogin = false;
+		if( isset( $_SESSION['id'] ) ) {
+			// TODO 本来の意味的には逆、微妙なのでその内直す
+			$isLogin = true;
+		}
 		$smarty = new Smarty();
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
+		$smarty->assign( "login", $isLogin );
 		$smarty->display('Match/MatchingForm.tmpl');
 	}
 	

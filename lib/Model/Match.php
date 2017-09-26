@@ -30,12 +30,11 @@ class Match extends Base{
 	const MATCH_STATE_FINISHED	= 4;
 	const MATCH_STATE_ABSTAINED	= 5;
 	
-	const MAX_MATCH_RECRUIT_COUNT = 4;
-
+	const MAX_MATCH_RECRUIT_COUNT = 5;
+	
 	const FEATURE_GAME_COUNT       =  5; // topページの最新ゲームで最大何件表示させるか
 	const FEATURE_GAME_DATE_BEFORE = 10; // topページの最新ゲームを取るときに、何日前までの試合を対象とするか
-
-
+  
 	public function getMatchLastWeek( $oDb ){
 		$sSelectMatchSql = "SELECT * FROM " . self::MAIN_TABLE . " WHERE state IN(?,?) AND match_date BETWEEN DATE_FORMAT(NOW() - INTERVAL " . INTERVAL_BATCH_TIME . ", '%Y-%m-%d 06:00:00') AND DATE_FORMAT(NOW() , '%Y-%m-%d 06:00:00') ORDER BY match_date ASC";
 		$ahsParameter = [ self::MATCH_STATE_FINISHED, self::MATCH_STATE_ABSTAINED ];
@@ -120,5 +119,26 @@ class Match extends Base{
 		}
 		
 		return $bResult;
+	}
+
+	public function getMatchCountAtMonthByDate( $host_team_id, $date, $include_abstained = false ){
+        $start_month    = date("Y-m-01", strtotime( $date ) );
+        $end_month      = date("Y-m-01", strtotime( $date . " +1 month"));
+
+        if ($include_abstained) {
+		    $sSelectMatchSql = "SELECT count(1) as cnt FROM " . self::MAIN_TABLE . " WHERE host_team_id = ? and ? <= match_date and match_date < ? AND state not in (?, ?)";
+            $ahsParameter   = [ $host_team_id, $start_month, $end_month, self::MATCH_STATE_CANCEL,  self::MATCH_STATE_ABSTAINED];
+            $sType = "issii";
+        } else {
+		    $sSelectMatchSql = "SELECT count(1) as cnt FROM " . self::MAIN_TABLE . " WHERE host_team_id = ? and ? <= match_date and match_date < ? AND state <> ?";
+            $ahsParameter   = [ $host_team_id, $start_month, $end_month, self::MATCH_STATE_CANCEL];
+            $sType = "issi";
+        }
+		
+        $oDb = new Db();
+		$result = $oDb->executePrepare( $sSelectMatchSql, $sType, $ahsParameter );
+		$row = $result->fetch_assoc();
+
+		return $row["cnt"];
 	}
 }
