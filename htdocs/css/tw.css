@@ -1,0 +1,38 @@
+@charset "utf-8";
+#document.timeline-Widget {
+    max-width: 100% !important;
+    width: 100% !important;
+    }
+
+div.timeline-Widget {
+    max-width: 100% !important;
+    width: 100% !important;
+    }
+
+.timeline {
+    max-width: 100% !important;
+    width: 100% !important;
+    }
+
+/* ここから下を追記 */
+.SandboxRoot.env-bp-970 .timeline-Tweet-text {
+    font-size: 8.5pt !important;
+    line-height: 14pt!important;
+    }
+
+.SandboxRoot.env-bp-820 .timeline-Tweet-text {
+    font-size: 8.5pt !important;
+    line-height: 14pt!important;
+    }
+
+.SandboxRoot.env-bp-430 .timeline-Tweet-text {
+    font-size: 8.5pt !important;
+    line-height: 14pt!important;
+    }
+
+.SandboxRoot.env-bp-330 .timeline-Tweet-text {
+    font-size: 8.5pt !important;
+    line-height: 14pt!important;
+    }
+
+/*.SandboxRoot.env-bp-330 .TweetAuthor-name*/

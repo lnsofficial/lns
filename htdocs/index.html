@@ -37,13 +37,14 @@
   </div>
 <div class="container-fluid">
   <div class="row aisatu">
-      <div class="col-lg-7"><div class="aisatu">
+      <div class="col-lg-8"><div class="aisatu">
         <h1 class="submidashi">今後の試合予定</h1>
         <?php include($_SERVER['DOCUMENT_ROOT'] . "/include/feature_games.html"); ?>
       </div>
     </div>
-      <div class="col-lg-5 news-left">
+      <div class="col-lg-4 news-left">
         <div class="news">
+<!--
           <h1 class="submidashi news">NEWS</h1>
           <ul class="nav">
             <li role="presentation">2017/09/18 第3期の募集を開始しました</li>
@@ -55,6 +56,8 @@
             <li role="presentation">2017/02/04 募集締め切り日時を更新しました</li>
             <li role="presentation">2017/01/20 参加チームの募集を開始しました</li>
           </ul>
+-->
+<a class="twitter-timeline" href="https://twitter.com/LNSofficial_lol" height="350px" data-border-color="#f5deb3" data-chrome="noheader nofooter transparent">Tweets by LNSofficial_lol</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
         </div>
       </div>
     </div>
@@ -90,5 +93,19 @@ $(function(){
 
 	<!-- Include all compiled plugins (below), or include individual files as needed --> 
 	<script src="/js/bootstrap.js"></script>
+	<script type="text/javascript">
+$(window).load(function() {
+function changeWidget() {
+  var twFrame = $('iframe.twitter-timeline');
+  if (twFrame.length > 0) {
+    twFrame.contents()
+    .find('head').append('<link href="/css/tw.css" rel="stylesheet" type="text/css" media="all" />');
+    } else {
+      setTimeout(changeWidget, 1500);
+      }
+    }
+    changeWidget();
+ });
+	</script>
   </body>
 </html>
