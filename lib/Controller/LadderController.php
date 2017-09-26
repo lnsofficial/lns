@@ -40,7 +40,7 @@ class LadderController extends BaseController{
 		    	
 		    	$ahsTeamLadder = [];
 		    	$ahsTeamLadder["order"]			= $iOrder;
-		    	$ahsTeamLadder["team_id"]		= $oTeam->team_id;
+		    	$ahsTeamLadder["team_id"]		= $oTeam->id;
 		    	$ahsTeamLadder["team_name"]		= $oTeam->team_name;
 		    	$ahsTeamLadder["league_id"]		= $row["league_id"];
 		    	$ahsTeamLadder["league_name"]	= $row["league_name"];
