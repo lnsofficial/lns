@@ -35,54 +35,68 @@ class MatchController extends BaseController{
 		$showJoin = false;
 		$showCancel = false;
 		$showRegsiterResult = false;
-		switch( $oLoginTeam->id ){
-			case $iHostTeamId:
-				// ホスト
-				switch( $oMatch->state ){
-					case Match::MATCH_STATE_RECRUIT:
-						// 募集中
-						$showCancel = true;
-						break;
-					case Match::MATCH_STATE_MATCHED:
-						// 試合結果登録待ち
-						if( $oMatch->enableCancel() ){
-							$showCancel = true;
-						}
-						$showRegsiterResult = true;
-						break;
-				}
-				break;
-			case $oMatch->apply_team_id:
-				// ゲスト
-				switch( $oMatch->state ){
-					case Match::MATCH_STATE_RECRUIT:
-						// 募集中
-						$showJoin = true;
-						break;
-					case Match::MATCH_STATE_MATCHED:
-						// 試合結果登録待ち
-						if( $oMatch->enableCancel() ){
-							$showCancel = true;
-						}
-						$showRegsiterResult = true;
-						break;
-				}
-				break;
-			default:
-				// それ以外
-				switch( $oMatch->state ){
-					case Match::MATCH_STATE_RECRUIT:
-						// 募集中
-						if( date( 'Y-m-d H:i:s' ) < date( 'Y-m-d H:i:s', strtotime( $oMatch->match_date ) ) ){
-							$showJoin = true;
-						}
-						break;
-					case Match::MATCH_STATE_MATCHED:
-						// 試合結果登録待ち
-						break;
-				}
-				break;
-				
+		
+		// TODO 確認とかも権限処理必要
+		$bAuthorized = false;
+		$ahsAuthorizedTeamInfo = $oLoginUser->getAuthorizedTeam();
+		
+		foreach( $ahsAuthorizedTeamInfo as $asTeamInfo ){
+		    if( $oLoginTeam->id == $asTeamInfo["id"] ){
+		        $bAuthorized = true;
+		        break;
+		    }
+		}
+		
+		if( $bAuthorized ){
+		    switch( $oLoginTeam->id ){
+		    	case $iHostTeamId:
+		    		// ホスト
+		    		switch( $oMatch->state ){
+		    			case Match::MATCH_STATE_RECRUIT:
+		    				// 募集中
+		    				$showCancel = true;
+		    				break;
+		    			case Match::MATCH_STATE_MATCHED:
+		    				// 試合結果登録待ち
+		    				if( $oMatch->enableCancel() ){
+		    					$showCancel = true;
+		    				}
+		    				$showRegsiterResult = true;
+		    				break;
+		    		}
+		    		break;
+		    	case $oMatch->apply_team_id:
+		    		// ゲスト
+		    		switch( $oMatch->state ){
+		    			case Match::MATCH_STATE_RECRUIT:
+		    				// 募集中
+		    				$showJoin = true;
+		    				break;
+		    			case Match::MATCH_STATE_MATCHED:
+		    				// 試合結果登録待ち
+		    				if( $oMatch->enableCancel() ){
+		    					$showCancel = true;
+		    				}
+		    				$showRegsiterResult = true;
+		    				break;
+		    		}
+		    		break;
+		    	default:
+		    		// それ以外
+		    		switch( $oMatch->state ){
+		    			case Match::MATCH_STATE_RECRUIT:
+		    				// 募集中
+		    				if( date( 'Y-m-d H:i:s' ) < date( 'Y-m-d H:i:s', strtotime( $oMatch->match_date ) ) ){
+		    					$showJoin = true;
+		    				}
+		    				break;
+		    			case Match::MATCH_STATE_MATCHED:
+		    				// 試合結果登録待ち
+		    				break;
+		    		}
+		    		break;
+		    		
+		    }
 		}
 		
 		$smarty = new Smarty();
@@ -313,8 +327,22 @@ class MatchController extends BaseController{
 		
 		$oUser = new User( $oDb, $_SESSION["id"] );
 		$oLoginTeam = $oUser->getTeam();
-		$oLatestLastJoin = $oLoginTeam->getLastJoin( $oDb );
-		$ahsUserInfo = User::info( $oUser->id );
+		
+		$bJoinedLadder = false;
+		$oLatestLastJoin = null;
+		if( $oLoginTeam ){
+		    $oLatestLastJoin = $oLoginTeam->getLastJoin( $oDb );
+		    $ahsUserInfo = User::info( $oUser->id );
+		    
+		    $ahsAuthorizedTeamInfo = $oUser->getAuthorizedTeam();
+		    
+		    foreach( $ahsAuthorizedTeamInfo as $asTeamInfo ){
+		        if( $asTeamInfo["ladder"] ){
+		            $bJoinedLadder = true;
+		            break;
+		        }
+		    }
+		}
 		
 		$smarty = new Smarty();
 		
@@ -322,6 +350,7 @@ class MatchController extends BaseController{
 		$smarty->compile_dir  = PATH_TMPL_C;
 		
 		$smarty->assign( "match_recruit_list"	, $ahsMatchList );
+		$smarty->assign( "is_joined_ladder"	, $bJoinedLadder );
 		if( $oLatestLastJoin ){
 			$smarty->assign( "last_join_date"		, $oLatestLastJoin->joined_at );
 		}

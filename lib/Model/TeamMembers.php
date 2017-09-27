@@ -32,6 +32,9 @@ class TeamMembers extends Base{
         $team_members = [];
         while( $team_member = $result->fetch_assoc() )
         {
+            $oUser = new User( $db, $team_member["id"] );
+            $oLastApiQueue = $oUser->getLastApiQueue();
+            $team_member["last_api_queue_state"] = $oLastApiQueue->state;
             $team_members[] = $team_member;
         }
 

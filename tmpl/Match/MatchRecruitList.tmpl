@@ -30,7 +30,7 @@
           <ul class="nav side">
             <li role="presentation">最終試合応募日時</li>
             <li role="presentation">{if isset( $last_join_date )}{$last_join_date}{/if}</li>
-            <li role="presentation"><a href="/Match/form">試合を募集</a></li>
+            {if $is_joined_ladder}<li role="presentation"><a href="/Match/form">試合を募集</a></li>{/if}
           </ul>
         </div>
         <div class="col-lg-10" id="tabbox">
