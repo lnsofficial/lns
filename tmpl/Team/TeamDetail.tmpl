@@ -64,8 +64,9 @@
         <h2>選手一覧</h2>
         <table  class="table-bordered">
           <tr>
-            <th>サモナーネーム</th>
-            <th>メインロール</th>
+            <th>サモナーネーム　</th>
+            <th>メインロール　</th>
+            <th>確認状況　</th>
           </tr>
           {foreach from=$team_members item=member key=member_id}
             <tr>
@@ -77,9 +78,12 @@
               {if $member.main_role == 4}ADC{/if}
               {if $member.main_role == 5}Support{/if}
               </td>
+              <td>{if $member.summoner_id}確認済み{else}{if $member.last_api_queue_state == ApiQueues::STATE_UNTREATED}未確認{elseif $member.last_api_queue_state == ApiQueues::STATE_FAILED}エラー{/if}{/if}</td>
             </tr>
           {/foreach}
         </table>
+        <p>メンバー全員の情報を運営が確認次第、大会への参加が可能となります。</p>
+        <p>確認状況がエラーの場合、サモナーネームを誤って登録している可能性があります。</p>
 
         <h2>代表者</h2>
         <table  class="table-bordered">

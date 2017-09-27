@@ -35,7 +35,7 @@
           {foreach from=$ladder_list item=ladder key=id}
           <tr class="row">
             <td class="col-md-1">{$ladder.order}</td>
-            <td class="col-md-6"><a href="" onClick="showTeamDetail( {$ladder.team_id} ); return false;">{$ladder.team_name}</a></td>
+            <td class="col-md-6"><a href="/Team/Detail/{$ladder.team_id}">{$ladder.team_name}</a></td>
             <td class="col-md-3">{$ladder.league_name}</td>
             <td class="col-md-2">{$ladder.point}</td>
           </tr>
@@ -49,12 +49,5 @@
   <script src="/js/jquery-1.11.3.min.js"></script>
   <!-- Include all compiled plugins (below), or include individual files as needed --> 
   <script src="/js/bootstrap.js"></script>
-  <script type="text/javascript">
-    function showTeamDetail( team_id ){
-      document.form1.action = "/Team/Detail";
-      document.form1.team_id.value = team_id;
-      document.form1.submit();
-    }
-  </script>
   </body>
 </html>

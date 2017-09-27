@@ -179,6 +179,10 @@ class TeamController extends BaseController{
         require_logined_session();
 		$oDb = new Db();
 		$oTeam = new Teams( $oDb, $team_id );
+		if( $oTeam->id == null ){
+			self::displayError();
+		    exit();
+		}
 
 		// team members
 		$team_members = TeamMembers::getByTeamId( $oTeam->id );
@@ -201,8 +205,6 @@ class TeamController extends BaseController{
         $user_id = $_SESSION["id"];
 		$user = User::info( $user_id );
 		
-		$ahsTeamMembers = $oTeam->getTeamMembers( $oDb );
-		
 		$isThisTeamJoinLadder = false;
 		if( $team_owner->id == $user["id"] ){
 		    $isThisTeamJoinLadder = true;
@@ -212,9 +214,9 @@ class TeamController extends BaseController{
 		    $isThisTeamJoinLadder = false;
 		}
 		
-		if( count( $ahsTeamMembers ) ){
-		    foreach( $ahsTeamMembers as $asMember ){
-		        if( !isset( $asMember["summoner_id"] ) || !isset( $asMember["tier"] ) || !isset( $asMember["rank"] ) ){
+		if( count( $team_members ) ){
+		    foreach( $team_members as $member ){
+		        if( !isset( $member["summoner_id"] ) || !isset( $member["tier"] ) || !isset( $member["rank"] ) ){
 		            $isThisTeamJoinLadder = false;
 		            break;
 		        }

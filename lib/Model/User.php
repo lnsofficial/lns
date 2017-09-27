@@ -3,6 +3,7 @@ require_once( PATH_MODEL . "Base.php" );
 require_once( PATH_MODEL . "Teams.php" );
 require_once( PATH_MODEL . "TeamMembers.php" );
 require_once( PATH_MODEL . "ApiQueues.php" );
+require_once( PATH_MODEL . "Ladder.php" );
 
 class User extends Base{
 	const MAIN_TABLE	= "users";
@@ -80,6 +81,43 @@ class User extends Base{
 			$oTeam = new Teams( $oDb, $ahsResult[0]["team_id"] );
 		}
 		return $oTeam;
+	}
+	
+	public function getAuthorizedTeam(){
+	    $ahsTeam = [];
+	    
+	    $ahsUserInfo = self::info( $this->id );
+	    
+	    foreach( $ahsUserInfo['team_owners'] as $asOwnerTeam ){
+	        $ahsTeam[] = self::getTeamInfo($asOwnerTeam["team_id"]);
+	    }
+	    foreach( $ahsUserInfo['team_contacts'] as $asContactTeam ){
+	        $ahsTeam[] = self::getTeamInfo($asContactTeam["team_id"]);
+	    }
+	    
+		return $ahsTeam;
+	}
+	
+	private function getTeamInfo( $iTeamId ){
+	    $oDb = new Db();
+	    
+	    $asTeamInfo = null;
+	    
+	    $oTeam = new Teams( $oDb, $iTeamId );
+	    
+	    if( $oTeam ){
+	        $asTeamInfo["id"] = $oTeam->id;
+	        $asTeamInfo["name"] = $oTeam->team_name;
+	        
+    		$ahsParameter = [ [ "column" => "team_id",  "type" => "int", "value" => $oTeam->id ] ];
+	        $oLadder = $oTeam->getCurrentLadder( $oDb );
+	        $asTeamInfo["ladder"] = $oLadder ? true : false;
+	        
+	        $oLastJoin = $oTeam->getLastJoin( $oDb );
+	        $asTeamInfo["last_joined"] = $oLastJoin ? $oLastJoin->joined_at : null;
+	    }
+	    
+	    return $asTeamInfo;
 	}
 	
 	function getLastApiQueue(){

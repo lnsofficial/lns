@@ -141,7 +141,10 @@ class Teams extends Base{
 	
 	public function getLeague( $oDb ){
 		$oLadder = $this->getCurrentLadder( $oDb );
-		$oLeague = new League( $oDb, $oLadder->league_id );
+		$oLeague = null;
+		if( $oLadder ){
+		    $oLeague = new League( $oDb, $oLadder->league_id );
+		}
 		
 		return $oLeague;
 	}
