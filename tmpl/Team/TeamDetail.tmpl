@@ -78,7 +78,7 @@
               {if $member.main_role == 4}ADC{/if}
               {if $member.main_role == 5}Support{/if}
               </td>
-              <td>{if $member.summoner_id}確認済み{else}{if $member.last_api_queue == ApiQueues::STATE_UNTREATED}未確認{elseif $member.last_api_queue == ApiQueues::STATE_FAILED}エラー{/if}{/if}</td>
+              <td>{if $member.summoner_id}確認済み{else}{if $member.last_api_queue_state == ApiQueues::STATE_UNTREATED}未確認{elseif $member.last_api_queue_state == ApiQueues::STATE_FAILED}エラー{/if}{/if}</td>
             </tr>
           {/foreach}
         </table>
