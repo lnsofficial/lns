@@ -22,6 +22,7 @@ class Match extends Base{
 	const MATCH_TYPE_ANY					= 1;
 	const MATCH_TYPE_LESS_SAME				= 2;
 	const MATCH_TYPE_LESS_ONE_ON_THE_SAME	= 3;
+	const MATCH_TYPE_LESS_TWO_ON_THE_SAME	= 4;
 	
 	const MATCH_STATE_DISABLED	= 0;
 	const MATCH_STATE_RECRUIT	= 1;
@@ -119,6 +120,37 @@ class Match extends Base{
 		}
 		
 		return $bResult;
+	}
+	
+	// 試合に参加可能かチェック
+	public function enableJoin( $iHostRank, $iApplyRank ){
+	    $bEnableJoin = true;
+		switch( $this->type ){
+			case Match::MATCH_TYPE_ANY:
+				// 何もしない
+				break;
+			case Match::MATCH_TYPE_LESS_SAME:
+				// ホストのランクが自分のランクより下ならエラー
+				if( $iHostRank > $iApplyRank ){
+					$bEnableJoin = false;
+				}
+				break;
+			case Match::MATCH_TYPE_LESS_ONE_ON_THE_SAME:
+	    echo($iHostRank );
+				// ホストのランクが自分のランクから2つ以下ならエラー
+				if( $iHostRank > $iApplyRank + 1 ){
+					$bEnableJoin = false;
+				}
+				break;
+			case Match::MATCH_TYPE_LESS_TWO_ON_THE_SAME:
+				// ホストのランクが自分のランクから2つ以下ならエラー
+				if( $iHostRank > $iApplyRank + 2 ){
+					$bEnableJoin = false;
+				}
+				break;
+		}
+		
+		return $bEnableJoin;
 	}
 
 	public function getMatchCountAtMonthByDate( $host_team_id, $date, $include_abstained = false ){

@@ -28,9 +28,13 @@ class MatchController extends BaseController{
 		
 		$iHostTeamId = $oMatch->host_team_id;
 		$oHostTeam = new Teams( $oDb, $iHostTeamId );
+		$oHostTeamLadder = $oHostTeam->getCurrentLadder( $oDb );
+		$oHostTeamLeague = new League( $oDb, $oHostTeamLadder->league_id );
 		
 		$oLoginUser = new User( $oDb, $_SESSION["id"] );
 		$oLoginTeam = $oLoginUser->getTeam();
+		$oLoginTeamLadder = $oLoginTeam->getCurrentLadder( $oDb );
+		$oLoginTeamLeague = new League( $oDb, $oLoginTeamLadder->league_id );
 		
 		$showJoin = false;
 		$showCancel = false;
@@ -87,7 +91,7 @@ class MatchController extends BaseController{
 		    			case Match::MATCH_STATE_RECRUIT:
 		    				// 募集中
 		    				if( date( 'Y-m-d H:i:s' ) < date( 'Y-m-d H:i:s', strtotime( $oMatch->match_date ) ) ){
-		    					$showJoin = true;
+		    					$showJoin = $oMatch->enableJoin( $oHostTeamLeague->rank, $oLoginTeamLeague->rank );
 		    				}
 		    				break;
 		    			case Match::MATCH_STATE_MATCHED:
@@ -154,24 +158,11 @@ class MatchController extends BaseController{
 			exit;
 		}
 		
-		switch( $oMatch->type ){
-			case Match::MATCH_TYPE_ANY:
-				// 何もしない
-				break;
-			case Match::MATCH_TYPE_LESS_SAME:
-				// ホストのランクが自分のランクより下ならエラー
-				if( $oHostTeamLeague->rank > $oApplyTeamLeague->rank ){
-					self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_HOST_DONT_APPLY );
-					exit;
-				}
-				break;
-			case Match::MATCH_TYPE_LESS_ONE_ON_THE_SAME:
-				// ホストのランクが自分のランクから2つ以下ならエラー
-				if( $oHostTeamLeague->rank > $oApplyTeamLeague->rank + 1 ){
-					self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_HOST_DONT_APPLY );
-					exit;
-				}
-				break;
+		
+		$bEnableJoin = $oMatch->enableJoin( $oHostTeamLeague->rank, $oApplyTeamLeague->rank );
+		if( !$bEnableJoin ){
+			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_HOST_DONT_APPLY );
+			exit;
 		}
 		
 		$oLatestLastJoin = $oApplyTeam->getLastJoin( $oDb );
