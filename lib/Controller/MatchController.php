@@ -34,7 +34,9 @@ class MatchController extends BaseController{
 		$oLoginUser = new User( $oDb, $_SESSION["id"] );
 		$oLoginTeam = $oLoginUser->getTeam();
 		$oLoginTeamLadder = $oLoginTeam->getCurrentLadder( $oDb );
-		$oLoginTeamLeague = new League( $oDb, $oLoginTeamLadder->league_id );
+		if( $oLoginTeamLadder ){
+		    $oLoginTeamLeague = new League( $oDb, $oLoginTeamLadder->league_id );
+		}
 		
 		$showJoin = false;
 		$showCancel = false;
@@ -51,7 +53,7 @@ class MatchController extends BaseController{
 		    }
 		}
 		
-		if( $bAuthorized ){
+		if( $bAuthorized && $oLoginTeamLadder ){
 		    switch( $oLoginTeam->id ){
 		    	case $iHostTeamId:
 		    		// ホスト

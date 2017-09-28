@@ -49,10 +49,10 @@
           <div class="form-group">
              <label for="mail_address">ブロック指定</label>
              <select class="form-control" disabled>
-               <option {if $type == 1}selected{/if}>どこからでも</option>
-               <option {if $type == 4}selected{/if}>２つ上のブロック以下</option>
-               <option {if $type == 3}selected{/if}>１つ上のブロック以下</option>
-               <option {if $type == 2}selected{/if}>同ブロック以下</option>
+               <option {if $type == MATCH::MATCH_TYPE_ANY}selected{/if}>どこからでも</option>
+               <option {if $type == MATCH::MATCH_TYPE_LESS_TWO_ON_THE_SAME}selected{/if}>２つ上のブロック以下</option>
+               <option {if $type == MATCH::MATCH_TYPE_LESS_ONE_ON_THE_SAME}selected{/if}>１つ上のブロック以下</option>
+               <option {if $type == MATCH::MATCH_TYPE_LESS_SAME}selected{/if}>同ブロック以下</option>
              </select>
           </div>
           <div class="form-group">
