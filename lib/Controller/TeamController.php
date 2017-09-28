@@ -246,6 +246,7 @@ class TeamController extends BaseController{
 		$smarty->assign( "team"             , $oTeam );
 	    $smarty->assign( "logo_file"        , $logo_file );
 	    if( isset( $user ) ){
+		    $smarty->assign( "user"      , $user );
 		    $isThisTeamContact      = count( array_filter($user['team_contacts'],function($item)use($team_id){ return $item['team_id']==$team_id; }) );
 		    $isThisTeamStaff        = count( array_filter($user['team_staffs'],  function($item)use($team_id){ return $item['team_id']==$team_id; }) );
 		    $isTeamMemberApply      = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_MEMBER; }) );
