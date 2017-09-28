@@ -19,6 +19,6 @@ class SummonersByName extends ApiBase
 	];
 	protected function makeUrl()
 	{
-		return sprintf(static::$api_base . static::$path, urlencode($this->params['name']));
+		return sprintf(static::$api_base . static::$path, rawurlencode($this->params['name']));
 	}
 }
