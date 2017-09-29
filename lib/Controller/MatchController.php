@@ -28,61 +28,81 @@ class MatchController extends BaseController{
 		
 		$iHostTeamId = $oMatch->host_team_id;
 		$oHostTeam = new Teams( $oDb, $iHostTeamId );
+		$oHostTeamLadder = $oHostTeam->getCurrentLadder( $oDb );
+		$oHostTeamLeague = new League( $oDb, $oHostTeamLadder->league_id );
 		
 		$oLoginUser = new User( $oDb, $_SESSION["id"] );
 		$oLoginTeam = $oLoginUser->getTeam();
+		$oLoginTeamLadder = $oLoginTeam->getCurrentLadder( $oDb );
+		if( $oLoginTeamLadder ){
+		    $oLoginTeamLeague = new League( $oDb, $oLoginTeamLadder->league_id );
+		}
 		
 		$showJoin = false;
 		$showCancel = false;
 		$showRegsiterResult = false;
-		switch( $oLoginTeam->id ){
-			case $iHostTeamId:
-				// ホスト
-				switch( $oMatch->state ){
-					case Match::MATCH_STATE_RECRUIT:
-						// 募集中
-						$showCancel = true;
-						break;
-					case Match::MATCH_STATE_MATCHED:
-						// 試合結果登録待ち
-						if( $oMatch->enableCancel() ){
-							$showCancel = true;
-						}
-						$showRegsiterResult = true;
-						break;
-				}
-				break;
-			case $oMatch->apply_team_id:
-				// ゲスト
-				switch( $oMatch->state ){
-					case Match::MATCH_STATE_RECRUIT:
-						// 募集中
-						$showJoin = true;
-						break;
-					case Match::MATCH_STATE_MATCHED:
-						// 試合結果登録待ち
-						if( $oMatch->enableCancel() ){
-							$showCancel = true;
-						}
-						$showRegsiterResult = true;
-						break;
-				}
-				break;
-			default:
-				// それ以外
-				switch( $oMatch->state ){
-					case Match::MATCH_STATE_RECRUIT:
-						// 募集中
-						if( date( 'Y-m-d H:i:s' ) < date( 'Y-m-d H:i:s', strtotime( $oMatch->match_date ) ) ){
-							$showJoin = true;
-						}
-						break;
-					case Match::MATCH_STATE_MATCHED:
-						// 試合結果登録待ち
-						break;
-				}
-				break;
-				
+		
+		// TODO 確認とかも権限処理必要
+		$bAuthorized = false;
+		$ahsAuthorizedTeamInfo = $oLoginUser->getAuthorizedTeam();
+		
+		foreach( $ahsAuthorizedTeamInfo as $asTeamInfo ){
+		    if( $oLoginTeam->id == $asTeamInfo["id"] ){
+		        $bAuthorized = true;
+		        break;
+		    }
+		}
+		
+		if( $bAuthorized && $oLoginTeamLadder ){
+		    switch( $oLoginTeam->id ){
+		    	case $iHostTeamId:
+		    		// ホスト
+		    		switch( $oMatch->state ){
+		    			case Match::MATCH_STATE_RECRUIT:
+		    				// 募集中
+		    				$showCancel = true;
+		    				break;
+		    			case Match::MATCH_STATE_MATCHED:
+		    				// 試合結果登録待ち
+		    				if( $oMatch->enableCancel() ){
+		    					$showCancel = true;
+		    				}
+		    				$showRegsiterResult = true;
+		    				break;
+		    		}
+		    		break;
+		    	case $oMatch->apply_team_id:
+		    		// ゲスト
+		    		switch( $oMatch->state ){
+		    			case Match::MATCH_STATE_RECRUIT:
+		    				// 募集中
+		    				$showJoin = true;
+		    				break;
+		    			case Match::MATCH_STATE_MATCHED:
+		    				// 試合結果登録待ち
+		    				if( $oMatch->enableCancel() ){
+		    					$showCancel = true;
+		    				}
+		    				$showRegsiterResult = true;
+		    				break;
+		    		}
+		    		break;
+		    	default:
+		    		// それ以外
+		    		switch( $oMatch->state ){
+		    			case Match::MATCH_STATE_RECRUIT:
+		    				// 募集中
+		    				if( date( 'Y-m-d H:i:s' ) < date( 'Y-m-d H:i:s', strtotime( $oMatch->match_date ) ) ){
+		    					$showJoin = $oMatch->enableJoin( $oHostTeamLeague->rank, $oLoginTeamLeague->rank );
+		    				}
+		    				break;
+		    			case Match::MATCH_STATE_MATCHED:
+		    				// 試合結果登録待ち
+		    				break;
+		    		}
+		    		break;
+		    		
+		    }
 		}
 		
 		$smarty = new Smarty();
@@ -140,24 +160,11 @@ class MatchController extends BaseController{
 			exit;
 		}
 		
-		switch( $oMatch->type ){
-			case Match::MATCH_TYPE_ANY:
-				// 何もしない
-				break;
-			case Match::MATCH_TYPE_LESS_SAME:
-				// ホストのランクが自分のランクより下ならエラー
-				if( $oHostTeamLeague->rank > $oApplyTeamLeague->rank ){
-					self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_HOST_DONT_APPLY );
-					exit;
-				}
-				break;
-			case Match::MATCH_TYPE_LESS_ONE_ON_THE_SAME:
-				// ホストのランクが自分のランクから2つ以下ならエラー
-				if( $oHostTeamLeague->rank > $oApplyTeamLeague->rank + 1 ){
-					self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_HOST_DONT_APPLY );
-					exit;
-				}
-				break;
+		
+		$bEnableJoin = $oMatch->enableJoin( $oHostTeamLeague->rank, $oApplyTeamLeague->rank );
+		if( !$bEnableJoin ){
+			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_HOST_DONT_APPLY );
+			exit;
 		}
 		
 		$oLatestLastJoin = $oApplyTeam->getLastJoin( $oDb );
@@ -187,7 +194,7 @@ class MatchController extends BaseController{
 		$oMatch->state = Match::MATCH_STATE_MATCHED;
 		$oMatch->save();
 		
-		$oTeamJoin->join_date = date('Y-m-d H:i:s');
+		$oTeamJoin->joined_at = date('Y-m-d H:i:s');
 		$oTeamJoin->team_id = $oApplyTeam->id;
 		$oTeamJoin->match_id = $oMatch->id;
 		$oTeamJoin->state = TeamJoin::STATE_ENABLE;
@@ -313,7 +320,22 @@ class MatchController extends BaseController{
 		
 		$oUser = new User( $oDb, $_SESSION["id"] );
 		$oLoginTeam = $oUser->getTeam();
-		$oLatestLastJoin = $oLoginTeam->getLastJoin( $oDb );
+		
+		$bJoinedLadder = false;
+		$oLatestLastJoin = null;
+		if( $oLoginTeam ){
+		    $oLatestLastJoin = $oLoginTeam->getLastJoin( $oDb );
+		    $ahsUserInfo = User::info( $oUser->id );
+		    
+		    $ahsAuthorizedTeamInfo = $oUser->getAuthorizedTeam();
+		    
+		    foreach( $ahsAuthorizedTeamInfo as $asTeamInfo ){
+		        if( $asTeamInfo["ladder"] ){
+		            $bJoinedLadder = true;
+		            break;
+		        }
+		    }
+		}
 		
 		$smarty = new Smarty();
 		
@@ -321,6 +343,7 @@ class MatchController extends BaseController{
 		$smarty->compile_dir  = PATH_TMPL_C;
 		
 		$smarty->assign( "match_recruit_list"	, $ahsMatchList );
+		$smarty->assign( "is_joined_ladder"	, $bJoinedLadder );
 		if( $oLatestLastJoin ){
 			$smarty->assign( "last_join_date"		, $oLatestLastJoin->joined_at );
 		}
@@ -390,29 +413,12 @@ class MatchController extends BaseController{
 	}
 
 	public function checkRecruitEnable( $sMatchDate, $host_id ){
-		// 4 regist in a month
-		$count = $this->getMatchCountInMonth( $sMatchDate, $host_id );
+		// 5 regist in a month
+        $count = Match::getMatchCountAtMonthByDate( $host_id, $sMatchDate, true);
 		if ($count >= Match::MAX_MATCH_RECRUIT_COUNT) {
 			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_OVER_REGIST );
 			exit;
 		}
-	}
-
-	public function getMatchCountInMonth( $sMatchDate, $host_id ){
-		// 4 regist in a month
-		$start_month	= date("Y-m-01", strtotime( $sMatchDate ) );
-		$end_month		= date("Y-m-01", strtotime( $sMatchDate . " +1 month"));
-		
-		$sSelectSql		= "SELECT count(*) as cnt FROM matches WHERE host_team_id = ? and ? <= match_date and match_date < ? AND state <> ?";
-		$ahsParameter	= [ $host_id, $start_month, $end_month, Match::MATCH_STATE_CANCEL ];
-		
-		$oDb = new Db();
-		
-		$result = $oDb->executePrepare( $sSelectSql, "issi", $ahsParameter );
-		
-		$row = $result->fetch_assoc();
-		
-		return $row["cnt"];
 	}
 	
 	private function validation(){
@@ -437,13 +443,21 @@ class MatchController extends BaseController{
 	public function form(){
 		session_set_save_handler( new MysqlSessionHandler() );
 		require_logined_session();
+
+
 		self::displayMatchingForm();
 	}
 
 	public function displayMatchingForm(){
+		$isLogin = false;
+		if( isset( $_SESSION['id'] ) ) {
+			// TODO 本来の意味的には逆、微妙なのでその内直す
+			$isLogin = true;
+		}
 		$smarty = new Smarty();
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
+		$smarty->assign( "login", $isLogin );
 		$smarty->display('Match/MatchingForm.tmpl');
 	}
 	

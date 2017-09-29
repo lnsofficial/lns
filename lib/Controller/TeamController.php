@@ -176,9 +176,14 @@ class TeamController extends BaseController{
 	}
 	public function detail( $team_id = 0 ){
         session_set_save_handler( new MysqlSessionHandler() );
-        require_logined_session();
+	    @session_start();
+        
 		$oDb = new Db();
 		$oTeam = new Teams( $oDb, $team_id );
+		if( $oTeam->id == null ){
+			self::displayError();
+		    exit();
+		}
 
 		// team members
 		$team_members = TeamMembers::getByTeamId( $oTeam->id );
@@ -189,7 +194,7 @@ class TeamController extends BaseController{
 		// このチームへ届いている申請一覧
 		$applys_for_team = UserTeamApply::getByTeamId( $oTeam->id );
         // team logo
-        $logo_file = $oTeam->id . "_logo.jpg";
+        $logo_file = Teams::getLogoFileName( $oTeam->id );
         $logo_path = PATH_TEAM_LOGO . $logo_file;
         if (!file_exists($logo_path)) {
             $logo_path = false;
@@ -198,14 +203,36 @@ class TeamController extends BaseController{
 		// team_staffs
 		$team_staffs = TeamStaffs::getByTeamId( $oTeam->id );
 		// users
-        $user_id = $_SESSION["id"];
-		$user = User::info( $user_id );
+		
+		$bLogin = false;
+		if( isset( $_SESSION["id"] ) ){
+		    $bLogin = true;
+            $user_id = $_SESSION["id"];
+		    $user = User::info( $user_id );
+    		$isThisTeamJoinLadder = false;
+    		if( $team_owner->id == $user["id"] ){
+    		    $isThisTeamJoinLadder = true;
+    		}
+    		
+    		if( $oTeam->getCurrentLadder( $oDb ) ){
+    		    $isThisTeamJoinLadder = false;
+    		}
+    		
+    		if( count( $team_members ) ){
+    		    foreach( $team_members as $member ){
+    		        if( !isset( $member["summoner_id"] ) || !isset( $member["tier"] ) || !isset( $member["rank"] ) ){
+    		            $isThisTeamJoinLadder = false;
+    		            break;
+    		        }
+    		    }
+    		}
+		}
+		
 		// 自身のチーム所属情報
-		$my_team_member = TeamMembers::findByUserId( $user["id"] );
 		$smarty = new Smarty();
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
-		$smarty->assign( "login"            , false );
+		$smarty->assign( "login"            , $bLogin );
 		$smarty->assign( "team_id"			, $oTeam->id );
 		$smarty->assign( "team_name"		, $oTeam->team_name );
 		$smarty->assign( "team_name_kana"	, $oTeam->team_name_kana );
@@ -216,19 +243,22 @@ class TeamController extends BaseController{
 		$smarty->assign( "team_contacts"    , $team_contacts );
 		$smarty->assign( "team_staffs"      , $team_staffs );
 		$smarty->assign( "applys_for_team"  , $applys_for_team );
-		$smarty->assign( "user"             , $user );
 		$smarty->assign( "team"             , $oTeam );
 	    $smarty->assign( "logo_file"        , $logo_file );
-		$isThisTeamContact      = count( array_filter($user['team_contacts'],function($item)use($team_id){ return $item['team_id']==$team_id; }) );
-		$isThisTeamStaff        = count( array_filter($user['team_staffs'],  function($item)use($team_id){ return $item['team_id']==$team_id; }) );
-		$isTeamMemberApply      = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_MEMBER; }) );
-		$isThisTeamContactApply = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_CONTACT && $item['team_id']==$team_id; }) );
-		$isThisTeamStaffApply   = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_STAFF   && $item['team_id']==$team_id; }) );
-		$smarty->assign( "isThisTeamContact"      , $isThisTeamContact );
-		$smarty->assign( "isThisTeamStaff"        , $isThisTeamStaff );
-		$smarty->assign( "isTeamMemberApply"      , $isTeamMemberApply );
-		$smarty->assign( "isThisTeamContactApply" , $isThisTeamContactApply );
-		$smarty->assign( "isThisTeamStaffApply"   , $isThisTeamStaffApply );
+	    if( isset( $user ) ){
+		    $smarty->assign( "user"      , $user );
+		    $isThisTeamContact      = count( array_filter($user['team_contacts'],function($item)use($team_id){ return $item['team_id']==$team_id; }) );
+		    $isThisTeamStaff        = count( array_filter($user['team_staffs'],  function($item)use($team_id){ return $item['team_id']==$team_id; }) );
+		    $isTeamMemberApply      = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_MEMBER; }) );
+		    $isThisTeamContactApply = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_CONTACT && $item['team_id']==$team_id; }) );
+		    $isThisTeamStaffApply   = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_STAFF   && $item['team_id']==$team_id; }) );
+		    $smarty->assign( "isThisTeamContact"      , $isThisTeamContact );
+		    $smarty->assign( "isThisTeamStaff"        , $isThisTeamStaff );
+		    $smarty->assign( "isTeamMemberApply"      , $isTeamMemberApply );
+		    $smarty->assign( "isThisTeamContactApply" , $isThisTeamContactApply );
+		    $smarty->assign( "isThisTeamStaffApply"   , $isThisTeamStaffApply );
+		    $smarty->assign( "isThisTeamJoinLadder", $isThisTeamJoinLadder );
+		}
 
 		$smarty->display('Team/TeamDetail.tmpl');
 	}
@@ -246,7 +276,6 @@ class TeamController extends BaseController{
 
         self::_displayTeamForm();
 	}
-
 	private function _displayTeamForm(){
 		$smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;

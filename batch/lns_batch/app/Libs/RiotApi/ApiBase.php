@@ -28,7 +28,7 @@ abstract class ApiBase
 // 利用環境(フレームワーク？)に合わせた方がいいと思うので環境ごとに適宜処理を変更してほしい
 //		static::$apikey = getenv('APIKEY');
 //		$this->apikey = $apikey;
-		$this->apikey = config('app.key');
+		$this->apikey = env('RIOTAPIKEY');
 	}
 	/**
 	 * // Usage: $testapi  = new SummonersByName();
