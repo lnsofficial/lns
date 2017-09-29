@@ -34,9 +34,13 @@ class MatchController extends BaseController{
 		
 		$oLoginUser = new User( $oDb, $_SESSION["id"] );
 		$oLoginTeam = $oLoginUser->getTeam();
-		$oLoginTeamLadder = $oLoginTeam->getCurrentLadder( $oDb );
-		if( $oLoginTeamLadder ){
-		    $oLoginTeamLeague = new League( $oDb, $oLoginTeamLadder->league_id );
+		$oLoginTeamLadder = null;
+		$oLoginTeamLeague = null;
+		if( $oLoginTeam ){
+		    $oLoginTeamLadder = $oLoginTeam->getCurrentLadder( $oDb );
+    		if( $oLoginTeamLadder ){
+    		    $oLoginTeamLeague = new League( $oDb, $oLoginTeamLadder->league_id );
+    		}
 		}
 
         $showJoin           = false;
@@ -342,6 +346,7 @@ class MatchController extends BaseController{
 		$oLoginTeam = $oUser->getTeam();
 		
 		$bJoinedLadder = false;
+		$ahsAuthorizedTeamInfo = null;
 		$oLatestLastJoin = null;
 		if( $oLoginTeam ){
 		    $oLatestLastJoin = $oLoginTeam->getLastJoin( $oDb );
