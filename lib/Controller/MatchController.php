@@ -33,9 +33,13 @@ class MatchController extends BaseController{
 		
 		$oLoginUser = new User( $oDb, $_SESSION["id"] );
 		$oLoginTeam = $oLoginUser->getTeam();
-		$oLoginTeamLadder = $oLoginTeam->getCurrentLadder( $oDb );
-		if( $oLoginTeamLadder ){
-		    $oLoginTeamLeague = new League( $oDb, $oLoginTeamLadder->league_id );
+		$oLoginTeamLadder = null;
+		$oLoginTeamLeague = null;
+		if( $oLoginTeam ){
+		    $oLoginTeamLadder = $oLoginTeam->getCurrentLadder( $oDb );
+    		if( $oLoginTeamLadder ){
+    		    $oLoginTeamLeague = new League( $oDb, $oLoginTeamLadder->league_id );
+    		}
 		}
 		
 		$showJoin = false;
@@ -322,6 +326,7 @@ class MatchController extends BaseController{
 		$oLoginTeam = $oUser->getTeam();
 		
 		$bJoinedLadder = false;
+		$ahsAuthorizedTeamInfo = null;
 		$oLatestLastJoin = null;
 		if( $oLoginTeam ){
 		    $oLatestLastJoin = $oLoginTeam->getLastJoin( $oDb );
@@ -344,6 +349,9 @@ class MatchController extends BaseController{
 		
 		$smarty->assign( "match_recruit_list"	, $ahsMatchList );
 		$smarty->assign( "is_joined_ladder"	, $bJoinedLadder );
+		if( $ahsAuthorizedTeamInfo ){
+		    $smarty->assign( "authorized_team"		, $ahsAuthorizedTeamInfo );
+		}
 		if( $oLatestLastJoin ){
 			$smarty->assign( "last_join_date"		, $oLatestLastJoin->joined_at );
 		}
