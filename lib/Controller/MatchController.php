@@ -6,6 +6,7 @@ require_once( PATH_MODEL . 'Teams.php' );
 require_once( PATH_MODEL . 'Ladder.php' );
 require_once( PATH_MODEL . 'TeamJoin.php' );
 require_once( PATH_MODEL . 'League.php' );
+require_once( PATH_MODEL . 'MatchCheckin.php' );
 
 class MatchController extends BaseController{
 	const DISPLAY_DIR_PATH	= "Match";
@@ -37,10 +38,11 @@ class MatchController extends BaseController{
 		if( $oLoginTeamLadder ){
 		    $oLoginTeamLeague = new League( $oDb, $oLoginTeamLadder->league_id );
 		}
-		
-		$showJoin = false;
-		$showCancel = false;
-		$showRegsiterResult = false;
+
+        $showJoin           = false;
+        $showCheckin        = false; // チェックインできるのはとりあえずteam_memberのみで。
+        $showCancel         = false;
+        $showRegsiterResult = false;
 		
 		// TODO 確認とかも権限処理必要
 		$bAuthorized = false;
@@ -104,22 +106,35 @@ class MatchController extends BaseController{
 		    		
 		    }
 		}
-		
+
+        // ・自信がこのマッチのhost_team_id/apply_team_idどちらかのチームのteam_memberであること
+        // ・このマッチのstateがMatch::MATCH_STATE_MATCHEDであること
+        // この２つを満たしてるとき、$showCheckin = true にする。
+        if( $oMatch->state == Match::MATCH_STATE_MATCHED && !empty($oLoginTeam) )
+        {
+            if( $oLoginTeam->id == $oMatch->host_team_id || $oLoginTeam->id == $oMatch->apply_team_id )
+            {
+                $showCheckin = true;
+            }
+        }
+
+
 		$smarty = new Smarty();
 		
 		$smarty->template_dir = PATH_TMPL;
 		$smarty->compile_dir  = PATH_TMPL_C;
 		
-		$smarty->assign( "match_id", $iMatchId );
-		$smarty->assign( "host_team_name", $oHostTeam->team_name );
-		$smarty->assign( "match_date", $oMatch->match_date );
-		$smarty->assign( "recruit_start_date", $oMatch->recruit_start_date );
-		$smarty->assign( "stream", $oMatch->stream );
-		$smarty->assign( "image_path", $oMatch->screen_shot_url );
-		$smarty->assign( "type", $oMatch->type );
-		$smarty->assign( "show_join", $showJoin );
-		$smarty->assign( "show_cancel", $showCancel );
-		$smarty->assign( "show_register_result", $showRegsiterResult );
+        $smarty->assign( "match_id",             $iMatchId );
+        $smarty->assign( "host_team_name",       $oHostTeam->team_name );
+        $smarty->assign( "match_date",           $oMatch->match_date );
+        $smarty->assign( "recruit_start_date",   $oMatch->recruit_start_date );
+        $smarty->assign( "stream",               $oMatch->stream );
+        $smarty->assign( "image_path",           $oMatch->screen_shot_url );
+        $smarty->assign( "type",                 $oMatch->type );
+        $smarty->assign( "show_join",            $showJoin );
+        $smarty->assign( "show_checkin",         $showCheckin );
+        $smarty->assign( "show_cancel",          $showCancel );
+        $smarty->assign( "show_register_result", $showRegsiterResult );
 		
 		$smarty->display('Match/MatchDetail.tmpl');
 	}
@@ -150,7 +165,12 @@ class MatchController extends BaseController{
 		// TODO その内チームに所属リーグの情報引っ張ってくる関数作成
 		$oHostTeamLadder = $oHostTeam->getCurrentLadder( $oDb );
 		$oApplyTeamLadder = $oApplyTeam->getCurrentLadder( $oDb );
-		
+                // 申請側チームが「大会に参加」を押していないと、laddersに登録されていない。この場合はだめ！
+                if( empty($oApplyTeamLadder) )
+                {
+                    self::displayCommonScreen( ERR_HEAD_COMMON, "「大会に参加」後に試合募集への応募をしてください。" );
+                    exit;
+                }
 		$oHostTeamLeague = new League( $oDb, $oHostTeamLadder->league_id );
 		$oApplyTeamLeague = new League( $oDb, $oApplyTeamLadder->league_id );
 		
@@ -447,6 +467,152 @@ class MatchController extends BaseController{
 
 		self::displayMatchingForm();
 	}
+
+
+    /**
+     * 試合へのチェックインするやつ(form)
+     * 
+     */
+    public function checkin_form()
+    {
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+
+        $db = new Db();
+
+        // 試合情報とチェックイン情報を取ってきてsmartyに渡す。
+        $match_id = $_REQUEST['match_id'];
+        $match    = new Match( $db, $match_id );
+
+        // 適当なmatch_idはNG。
+        if( empty($match) )
+        {
+            self::displayCommonScreen( ERR_HEAD_COMMON, '試合がみつかりません。' );
+            exit;
+        }
+
+        // このマッチのhost_team_id/apply_team_idどちらかの、team_memberじゃないとNG。
+        $user         = User::info( $_SESSION["id"] );
+        if( empty($user['team']) || ($user['team']['id'] != $match->host_team_id && $user['team']['id'] != $match->apply_team_id) )
+        {
+            self::displayCommonScreen( ERR_HEAD_COMMON, 'この試合のチームのメンバーである必要があります。' );
+            exit;
+        }
+
+        // team_membersにcheckinsの情報付け足す。
+        $checkins     = MatchCheckin::getByMatchIdTeamId( $match_id, $user['team']['id'] );
+        $team_members = TeamMembers::getByTeamId( $user['team']['id'] );
+        foreach( $team_members as &$team_member )
+        {
+            $team_member['is_checkin'] = count( array_filter($checkins, function($item)use($team_member){ return $item['user_id'] == $team_member['user_id'];}) ) ? true : false;
+        }
+
+
+        $isLogin = false;
+        if( isset( $_SESSION['id'] ) ) {
+            // TODO 本来の意味的には逆、微妙なのでその内直す
+            $isLogin = true;
+        }
+        $smarty = new Smarty();
+        $smarty->template_dir = PATH_TMPL;
+        $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->assign( "login", $isLogin );
+
+        $smarty->assign( "match",            $match );
+        $smarty->assign( "user",             $user );
+        $smarty->assign( "checkins",         $checkins );
+        $smarty->assign( "team_members",     $team_members );
+
+        $smarty->display('Match/MatchCheckinForm.tmpl');
+    }
+    /**
+     * 試合へのチェックインするやつ(commit)
+     * 
+     */
+    public function checkin_commit()
+    {
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+
+        $db = new Db();
+
+        // 試合情報とチェックイン情報を取ってきてsmartyに渡す。
+        $match_id = $_REQUEST['match_id'];
+        $match    = new Match( $db, $match_id );
+        // 適当なmatch_idはNG。
+        if( empty($match) )
+        {
+            self::displayCommonScreen( ERR_HEAD_COMMON, '試合がみつかりません。' );
+            exit;
+        }
+
+        // このマッチのhost_team_id/apply_team_idどちらかの、team_memberじゃないとNG。
+        $user         = User::info( $_SESSION["id"] );
+        if( empty($user['team']) || ($user['team']['id'] != $match->host_team_id && $user['team']['id'] != $match->apply_team_id) )
+        {
+            self::displayCommonScreen( ERR_HEAD_COMMON, 'この試合のチームのメンバーである必要があります。' );
+            exit;
+        }
+
+
+        $checkins     = MatchCheckin::getByMatchIdTeamId( $match_id, $user['team']['id'] );
+        $team_members = TeamMembers::getByTeamId( $user['team']['id'] );
+
+
+        $checkin_user_ids = [];
+        foreach( $team_members as $team_member )
+        {
+            // formからは "user_○○"(users.id)のフィールド名でチェックされたやつがPOSTされるので、キャッチする
+            $checkbox_name = 'user_' . $team_member['user_id'];
+            if( isset($_REQUEST[$checkbox_name]) && !empty($_REQUEST[$checkbox_name]) )
+            {
+                // チェックインするusers.idを集めておく。
+                $checkin_user_ids[] = $team_member['user_id'];
+            }
+        }
+        // 5名じゃなかったらNG。
+        if( count($checkin_user_ids) != 5 )
+        {
+            self::displayCommonScreen( ERR_HEAD_COMMON, 'チェックインのメンバーを 5名 指定してください。' );
+            exit;
+        }
+
+        $db = new Db();
+        $db->beginTransaction();
+        foreach( $checkin_user_ids as $uid )
+        {
+            // team_membersにいないuser_idでpostされてたらNG。
+            $team_member = current( array_filter($team_members, function($item)use($uid){ return $item['user_id'] == $uid;}) );
+            if( empty($team_member) )
+            {
+                self::displayCommonScreen( ERR_HEAD_COMMON, ERR_COMMON_INPUT );
+                exit;
+            }
+
+            // 修正の場合もあるので、チェックイン情報があるか取ってきてみる。
+            $checkin = MatchCheckin::findByMatchIdTeamIdUserId($match_id, $user['team']['id'], $uid);
+            if( empty($checkin) )
+            {
+                $match_checkin = new MatchCheckin($db);
+            }
+            else
+            {
+                $match_checkin = new MatchCheckin($db, $checkin['id']);
+            }
+            $match_checkin->match_id    = $match_id;
+            $match_checkin->team_id     = $user['team']['id'];
+            $match_checkin->user_id     = $uid;
+            $match_checkin->summoner_id = $team_member['summoner_id'];
+            $match_checkin->save();
+        }
+        $db->commit();
+
+        // マッチ詳細画面へリダイレクト
+        header('location: /Match/Display?match_id='.$match_id);
+        exit();
+    }
+
+
 
 	public function displayMatchingForm(){
 		$isLogin = false;
