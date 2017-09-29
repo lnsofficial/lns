@@ -349,9 +349,6 @@ class MatchController extends BaseController{
 		
 		$smarty->assign( "match_recruit_list"	, $ahsMatchList );
 		$smarty->assign( "is_joined_ladder"	, $bJoinedLadder );
-		if( $ahsAuthorizedTeamInfo ){
-		    $smarty->assign( "authorized_team"		, $ahsAuthorizedTeamInfo );
-		}
 		if( $oLatestLastJoin ){
 			$smarty->assign( "last_join_date"		, $oLatestLastJoin->joined_at );
 		}
