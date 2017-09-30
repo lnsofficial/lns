@@ -23,7 +23,7 @@
     <div class="row">
       <div class="col-lg-2 about-menu">
         <ul class="nav side">
-          {if isset($user) && !$isThisTeamJoinedLadder}
+          {if isset($user)}
           <li role="presentation">チームへ参加</li>
           {if $user['team_member'] || $isTeamMemberApply    || count($team_members) >= Teams::COUNT_MAX_MEMBER}
           {else}
@@ -133,7 +133,7 @@
           {/if}
         {/if}
 
-        {if isset($user) && !$isThisTeamJoinedLadder}
+        {if isset($user)}
         {if count($applys_for_team) > 0}
           {if $user.id == $team_owner->id}
         <h3>応募一覧</h3>
