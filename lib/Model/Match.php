@@ -180,7 +180,7 @@ class Match extends Base{
     public function enableCheckin(){
         $enableCheckin = false;
         $start_date    = date( "Y-m-d h:i:s", strtotime( $this->match_date . "-1 hour" ) );
-        $end_date      = date( "Y-m-d h:i:s", strtotime( $this->match_date . "-15 minute" ) );
+        $end_date      = date( "Y-m-d h:i:s", strtotime( $this->match_date . "-10 minute" ) );
         $current_date  = date( "Y-m-d h:i:s" );
         
         if( $current_date <= $end_date && $current_date >= $start_date ){
