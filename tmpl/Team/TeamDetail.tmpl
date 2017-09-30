@@ -133,7 +133,7 @@
           {/if}
         {/if}
 
-        {if isset($user)}
+        {if isset($user) && !$isThisTeamJoinedLadder}
         {if count($applys_for_team) > 0}
           {if $user.id == $team_owner->id}
         <h3>応募一覧</h3>
