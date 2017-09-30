@@ -205,23 +205,25 @@ class TeamController extends BaseController{
 		// users
 		
 		$bLogin = false;
+		$isThisTeamJoinedLadder = false;
 		if( isset( $_SESSION["id"] ) ){
 		    $bLogin = true;
             $user_id = $_SESSION["id"];
 		    $user = User::info( $user_id );
-    		$isThisTeamJoinLadder = false;
+    		$isThisTeamEnableJoinLadder = false;
     		if( $team_owner->id == $user["id"] ){
-    		    $isThisTeamJoinLadder = true;
+    		    $isThisTeamEnableJoinLadder = true;
     		}
     		
     		if( $oTeam->getCurrentLadder( $oDb ) ){
-    		    $isThisTeamJoinLadder = false;
+    		    $isThisTeamJoinedLadder = true;
+    		    $isThisTeamEnableJoinLadder = false;
     		}
     		
     		if( count( $team_members ) ){
     		    foreach( $team_members as $member ){
     		        if( !isset( $member["summoner_id"] ) || !isset( $member["tier"] ) || !isset( $member["rank"] ) ){
-    		            $isThisTeamJoinLadder = false;
+    		            $isThisTeamEnableJoinLadder = false;
     		            break;
     		        }
     		    }
@@ -257,7 +259,8 @@ class TeamController extends BaseController{
 		    $smarty->assign( "isTeamMemberApply"      , $isTeamMemberApply );
 		    $smarty->assign( "isThisTeamContactApply" , $isThisTeamContactApply );
 		    $smarty->assign( "isThisTeamStaffApply"   , $isThisTeamStaffApply );
-		    $smarty->assign( "isThisTeamJoinLadder", $isThisTeamJoinLadder );
+		    $smarty->assign( "isThisTeamEnableJoinLadder", $isThisTeamEnableJoinLadder );
+		    $smarty->assign( "isThisTeamJoinedLadder", $isThisTeamJoinedLadder );
 		}
 
 		$smarty->display('Team/TeamDetail.tmpl');
