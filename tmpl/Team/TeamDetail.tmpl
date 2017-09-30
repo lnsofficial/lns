@@ -18,11 +18,12 @@
   <!--The following script tag downloads a font from the Adobe Edge Web Fonts server for use within the web page. We recommend that you do not modify it.--><script>var __adobewebfontsappname__="dreamweaver"</script><script src="http://use.edgefonts.net/open-sans:n3,n8,n4:default;overlock:n4:default;poiret-one:n4:default;paytone-one:n4:default.js" type="text/javascript"></script>
 </head>
   <body>
-  {include file='header.tmpl' login=true}
+  {include file='header.tmpl' login=$login}
   <div class="container-fluid">
     <div class="row">
       <div class="col-lg-2 about-menu">
         <ul class="nav side">
+          {if isset($user) && !$isThisTeamJoinedLadder}
           <li role="presentation">チームへ参加</li>
           {if $user['team_member'] || $isTeamMemberApply    || count($team_members) >= Teams::COUNT_MAX_MEMBER}
           {else}
@@ -36,10 +37,14 @@
           {else}
           <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=3">アナリスト申請</a></li>
           {/if}
+          {if $isThisTeamEnableJoinLadder }
+          <li role="presentation"><a href="/Ladder/Join/?team_id={$team_id}">大会へ参加</a></li>
+          {/if}
+          {/if}
         </ul>
       </div>
       <div class="col-lg-9">
-        <h2>チーム情報</h2>
+        <h2>チーム情報&nbsp;<img src="/img/logo/{$logo_file}" width="70px" /></h2>
         <table class="table-bordered">
           <tr>
             <th>チーム名</th>
@@ -61,8 +66,9 @@
         <h2>選手一覧</h2>
         <table  class="table-bordered">
           <tr>
-            <th>サモナーネーム</th>
-            <th>メインロール</th>
+            <th>サモナーネーム　</th>
+            <th>メインロール　</th>
+            <th>確認状況　</th>
           </tr>
           {foreach from=$team_members item=member key=member_id}
             <tr>
@@ -74,9 +80,12 @@
               {if $member.main_role == 4}ADC{/if}
               {if $member.main_role == 5}Support{/if}
               </td>
+              <td>{if $member.summoner_id}確認済み{else}{if $member.last_api_queue_state == ApiQueues::STATE_UNTREATED}未確認{elseif $member.last_api_queue_state == ApiQueues::STATE_FAILED}エラー{/if}{/if}</td>
             </tr>
           {/foreach}
         </table>
+        <p>メンバー全員の情報を運営が確認次第、大会への参加が可能となります。</p>
+        <p>確認状況がエラーの場合、サモナーネームを誤って登録している可能性があります。</p>
 
         <h2>代表者</h2>
         <table  class="table-bordered">
@@ -124,6 +133,7 @@
           {/if}
         {/if}
 
+        {if isset($user) && !$isThisTeamJoinedLadder}
         {if count($applys_for_team) > 0}
           {if $user.id == $team_owner->id}
         <h3>応募一覧</h3>
@@ -168,12 +178,23 @@
           {/if}
         {/if}
 
+        {if $user.id == $team_owner->id}
+          <h2>チームロゴ</h2>
+          <form method="post" action="/Team/uploadTeamLogo" class="form-horizontal" enctype="multipart/form-data">
+              <div class="form-group">
+                <div class="col-sm-9">
+                  <input type="hidden" id="team_id" name="team_id" value="{$team_id}">
+                  <input type="hidden" name="MAX_FILE_SIZE" value="1000000" />
+                  <input type="file" id="inputTeamLogo" name="inputTeamLogo">
+                  <input type="submit" value="チームロゴをアップロードする" onclick="return isImageFile(document.getElementById('inputTeamLogo').value)">
+                </div>
+              </div>
+          </form>
+        {/if}
+        {/if}
+
       </div>
     </div>
-
-
-
-
   </div>
   {include file='footer.tmpl'}
 
@@ -194,6 +215,26 @@
 			return false;
 		}
 	}
+    function getExtension(fileName) {
+        var ret;
+        if (!fileName) {
+          return ret;
+        }
+        var fileTypes = fileName.split(".");
+        var len = fileTypes.length;
+        if (len === 0) {
+          return ret;
+        }
+        ret = fileTypes[len - 1];
+        return ret;
+    }
+    function isImageFile(fileName) {
+        var Extension = getExtension(fileName);
+        if (Extension.toLowerCase() != "png" && Extension.toLowerCase() != "jpg" && Extension.toLowerCase() != "jpeg" && Extension.toLowerCase() != "gif") {
+            alert("適切な形式ではありません。png, jpeg, jpg, gifでアップロードしてください。");
+            return false;
+        }
+    }
 	// --></script>
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 

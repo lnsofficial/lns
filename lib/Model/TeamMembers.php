@@ -24,7 +24,7 @@ class TeamMembers extends Base{
     {
         $db = new Db();
 
-        $prepareSql = "SELECT tm.id AS id,tm.team_id AS team_id,tm.user_id AS user_id,u.summoner_id AS summoner_id,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role,u. main_champion AS  main_champion FROM team_members AS tm LEFT JOIN users AS u ON tm.user_id=u.id WHERE team_id = ?";
+        $prepareSql = "SELECT tm.id AS id,tm.team_id AS team_id,tm.user_id AS user_id,u.summoner_id AS summoner_id,u.tier AS tier,u.rank AS rank,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role,u. main_champion AS  main_champion FROM team_members AS tm LEFT JOIN users AS u ON tm.user_id=u.id WHERE team_id = ?";
         $bindParam  = [ $team_id ];
 
         $result = $db->executePrepare( $prepareSql, "i", $bindParam );
@@ -32,6 +32,9 @@ class TeamMembers extends Base{
         $team_members = [];
         while( $team_member = $result->fetch_assoc() )
         {
+            $oUser = new User( $db, $team_member["user_id"] );
+            $oLastApiQueue = $oUser->getLastApiQueue();
+            $team_member["last_api_queue_state"] = $oLastApiQueue->state;
             $team_members[] = $team_member;
         }
 

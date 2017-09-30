@@ -2,17 +2,32 @@
 require_once( PATH_MODEL . "Base.php" );
 require_once( PATH_MODEL . "Teams.php" );
 require_once( PATH_MODEL . "TeamMembers.php" );
+require_once( PATH_MODEL . "ApiQueues.php" );
+require_once( PATH_MODEL . "Ladder.php" );
 
 class User extends Base{
 	const MAIN_TABLE	= "users";
 	const COL_ID		= "id";
+	
+	const RANK_LIST = [
+	    "CHALLENGER" => [ "I" => 100 ],
+	    "MASTER"     => [ "I" => 94  ],
+	    "DIAMOND"    => [ "I" => 88, "II" => 83, "III" => 78, "IV" => 73, "V" => 68],
+	    "PLATINUM"   => [ "I" => 63, "II" => 60, "III" => 57, "IV" => 54, "V" => 51],
+	    "GOLD"       => [ "I" => 48, "II" => 45, "III" => 42, "IV" => 39, "V" => 36],
+	    "SILVER"     => [ "I" => 33, "II" => 31, "III" => 29, "IV" => 27, "V" => 25],
+	    "BRONZE"     => [ "I" => 23, "II" => 22, "III" => 21, "IV" => 20, "V" => 10],
+	];
 	
 	// カラム
 	const DATA	= [
 		"id"			=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
 		"login_id"		=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
 		"password"		=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
-		"summoner_id"	=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
+		"summoner_id"	=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
+		"account_id"	=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
+		"tier"	        => [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
+		"rank"	        => [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
 		"summoner_name"	=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
 		"discord_id"	=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
 		"main_role"		=> [ "type" => "int"		, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
@@ -66,6 +81,58 @@ class User extends Base{
 			$oTeam = new Teams( $oDb, $ahsResult[0]["team_id"] );
 		}
 		return $oTeam;
+	}
+	
+	public function getAuthorizedTeam(){
+	    $ahsTeam = [];
+	    
+	    $ahsUserInfo = self::info( $this->id );
+	    
+	    foreach( $ahsUserInfo['team_owners'] as $asOwnerTeam ){
+	        $ahsTeam[] = self::getTeamInfo($asOwnerTeam["team_id"]);
+	    }
+	    foreach( $ahsUserInfo['team_contacts'] as $asContactTeam ){
+	        $ahsTeam[] = self::getTeamInfo($asContactTeam["team_id"]);
+	    }
+	    
+		return $ahsTeam;
+	}
+	
+	private function getTeamInfo( $iTeamId ){
+	    $oDb = new Db();
+	    
+	    $asTeamInfo = null;
+	    
+	    $oTeam = new Teams( $oDb, $iTeamId );
+	    
+	    if( $oTeam ){
+	        $asTeamInfo["id"] = $oTeam->id;
+	        $asTeamInfo["name"] = $oTeam->team_name;
+	        
+    		$ahsParameter = [ [ "column" => "team_id",  "type" => "int", "value" => $oTeam->id ] ];
+	        $oLadder = $oTeam->getCurrentLadder( $oDb );
+	        $asTeamInfo["ladder"] = $oLadder ? true : false;
+	        
+	        $oLastJoin = $oTeam->getLastJoin( $oDb );
+	        $asTeamInfo["last_joined"] = $oLastJoin ? $oLastJoin->joined_at : null;
+	    }
+	    
+	    return $asTeamInfo;
+	}
+	
+	function getLastApiQueue(){
+		$oDb = new Db();
+		$oApiQueue = null;
+		
+		// TODO 複数ユーザーまとめて動かすバッチになってきたら手直しいるかも
+		$ahsParameter = [ [ "column" => "payload",  "type" => "varchar", "value" => json_encode( [ "user_id" => $this->id ] ) ] ];
+		$ahsOrder     = [ [ "column" => "id", "sort_order" => "DESC" ] ];
+		$ahsResult = ApiQueues::getList( $oDb, $ahsParameter, $ahsOrder );
+		
+		if( $ahsResult ){
+			$oApiQueue = new ApiQueues( $oDb, $ahsResult[0]["id"] );
+		}
+		return $oApiQueue;
 	}
 
 
@@ -137,7 +204,6 @@ class User extends Base{
 		{
 			$team = Teams::find( $team_member['team_id'] );
 		}
-
 		// UserTeamApply
 		$prepareSql  = "SELECT * FROM user_team_applys WHERE user_id = ? AND deleted_at IS NULL";
 		$bindParam   = [ $user_id ];
@@ -147,14 +213,13 @@ class User extends Base{
 		{
 			$user_team_applys[] = $user_team_apply;
 		}
-
 		$user['team_member']      = $team_member;
 		$user['team_owners']      = $team_owners;
 		$user['team_staffs']      = $team_staffs;
 		$user['team_contacts']    = $team_contacts;
 		$user['team']             = $team;
 		$user['user_team_applys'] = $user_team_applys;
-
+		
         return $user;
     }
 

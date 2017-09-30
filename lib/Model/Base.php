@@ -39,7 +39,7 @@ class Base{
 		}
 	}
 	
-	public static function getList( $oDb, $ahsParameter ){
+	public static function getList( $oDb, $ahsParameter, $ahsOrder = null ){
 		$sSelectSql = "SELECT * FROM " . static::MAIN_TABLE . " WHERE ";
 		$asParameter = [];
 		$sType = "";
@@ -51,7 +51,8 @@ class Base{
 			}
 			switch( $value["type"] ){
 				case "int":
-					$asWhereSql[] = $value["column"] . " = ? ";
+				    $sOperator = isset( $value["operator"] ) ? $value["operator"] : "=";
+					$asWhereSql[] = $value["column"] . " " . $sOperator . " ? ";
 					$asParameter[] = $value["value"];
 					$sType .= "i";
 					break;
@@ -68,7 +69,17 @@ class Base{
 			}
 		}
 		
+		$asOrderSql = [];
+		if( isset( $ahsOrder ) ){
+		    foreach( $ahsOrder as $order ){
+		        $asOrderSql[] = $order["column"] . " " . $order["sort_order"];
+		    }
+		}
+		
 		$sSelectSql .= implode( " AND ", $asWhereSql );
+		if( count( $asOrderSql ) > 0 ){
+		    $sSelectSql .= " ORDER BY " . implode( " ,", $asOrderSql );
+		}
 		
 		$oResult = $oDb->executePrepare( $sSelectSql, $sType, $asParameter );
 		

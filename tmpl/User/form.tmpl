@@ -43,6 +43,7 @@
               <label for="inputPW" class="col-sm-3 control-label">Password（必須）</label>
               <div class="col-sm-9">
                 <input type="password" class="form-control" maxlength="20" id="inputPW" name="password" placeholder="Password">
+                <input type="password" class="form-control" maxlength="20" id="inputPWVerify" name="password_verify" placeholder="確認のためもう一度入力してください">
                 <p>※半角英数字で20文字以内で入力してください</p>
               </div>
             </div>
@@ -102,6 +103,11 @@
             
             if( result == false ){
                 alert("必須項目が未入力です。");
+            }else{
+                if( $("#inputPW").val() != $("#inputPWVerify").val() ){
+                    result = false;
+                    alert("パスワードと確認用パスワードが一致しません。");
+                }
             }
             
             return result;

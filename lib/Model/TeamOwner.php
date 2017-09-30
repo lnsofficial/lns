@@ -13,10 +13,11 @@ class TeamOwner extends Base{
 		"user_id"			=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
 	];
 
-	public static function getUserIdFromTeamId( $team_id ){
+	public function getUserIdFromTeamId( $team_id ){
 		$oDb = new Db();
 		
-		$ahsResult = static::getList( $oDb, [ [ "column" => "team_id",  "type" => "int", "value" => $team_id ] ] );
+		$ahsResult = TeamOwner::getList( $oDb, [ [ "column" => "team_id",  "type" => "int", "value" => $team_id ] ] );
+		$oUser = null;
 		if( $ahsResult ){
 			$oUser = new User( $oDb, $ahsResult[0]["user_id"] );
 		}

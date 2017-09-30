@@ -18,7 +18,7 @@
   <!--The following script tag downloads a font from the Adobe Edge Web Fonts server for use within the web page. We recommend that you do not modify it.--><script>var __adobewebfontsappname__="dreamweaver"</script><script src="http://use.edgefonts.net/open-sans:n3,n8,n4:default;overlock:n4:default;poiret-one:n4:default;paytone-one:n4:default.js" type="text/javascript"></script>
 </head>
   <body>
-  {include file='header.tmpl'}
+  {include file='header.tmpl' login=true}
   <div class="container-fluid">
     <style>
     </style>
@@ -29,6 +29,7 @@
             <li role="presentation">募集開始日時</li>
             <li role="presentation">{$recruit_start_date}</li>
             {if $show_join}<li role="presentation"><a href="" onClick="join(); return false;">試合を申し込む</a></li>{/if}
+            {if $show_checkin}<li role="presentation"><a href="" onClick="checkin(); return false;">チェックイン(確定/修正)する</a></li>{/if}
             {if $show_cancel}<li role="presentation"><a href="" onClick="cancel(); return false;">試合をキャンセル</a></li>{/if}
             {if $show_register_result}<li role="presentation"><a href="" onClick="registerResult(); return false;">試合結果を登録</a></li>{/if}
           </ul>
@@ -49,9 +50,10 @@
           <div class="form-group">
              <label for="mail_address">ブロック指定</label>
              <select class="form-control" disabled>
-               <option {if $type == 1}selected{/if}>どこからでも</option>
-               <option {if $type == 3}selected{/if}>１つ上のブロック以下</option>
-               <option {if $type == 2}selected{/if}>同ブロック以下</option>
+               <option {if $type == MATCH::MATCH_TYPE_ANY}selected{/if}>どこからでも</option>
+               <option {if $type == MATCH::MATCH_TYPE_LESS_TWO_ON_THE_SAME}selected{/if}>２つ上のブロック以下</option>
+               <option {if $type == MATCH::MATCH_TYPE_LESS_ONE_ON_THE_SAME}selected{/if}>１つ上のブロック以下</option>
+               <option {if $type == MATCH::MATCH_TYPE_LESS_SAME}selected{/if}>同ブロック以下</option>
              </select>
           </div>
           <div class="form-group">
@@ -68,7 +70,7 @@
           </div>
           {/if}
           <div class="form-group">
-            ※試合結果は、試合日時から4時間以内に登録してください
+            ※試合結果は、試合日時後の朝6時までに登録してください
           </div>
         </div>
       </div>
@@ -81,6 +83,12 @@
     function join(){
       if( window.confirm( '試合を申し込みます。' ) ){
         document.form1.action = "/Match/Join";
+        document.form1.submit();
+      }
+    }
+    function checkin(){
+      if( window.confirm( '試合に参加するメンバーを確定させる手続きに入ります。' ) ){
+        document.form1.action = "/Match/Checkin_form";
         document.form1.submit();
       }
     }

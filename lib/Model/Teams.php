@@ -1,6 +1,8 @@
 <?php
 require_once( PATH_MODEL . "Base.php" );
 require_once( PATH_MODEL . "TeamStaffs.php" );
+require_once( PATH_MODEL . "TeamJoin.php" );
+require_once( PATH_MODEL . "Ladder.php" );
 
 class Teams extends Base{
 	const MAIN_TABLE			= "teams";
@@ -21,6 +23,19 @@ class Teams extends Base{
 	const COUNT_MAX_MEMBER      = 10;        // チームに所属できるメンバーの最大数
 	const COUNT_MAX_CONTACT     =  1;        // チームに所属できる連絡者の最大数
 	const COUNT_MAX_STAFF       =  1;        // チームに所属できるアナリストの最大数
+	const COUNT_MIN_JOIN_LADDER =  5;        // 大会に参加可能な最低選手人数
+
+
+    /**
+     * // ロゴファイル名はここから取る感じで。
+     * 
+     * @param  int                  $team_id                // teams.id
+     * @return string
+     */
+    static function getLogoFileName( $team_id )
+    {
+        return $team_id . '_logo.jpg';
+    }
 
 
     /**
@@ -58,7 +73,39 @@ class Teams extends Base{
         $bindParam  = [$id];
         return $db->executePrepare( $prepareSql, "i", $bindParam )->fetch_assoc();
     }
-    
+    /**
+     * // pk検索複数レコード
+     * 
+     * @param  array                $ids                     // [teams.id, ...]
+     * @return Teams[]
+     */
+    function getById( $ids )
+    {
+        $db = new Db();
+        $prepareSql = "SELECT * FROM teams WHERE id IN (";
+        $hatenas = '';
+        $types   = '';
+        foreach( $ids as $tid )
+        {
+            if( !empty($hatenas) )
+            {
+                $hatenas .= ',';
+            }
+            $hatenas .= '?';
+            $types   .= 'i';
+            $bindParam[]  = $tid;
+        }
+        $hatenas .= ')';
+        $prepareSql .= $hatenas;
+        $result = $db->executePrepare( $prepareSql, $types, $bindParam );
+        $teams = [];
+        while( $team = $result->fetch_assoc() )
+        {
+            $teams[] = $team;
+        }
+
+        return $teams;
+    }
 	// スタッフ取得
 	public function getStaff(){
 		$oDb = new Db();
@@ -74,5 +121,59 @@ class Teams extends Base{
 		$ahsTeams = Teams::getList( $oDb, [ [ "column" => "status",  "type" => "int", "value" => 0 ] ] );
 		
 		return $ahsTeams;
+	}
+	
+	public function getLastJoin( $oDb ){
+		$sSelectLastJoin = "SELECT id FROM " . TeamJoin::MAIN_TABLE . " WHERE team_id = ? AND state = ? ORDER BY joined_at DESC";
+		$ahsParameter = [ $this->id, TeamJoin::STATE_ENABLE ];
+		
+		$oResult = $this->db->executePrepare( $sSelectLastJoin, "ii", $ahsParameter );
+		
+		$oLastJoin = null;
+		while( $row = $oResult->fetch_array() ){
+			$iLastJoinId = $row["id"];
+			$oLastJoin = new TeamJoin( $oDb, $iLastJoinId );
+			break;
+		}
+		
+		return $oLastJoin;
+	}
+	
+	public function getLeague( $oDb ){
+		$oLadder = $this->getCurrentLadder( $oDb );
+		$oLeague = null;
+		if( $oLadder ){
+		    $oLeague = new League( $oDb, $oLadder->league_id );
+		}
+		
+		return $oLeague;
+	}
+	
+	public function getCurrentLadder( $oDb ){
+		$sSelectLadder = "SELECT * FROM " . Ladder::MAIN_TABLE . " WHERE team_id = ? ORDER BY term DESC";
+		$ahsParameter = [ $this->id ];
+		$oResult = $oDb->executePrepare( $sSelectLadder, "i", $ahsParameter );
+		
+		$oLadder = null;
+		while( $row = $oResult->fetch_array() ){
+			$oLadder = new Ladder( $oDb, $row["id"] );
+			break;
+		}
+		
+		return $oLadder;
+	}
+	
+	public function getTeamMembers( $oDb ){
+	    $sSelectTeamMember = "SELECT tm.team_id,us.id,us.summoner_id,us.tier,us.rank FROM team_members tm LEFT JOIN users us ON tm.user_id = us.id  WHERE team_id = ?";
+	    $ahsParameter = [ $this->id ];
+	    
+	    $oResult = $oDb->executePrepare( $sSelectTeamMember, "i", $ahsParameter );
+	    
+	    $ahsTeamMembers = null;
+	    while( $row = $oResult->fetch_assoc() ){
+	        $ahsTeamMembers[] = $row;
+	    }
+	    
+	    return $ahsTeamMembers;
 	}
 }

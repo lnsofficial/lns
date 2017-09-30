@@ -1,0 +1,95 @@
+<?php
+// TODO その内やり方修正
+require_once( getenv('BASE_PATH') . '/lib/common/Define.php');
+require_once( PATH_LIB . '/common/Db.php');
+require_once( PATH_LIB . '/common/UtilTime.php');
+require_once( PATH_LIB . '/Model/Match.php');
+require_once( PATH_LIB . '/Model/Teams.php');
+
+$feature_games = [];
+
+// 現在～10日後までの試合のうち、match_date降順でstate=2のマッチリストを最大5件もってくる。
+$from       = UtilTime::now();                                                                             // 現在
+$dest       = UtilTime::timeToStr( UtilTime::addSecond($from,  86400 * Match::FEATURE_GAME_DATE_BEFORE) ); // 10日後
+$db         = new Db();
+//$prepareSql = "SELECT * FROM matches WHERE state = ?                                                               ORDER BY match_date DESC LIMIT " . Match::FEATURE_GAME_COUNT;
+$prepareSql = "SELECT * FROM matches WHERE state = ? AND '" .$from. "' <= match_date AND match_date <= '".$dest."' ORDER BY match_date DESC LIMIT " . Match::FEATURE_GAME_COUNT;
+$bindParam  = [ Match::MATCH_STATE_MATCHED ];
+$result     = $db->executePrepare( $prepareSql, "i", $bindParam );
+
+$match_recruits = [];
+while( $match_recruit = $result->fetch_assoc() ){ $match_recruits[] = $match_recruit; }
+
+// チーム名とかを載せる為に、情報取ってきます。
+$feature_games = [];
+if( !empty($match_recruits) )
+{
+	$team_ids = [];
+	foreach( $match_recruits as $match_recruit )
+	{
+		$team_ids[] = $match_recruit['host_team_id'];
+		$team_ids[] = $match_recruit['apply_team_id'];
+	}
+	$team_ids = array_unique($team_ids);
+	$teams = Teams::getById($team_ids);
+
+	// 使いやすいように整形しておく。
+	$tmp = [];
+	foreach( $teams as $team )
+	{
+		$tmp[$team['id']] = $team;
+	}
+	$teams = $tmp;
+
+	// 表示用の情報を作っていく。
+	foreach( $match_recruits as $match_recruit )
+	{
+		$default_logo_file = "../NLSrogo.jpg";
+		$blue_logo_file    = Teams::getLogoFileName($match_recruit['host_team_id']);
+		$red_logo_file     = Teams::getLogoFileName($match_recruit['apply_team_id']);
+		if( !file_exists(PATH_TEAM_LOGO . $blue_logo_file) )
+		{
+			$blue_logo_file = $default_logo_file;
+		}
+		if( !file_exists(PATH_TEAM_LOGO . $red_logo_file) )
+		{
+			$red_logo_file  = $default_logo_file;
+		}
+		$feature_games[] = [
+			'blue' => [
+				'name'      => $teams[$match_recruit['host_team_id']]['team_name'],
+				'logo_file' => "/img/logo/" . $blue_logo_file,
+			],
+			'red' => [
+				'name'      => $teams[$match_recruit['apply_team_id']]['team_name'],
+				'logo_file' => "/img/logo/" . $red_logo_file,
+			],
+			'date' => $match_recruit['match_date'],
+		];
+	}
+}
+?>
+
+
+<?php if( !count($feature_games) ){ ?>
+<p>まだありません。</p>
+<?php } else { ?>
+	<ul class="nav">
+	<?php foreach( $feature_games as $game ){ ?>
+		<div class="row">
+			<div class="col-md-4 text-left">
+				<?php echo($game['date']); ?>
+			</div>
+			<div class="col-md-3 text-right">
+				<?php echo($game['blue']['name']); ?>
+			</div>
+			<div class="col-md-2 text-center">
+				<img src="<?php echo($game['blue']['logo_file']); ?>" width="30px" height="30px" /> vs <img src="<?php echo($game['red']['logo_file']); ?>" width="30px" height="30px" />
+			</div>
+			<div class="col-md-3 text-left">
+				<?php echo($game['red']['name']); ?>
+			</div>
+		</div>
+	<?php } ?>
+	</ul>
+<?php } ?>

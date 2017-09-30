@@ -18,7 +18,7 @@
   <!--The following script tag downloads a font from the Adobe Edge Web Fonts server for use within the web page. We recommend that you do not modify it.--><script>var __adobewebfontsappname__="dreamweaver"</script><script src="http://use.edgefonts.net/open-sans:n3,n8,n4:default;overlock:n4:default;poiret-one:n4:default;paytone-one:n4:default.js" type="text/javascript"></script>
 </head>
   <body>
-  {include file='header.tmpl'}
+  {include file='header.tmpl' login=true}
   <div class="container-fluid">
     <div class="row">
       <div class="col-lg-2 about-menu">
@@ -32,8 +32,10 @@
             <td>
               {if $type == 1}
                 どこからでも
+              {elseif $type == 4}
+                ２つ上のブロック以下
               {elseif $type == 3}
-                一つ上のブロック以下
+                １つ上のブロック以下
               {elseif $type == 2}
                 同ブロック以下
               {/if}
