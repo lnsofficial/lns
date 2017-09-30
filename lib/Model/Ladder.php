@@ -46,4 +46,17 @@ class Ladder extends Base{
         
         return $iTerm;
 	}
+
+	public function getLadderInfoByTerm( $oDb, $team ){
+	    $sSelectLadderSql = "SELECT * FROM t_ladder_ranking WHERE term = ?";
+	    $ahsParameter = [ $team ];
+	    
+	    $oLadderRanking = $oDb->executePrepare( $sSelectLadderSql, "i", $ahsParameter );
+	    
+        $ret = null;
+	    while( $row = $oLadderRanking->fetch_assoc() ) {
+            $ret[] = $row;
+        }
+        return $ret;
+	}
 }

@@ -1,11 +1,11 @@
 <?php
 ini_set('display_errors', 1);
 
-require_once('../lib/common/Define.php');
+require_once('/var/www/html/lib/common/Define.php');
 require_once( PATH_MODEL . "Match.php" );
-require_once( PATH_MODEL . "Team.php" );
+require_once( PATH_MODEL . "Teams.php" );
 require_once( PATH_MODEL . "League.php" );
-require_once( PATH_MODEL . "LadderRanking.php" );
+require_once( PATH_MODEL . "Ladder.php" );
 // ポイントを反映
 writeLog("-----------------【処理開始】-----------------");
 // マッチ一覧取得
@@ -27,34 +27,25 @@ writeLog("-----------------【処理終了】-----------------");
 
 function createNewLadder( $oDb ){
 	writeLog("[createNewLadder][Start]");
-	$sSelectTermSql = "SELECT MAX(term) as term FROM t_ladder_ranking";
-	$oTerm = $oDb->execute( $sSelectTermSql );
-	
-	$iTerm = 0;
-	while( $row = $oTerm->fetch_assoc() ) {
-		$iTerm = $row["term"];
-	}
+    $iTerm = Ladder::getCurrentTerm( $oDb );
 	
 	if( $iTerm == 0 ){
 		return false;
 	}
-	
-	$sSelectLadderSql = "SELECT * FROM t_ladder_ranking WHERE term = ?";
-	$ahsParameter = [ $iTerm ];
-	
-	$oLadderRanking = $oDb->executePrepare( $sSelectLadderSql, "i", $ahsParameter );
-	
-	while( $row = $oLadderRanking->fetch_assoc() ) {
-		writeLog( "[createNewLadder][TeamId:" . $row["team_id"] . "]" );
+
+    $ladder_infos = Ladder::getLadderInfoByTerm($oDb, $iTerm);
+
+    foreach ($ladder_infos as $info) {
+		writeLog( "[createNewLadder][TeamId:" . $info["team_id"] . "]" );
 		// 現在のラダーから次週のベース作成
-		$oNewLadder = new LadderRanking( $oDb );
+		$oNewLadder = new Ladder( $oDb );
 		
-		$oNewLadder->team_id = $row["team_id"];
-		$oNewLadder->league_id = $row["league_id"];
-		$oNewLadder->point = $row["point"];
+		$oNewLadder->team_id = $info["team_id"];
+		$oNewLadder->league_id = $info["league_id"];
+		$oNewLadder->point = $info["point"];
 		$oNewLadder->term = $iTerm + 1;
 		$oNewLadder->save();
-	}
+    }
 	
 	writeLog("[createNewLadder][End]");
 	return true;
@@ -70,8 +61,8 @@ function updateLadderRanking( $oDb ){
 		
 		$iWinnerTeamId = $row["winner"];
 		
-		$oHostTeam = new Team( $oDb, $row["host_team_id"] );
-		$oApplyTeam = new Team( $oDb, $row["apply_team_id"] );
+		$oHostTeam = new Teams( $oDb, $row["host_team_id"] );
+		$oApplyTeam = new Teams( $oDb, $row["apply_team_id"] );
 		
 		$oWinTeam = $oHostTeam->team_id == $iWinnerTeamId ? $oHostTeam : $oApplyTeam;
 		$oLoseTeam = $oHostTeam->team_id != $iWinnerTeamId ? $oHostTeam : $oApplyTeam;
