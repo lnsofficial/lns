@@ -111,12 +111,14 @@ class MatchController extends BaseController{
 		    }
 		}
 
-        // ・自信がこのマッチのhost_team_id/apply_team_idどちらかのチームのteam_memberであること
+        // ・自身がこのマッチのhost_team_id/apply_team_idどちらかのチームのteam_ownerであること
         // ・このマッチのstateがMatch::MATCH_STATE_MATCHEDであること
         // この２つを満たしてるとき、$showCheckin = true にする。
         if( $oMatch->state == Match::MATCH_STATE_MATCHED && !empty($oLoginTeam) )
         {
-            if( $oLoginTeam->id == $oMatch->host_team_id || $oLoginTeam->id == $oMatch->apply_team_id )
+            $user = User::info( $oLoginUser->id );
+            $owner_team_ids = array_map( function($item){ return $item['team_id']; }, $user['team_owners'] );
+            if( in_array($oMatch->host_team_id, $owner_team_ids) || in_array($oMatch->apply_team_id, $owner_team_ids) )
             {
                 $showCheckin = true;
             }
@@ -496,11 +498,12 @@ class MatchController extends BaseController{
             exit;
         }
 
-        // このマッチのhost_team_id/apply_team_idどちらかの、team_memberじゃないとNG。
+        // このマッチのhost_team_id/apply_team_idどちらかの、team_ownerじゃないとNG。
         $user         = User::info( $_SESSION["id"] );
-        if( empty($user['team']) || ($user['team']['id'] != $match->host_team_id && $user['team']['id'] != $match->apply_team_id) )
+        $owner_team_ids = array_map( function($item){ return $item['team_id']; }, $user['team_owners'] );
+        if( empty($user['team']) || (!in_array($match->host_team_id, $owner_team_ids) && !in_array($match->apply_team_id, $owner_team_ids)) )
         {
-            self::displayCommonScreen( ERR_HEAD_COMMON, 'この試合のチームのメンバーである必要があります。' );
+            self::displayCommonScreen( ERR_HEAD_COMMON, 'この試合のチームの代表者である必要があります。' );
             exit;
         }
 
@@ -551,11 +554,12 @@ class MatchController extends BaseController{
             exit;
         }
 
-        // このマッチのhost_team_id/apply_team_idどちらかの、team_memberじゃないとNG。
+        // このマッチのhost_team_id/apply_team_idどちらかの、team_ownerじゃないとNG。
         $user         = User::info( $_SESSION["id"] );
-        if( empty($user['team']) || ($user['team']['id'] != $match->host_team_id && $user['team']['id'] != $match->apply_team_id) )
+        $owner_team_ids = array_map( function($item){ return $item['team_id']; }, $user['team_owners'] );
+        if( empty($user['team']) || (!in_array($match->host_team_id, $owner_team_ids) && !in_array($match->apply_team_id, $owner_team_ids)) )
         {
-            self::displayCommonScreen( ERR_HEAD_COMMON, 'この試合のチームのメンバーである必要があります。' );
+            self::displayCommonScreen( ERR_HEAD_COMMON, 'この試合のチームの代表者である必要があります。' );
             exit;
         }
 
