@@ -29,6 +29,7 @@
             <li role="presentation">募集開始日時</li>
             <li role="presentation">{$recruit_start_date}</li>
             {if $show_join}<li role="presentation"><a href="" onClick="join(); return false;">試合を申し込む</a></li>{/if}
+            {if $show_checkin}<li role="presentation"><a href="" onClick="checkin(); return false;">チェックイン(確定/修正)する</a></li>{/if}
             {if $show_cancel}<li role="presentation"><a href="" onClick="cancel(); return false;">試合をキャンセル</a></li>{/if}
             {if $show_register_result}<li role="presentation"><a href="" onClick="registerResult(); return false;">試合結果を登録</a></li>{/if}
           </ul>
@@ -82,6 +83,12 @@
     function join(){
       if( window.confirm( '試合を申し込みます。' ) ){
         document.form1.action = "/Match/Join";
+        document.form1.submit();
+      }
+    }
+    function checkin(){
+      if( window.confirm( '試合に参加するメンバーを確定させる手続きに入ります。' ) ){
+        document.form1.action = "/Match/Checkin_form";
         document.form1.submit();
       }
     }
