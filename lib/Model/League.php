@@ -32,7 +32,7 @@ class League extends Base{
 		}else{
 			$iRank = $this->rank - 1;
 		}
-		$sSelectLeagueSql = "SELECT * FROM m_league WHERE rank = ?";
+		$sSelectLeagueSql = "SELECT * FROM " . self::MAIN_TABLE ." WHERE rank = ?";
 		$ahsParameter = [ $iRank ];
 		
 		$oResult = $oDb->executePrepare( $sSelectLeagueSql, "i", $ahsParameter );
@@ -55,7 +55,7 @@ class League extends Base{
 			$iRank = $this->rank + 1;
 		}
 		
-		$sSelectLeagueSql = "SELECT * FROM m_league WHERE rank = ?";
+		$sSelectLeagueSql = "SELECT * FROM " . self::MAIN_TABLE ." WHERE rank = ?";
 		$ahsParameter = [ $iRank ];
 		
 		$oResult = $oDb->executePrepare( $sSelectLeagueSql, "i", $ahsParameter );

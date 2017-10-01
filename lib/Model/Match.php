@@ -36,13 +36,18 @@ class Match extends Base{
 	const FEATURE_GAME_COUNT       =  5; // topページの最新ゲームで最大何件表示させるか
 	const FEATURE_GAME_DATE_BEFORE = 10; // topページの最新ゲームを取るときに、何日前までの試合を対象とするか
   
-	public function getMatchLastWeek( $oDb ){
+	public function getMatchLastDay( $oDb ){
 		$sSelectMatchSql = "SELECT * FROM " . self::MAIN_TABLE . " WHERE state IN(?,?) AND match_date BETWEEN DATE_FORMAT(NOW() - INTERVAL " . INTERVAL_BATCH_TIME . ", '%Y-%m-%d 06:00:00') AND DATE_FORMAT(NOW() , '%Y-%m-%d 06:00:00') ORDER BY match_date ASC";
 		$ahsParameter = [ self::MATCH_STATE_FINISHED, self::MATCH_STATE_ABSTAINED ];
 		
 		$oResult = $oDb->executePrepare( $sSelectMatchSql, "ii", $ahsParameter );
+
+        $ret = array();
+        while ($row = $oResult->fetch_assoc()) {
+            $ret[] = $row;
+        }
 		
-		return $oResult;
+		return $ret;
 	}
 	
 	public function getMatchList( $oDb, $ahsSearchOption ){
