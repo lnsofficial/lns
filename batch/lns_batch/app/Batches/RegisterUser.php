@@ -74,8 +74,10 @@ class RegisterUser extends QueueBase
 
 
 		// ちゃんと取れたので更新
-		LnsDB::transaction(function()use(&$user, &$queue, $sm_json, $sr_json)
+		try
 		{
+			LnsDB::beginTransaction();
+
 			$from = $user->toArray();
 			// サモナー情報更新して、
 			$user->summoner_name = $sm_json['name'];
@@ -101,7 +103,23 @@ class RegisterUser extends QueueBase
 			$queue->result = json_encode(['from'=>$from,'desc'=>$dest], JSON_UNESCAPED_UNICODE);
 			$queue->state  = ApiQueue::STATE_FINISHED;
 			$queue->save();
-		});
+
+			LnsDB::commit();
+		}
+		catch( Exception $e )
+		{
+			// DB更新で失敗したならしょうがないので次へ・・・。
+			$this->log('DB更新失敗：$e->getMessage() = '.$e->getMessage());
+			LnsDB::rollBack();
+
+			// 失敗ステータスにしてpayloadに詰め込んでおく。
+			LnsDB::beginTransaction();
+			$queue->result = 'DB更新失敗：$e->getMessage() = '.$e->getMessage();
+			$queue->state  = ApiQueue::STATE_FAILED;
+			$queue->save();
+			LnsDB::commit();
+			return false;
+		}
 
 		return true;
 	}

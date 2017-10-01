@@ -173,4 +173,20 @@ class Match extends Base{
 
 		return $row["cnt"];
 	}
+    
+    /**
+     * チェックイン可能な日時か
+     */
+    public function enableCheckin(){
+        $enableCheckin = false;
+        $start_date    = date( "Y-m-d h:i:s", strtotime( $this->match_date . "-1 hour" ) );
+        $end_date      = date( "Y-m-d h:i:s", strtotime( $this->match_date . "-10 minute" ) );
+        $current_date  = date( "Y-m-d h:i:s" );
+        
+        if( $current_date <= $end_date && $current_date >= $start_date ){
+            $enableCheckin = true;
+        }
+        
+        return $enableCheckin;
+    }
 }

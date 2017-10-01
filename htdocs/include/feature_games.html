@@ -8,12 +8,12 @@ require_once( PATH_LIB . '/Model/Teams.php');
 
 $feature_games = [];
 
-// 現在～10日前までの試合のうち、match_date降順でstate=2のマッチリストを最大5件もってくる。
-$dest       = UtilTime::now();                                                                             // 現在
-$from       = UtilTime::timeToStr( UtilTime::addSecond($dest, -86400 * Match::FEATURE_GAME_DATE_BEFORE) ); // 10日前
+// 現在～10日後までの試合のうち、match_date降順でstate=2のマッチリストを最大5件もってくる。
+$from       = UtilTime::now();                                                                             // 現在
+$dest       = UtilTime::timeToStr( UtilTime::addSecond($from,  86400 * Match::FEATURE_GAME_DATE_BEFORE) ); // 10日後
 $db         = new Db();
-//$prepareSql = "SELECT * FROM match_recruit_list WHERE state = ?                                                               ORDER BY match_date DESC LIMIT " . Match::FEATURE_GAME_COUNT;
-$prepareSql = "SELECT * FROM match_recruit_list WHERE state = ? AND '" .$from. "' <= match_date AND match_date <= '".$dest."' ORDER BY match_date DESC LIMIT " . Match::FEATURE_GAME_COUNT;
+//$prepareSql = "SELECT * FROM matches WHERE state = ?                                                               ORDER BY match_date DESC LIMIT " . Match::FEATURE_GAME_COUNT;
+$prepareSql = "SELECT * FROM matches WHERE state = ? AND '" .$from. "' <= match_date AND match_date <= '".$dest."' ORDER BY match_date DESC LIMIT " . Match::FEATURE_GAME_COUNT;
 $bindParam  = [ Match::MATCH_STATE_MATCHED ];
 $result     = $db->executePrepare( $prepareSql, "i", $bindParam );
 
@@ -76,7 +76,6 @@ if( !empty($match_recruits) )
 <?php } else { ?>
 	<ul class="nav">
 	<?php foreach( $feature_games as $game ){ ?>
-<!--		<li role="presentation"><?php echo($game['date']); ?> <?php echo($game['blue']['name']); ?> <img src="<?php echo($game['blue']['logo_file']); ?>" width="30px" /> vs <img src="<?php echo($game['red']['logo_file']); ?>" width="30px" /> <?php echo($game['red']['name']); ?></li> -->
 		<div class="row">
 			<div class="col-md-4 text-left">
 				<?php echo($game['date']); ?>
@@ -85,7 +84,7 @@ if( !empty($match_recruits) )
 				<?php echo($game['blue']['name']); ?>
 			</div>
 			<div class="col-md-2 text-center">
-				<img src="<?php echo($game['blue']['logo_file']); ?>" width="30px" /> vs <img src="<?php echo($game['red']['logo_file']); ?>" width="30px" />
+				<img src="<?php echo($game['blue']['logo_file']); ?>" width="30px" height="30px" /> vs <img src="<?php echo($game['red']['logo_file']); ?>" width="30px" height="30px" />
 			</div>
 			<div class="col-md-3 text-left">
 				<?php echo($game['red']['name']); ?>
