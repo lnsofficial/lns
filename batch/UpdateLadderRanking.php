@@ -1,7 +1,7 @@
 <?php
 ini_set('display_errors', 1);
 
-require_once('/var/www/html/lib/common/Define.php');
+require_once('../lib/common/Define.php');
 require_once( PATH_MODEL . "Match.php" );
 require_once( PATH_MODEL . "Teams.php" );
 require_once( PATH_MODEL . "League.php" );
