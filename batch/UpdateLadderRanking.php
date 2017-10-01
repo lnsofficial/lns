@@ -16,7 +16,11 @@ $oDb->beginTransaction();
 
 // TODO エラーハンドリング
 // 次週分のラダー一覧作成
-createNewLadder( $oDb );
+$ret = createNewLadder( $oDb );
+if ($ret === false) {
+    writeLog("-----------------【異常終了】-----------------");
+    exit;
+}
 
 // ラダー反映
 updateLadderRanking( $oDb );
@@ -34,6 +38,10 @@ function createNewLadder( $oDb ){
 	}
 
     $ladder_infos = Ladder::getLadderInfoByTerm($oDb, $iTerm);
+
+	if(empty($ladder_infos)){
+		return false;
+	}
 
     foreach ($ladder_infos as $info) {
 		writeLog( "[createNewLadder][TeamId:" . $info["team_id"] . "]" );

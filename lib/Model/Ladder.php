@@ -45,7 +45,7 @@ class Ladder extends Base{
 	    
 	    $oLadderRanking = $oDb->executePrepare( $sSelectLadderSql, "i", $ahsParameter );
 	    
-        $ret = null;
+        $ret = array();
 	    while( $row = $oLadderRanking->fetch_assoc() ) {
             $ret[] = $row;
         }
