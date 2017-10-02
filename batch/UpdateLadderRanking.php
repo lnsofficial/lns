@@ -1,7 +1,8 @@
 <?php
 ini_set('display_errors', 1);
 
-require_once('../lib/common/Define.php');
+//require_once('../lib/common/Define.php');
+require_once('/var/www/html/lib/common/Define.php');
 require_once( PATH_MODEL . "Match.php" );
 require_once( PATH_MODEL . "Teams.php" );
 require_once( PATH_MODEL . "League.php" );
@@ -62,9 +63,9 @@ function createNewLadder( $oDb ){
 function updateLadderRanking( $oDb ){
 	writeLog("[updateLadderRanking][Start]");
 	
-	$oLastWeekMatch = Match::getMatchLastDay( $oDb );
+	$oLastDayMatch = Match::getMatchLastDay( $oDb );
 
-    foreach ($oLastWeekMatch as $match) {
+    foreach ($oLastDayMatch as $match) {
 		$iMatchId = $match["id"];
 		writeLog("[updateLadderRanking][MatchId:" . $iMatchId . "]Start");
 		
