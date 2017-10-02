@@ -83,7 +83,7 @@ function updateLadderRanking( $oDb ){
 		if( $iState == Match::MATCH_STATE_FINISHED ){
 			updateTeamLadderNormal( $oDb, $oWinTeam, $oLoseTeam );
 		} else if( $iState == Match::MATCH_STATE_ABSTAINED ){
-			if( $row["host_team_id"] !== 0 && $match["apply_team_id"] !== 0 ){
+			if( $match["host_team_id"] !== 0 && $match["apply_team_id"] !== 0 ){
 				updateTeamLadderCancel( $oDb, $oWinTeam, $oLoseTeam );
 			}
 		}
