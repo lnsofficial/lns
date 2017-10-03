@@ -155,7 +155,6 @@ class Match extends Base{
 				}
 				break;
 			case Match::MATCH_TYPE_LESS_ONE_ON_THE_SAME:
-	    echo($iHostRank );
 				// ホストのランクが自分のランクから2つ以下ならエラー
 				if( $iHostRank > $iApplyRank + 1 ){
 					$bEnableJoin = false;
