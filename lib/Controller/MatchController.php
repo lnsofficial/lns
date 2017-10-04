@@ -73,7 +73,7 @@ class MatchController extends BaseController{
 		    				if( $oMatch->enableCancel() ){
 		    					$showCancel = true;
 		    				}
-		    				$showRegsiterResult = true;
+		    				$showRegsiterResult = $oMatch->expirationRegistMatchResult();
 		    				break;
 		    		}
 		    		break;
@@ -89,7 +89,7 @@ class MatchController extends BaseController{
 		    				if( $oMatch->enableCancel() ){
 		    					$showCancel = true;
 		    				}
-		    				$showRegsiterResult = true;
+		    				$showRegsiterResult = $oMatch->expirationRegistMatchResult();
 		    				break;
 		    		}
 		    		break;
