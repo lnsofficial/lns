@@ -18,7 +18,7 @@
 	define( "DB_PASSWORD"	, getenv('DB_PASSWORD') );
 	
 	// バッチ関連
-	define( "INTERVAL_BATCH_TIME"	, "1 WEEK" );
+	define( "INTERVAL_BATCH_TIME"	, "1 DAY" );
 	
 	
 	// 見出し

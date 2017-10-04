@@ -36,13 +36,18 @@ class Match extends Base{
 	const FEATURE_GAME_COUNT       =  5; // topページの最新ゲームで最大何件表示させるか
 	const FEATURE_GAME_DATE_BEFORE = 10; // topページの最新ゲームを取るときに、何日前までの試合を対象とするか
   
-	public function getMatchLastWeek( $oDb ){
+	public function getMatchLastDay( $oDb ){
 		$sSelectMatchSql = "SELECT * FROM " . self::MAIN_TABLE . " WHERE state IN(?,?) AND match_date BETWEEN DATE_FORMAT(NOW() - INTERVAL " . INTERVAL_BATCH_TIME . ", '%Y-%m-%d 06:00:00') AND DATE_FORMAT(NOW() , '%Y-%m-%d 06:00:00') ORDER BY match_date ASC";
 		$ahsParameter = [ self::MATCH_STATE_FINISHED, self::MATCH_STATE_ABSTAINED ];
 		
 		$oResult = $oDb->executePrepare( $sSelectMatchSql, "ii", $ahsParameter );
+
+        $ret = array();
+        while ($row = $oResult->fetch_assoc()) {
+            $ret[] = $row;
+        }
 		
-		return $oResult;
+		return $ret;
 	}
 	
 	public function getMatchList( $oDb, $ahsSearchOption ){
@@ -98,9 +103,23 @@ class Match extends Base{
 	// 試合結果の登録可能な時間を過ぎてないかチェック
 	public function expirationRegistMatchResult(){
 		$bResult = true;
-		// 次のバッチ開始予定時間の1時間前取得
-		// TODO 月曜の00~5時の試合の処理も入れる必要あり、とりあえずは暫定対応
-		$nextExecuteBatchDate = date('Y-m-d H:i:s', strtotime( $this->match_date . " + 4 hour" ) );
+		
+		$iMatchHour = (int)date('G', strtotime( $this->match_date ) );
+		
+		$sNextBatchDay = "";
+		
+		switch( $iMatchHour ){
+		    case $iMatchHour < 6:
+		        // 当日なので何もしない
+		        break;
+		    case $iMatchHour >= 6:
+		        // 翌日なので＋1日
+		        $sNextBatchDay = " + 1 day ";
+		        break;
+		}
+		
+		// 試合日時後のバッチ開始予定時間
+		$nextExecuteBatchDate = date('Y-m-d 06:00:00', strtotime( $this->match_date . $sNextBatchDay ) );
 		
 		if( date( 'Y-m-d H:i:s' ) > $nextExecuteBatchDate ){
 			$bResult = false;
