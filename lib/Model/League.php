@@ -49,7 +49,7 @@ class League extends Base{
 	// 一つ下のリーグ取得
 	public function getUnderOneLeague( $oDb ){
 		$iRank = 0;
-		if( $this->rank == 8 ){
+		if( $this->rank == self::LEAGUE_HIRA ){
 			$iRank = $this->rank;
 		}else{
 			$iRank = $this->rank + 1;
