@@ -73,7 +73,7 @@ class MatchController extends BaseController{
 		    				if( $oMatch->enableCancel() ){
 		    					$showCancel = true;
 		    				}
-		    				$showRegsiterResult = true;
+		    				$showRegsiterResult = $oMatch->expirationRegistMatchResult();
 		    				break;
 		    		}
 		    		break;
@@ -89,7 +89,7 @@ class MatchController extends BaseController{
 		    				if( $oMatch->enableCancel() ){
 		    					$showCancel = true;
 		    				}
-		    				$showRegsiterResult = true;
+		    				$showRegsiterResult = $oMatch->expirationRegistMatchResult();
 		    				break;
 		    		}
 		    		break;
@@ -120,7 +120,7 @@ class MatchController extends BaseController{
             $owner_team_ids = array_map( function($item){ return $item['team_id']; }, $user['team_owners'] );
             if( in_array($oMatch->host_team_id, $owner_team_ids) || in_array($oMatch->apply_team_id, $owner_team_ids) )
             {
-                $showCheckin = true;
+                $showCheckin = $oMatch->enableCheckin();
             }
         }
 
