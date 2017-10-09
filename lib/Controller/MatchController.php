@@ -269,7 +269,7 @@ class MatchController extends BaseController{
 		
 		// 参加者が居れば履歴のテーブル更新
 		if( $oApplyTeamId ){
-			$oApplyTeam = new Team( $oDb, $oApplyTeamId );
+			$oApplyTeam = new Teams( $oDb, $oApplyTeamId );
 			$oLastJoin = $oApplyTeam->getLastJoin( $oDb );
 			$oLastJoin->state = LastJoin::STATE_CANCEL;
 			$oLastJoin->save();
