@@ -396,6 +396,11 @@ class MatchController extends BaseController{
 			exit;
 		}
 
+        if (!Match::checkRecruitMatchDate($_REQUEST["match_date"])) {
+			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_DISABLE_RECRUIT_TIME );
+			exit;
+        }
+
 		$oDb = new Db();
 		$oUser = new User( $oDb, $_SESSION["id"] );
 		$oLoginTeam = $oUser->getTeam();
@@ -433,6 +438,12 @@ class MatchController extends BaseController{
 		$oLoginTeam = $oUser->getTeam();
 		
 		$this->checkRecruitEnable( $_REQUEST["match_date"], $oLoginTeam->id );
+        
+        // check time
+        if (!Match::checkRecruitMatchDate($_REQUEST["match_date"])) {
+			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_DISABLE_RECRUIT_TIME );
+			exit;
+        }
 		
 		$dtMatchDate = date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) );
 
