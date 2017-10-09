@@ -396,8 +396,7 @@ class MatchController extends BaseController{
 			exit;
 		}
 
-        $hour = date('H', strtotime($_REQUEST["match_date"]));
-        if (Match::DISABLE_MATCH_HOUR_START <= $hour && $hour < Match::DISABLE_MATCH_HOUR_END) {
+        if (!Match::checkRecruitMatchDate($_REQUEST["match_date"])) {
 			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_DISABLE_RECRUIT_TIME );
 			exit;
         }
@@ -441,8 +440,7 @@ class MatchController extends BaseController{
 		$this->checkRecruitEnable( $_REQUEST["match_date"], $oLoginTeam->id );
         
         // check time
-        $hour = date('H', strtotime($_REQUEST["match_date"]));
-        if (Match::DISABLE_MATCH_HOUR_START <= $hour && $hour < Match::DISABLE_MATCH_HOUR_END) {
+        if (!Match::checkRecruitMatchDate($_REQUEST["match_date"])) {
 			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_DISABLE_RECRUIT_TIME );
 			exit;
         }

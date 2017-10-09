@@ -210,4 +210,17 @@ class Match extends Base{
         
         return $enableCheckin;
     }
+
+    public function checkRecruitMatchDate($match_date){
+        if (empty($match_date)) {
+            return false;
+        }
+        
+        $hour = date('H', strtotime($match_date));
+        if (self::DISABLE_MATCH_HOUR_START <= $hour && $hour < self::DISABLE_MATCH_HOUR_END) {
+            return false;
+        }
+
+        return true;
+    }
 }
