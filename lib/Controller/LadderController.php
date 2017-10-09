@@ -119,4 +119,13 @@ class LadderController extends BaseController{
         
         header('Location: /Ladder/display');
     }
+
+	public function displayError(){
+		$smarty = new Smarty();
+		
+		$smarty->template_dir = PATH_TMPL;
+		$smarty->compile_dir  = PATH_TMPL_C;
+		
+		$smarty->display('commonError.tmpl');
+	}
 }
