@@ -40,4 +40,5 @@
 	define( "ERR_MATCH_PERMISSION"			, "権限がありません" );
 	define( "ERR_MATCH_OVER_REGIST"			, "既に該当月での試合の募集回数が上限に達しているため、応募できません。<br />１ヶ月に間に募集できる回数は４回までとなります。" );
 	define( "ERR_MATCH_OVER_RESULT_REGIST"	, "試合結果の登録可能時間を過ぎているため、登録できません" );
+	define( "ERR_MATCH_DISABLE_RECRUIT_TIME", "試合募集不可時間のため、登録できません" );
 	define( "ERR_MATCH_WINNER_NOT_PART"		, "勝者が参加チームのどちらでもありません" );
