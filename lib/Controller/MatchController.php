@@ -11,6 +11,8 @@ require_once( PATH_MODEL . 'MatchCheckin.php' );
 class MatchController extends BaseController{
 	const DISPLAY_DIR_PATH	= "Match";
 	const DISPLAY_FILE_PATH	= "Match_common";
+	const DISABLE_MATCH_HOUR_START = 4;
+	const DISABLE_MATCH_HOUR_END   = 6;
 
 	public function __construct(){
 	}
@@ -396,6 +398,12 @@ class MatchController extends BaseController{
 			exit;
 		}
 
+        $hour = date('H', strtotime($_REQUEST["match_date"]));
+        if (self::DISABLE_MATCH_HOUR_START <= $hour && $hour < self::DISABLE_MATCH_HOUR_END) {
+			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_DISABLE_RECRUIT_TIME );
+			exit;
+        }
+
 		$oDb = new Db();
 		$oUser = new User( $oDb, $_SESSION["id"] );
 		$oLoginTeam = $oUser->getTeam();
@@ -433,6 +441,13 @@ class MatchController extends BaseController{
 		$oLoginTeam = $oUser->getTeam();
 		
 		$this->checkRecruitEnable( $_REQUEST["match_date"], $oLoginTeam->id );
+        
+        // check time
+        $hour = date('H', strtotime($_REQUEST["match_date"]));
+        if (self::DISABLE_MATCH_HOUR_START <= $hour && $hour < self::DISABLE_MATCH_HOUR_END) {
+			self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_DISABLE_RECRUIT_TIME );
+			exit;
+        }
 		
 		$dtMatchDate = date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) );
 
