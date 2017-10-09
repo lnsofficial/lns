@@ -271,7 +271,7 @@ class MatchController extends BaseController{
 		if( $oApplyTeamId ){
 			$oApplyTeam = new Teams( $oDb, $oApplyTeamId );
 			$oLastJoin = $oApplyTeam->getLastJoin( $oDb );
-			$oLastJoin->state = LastJoin::STATE_CANCEL;
+			$oLastJoin->state = TeamJoin::STATE_CANCEL;
 			$oLastJoin->save();
 		}
 		
