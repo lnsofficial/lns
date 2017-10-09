@@ -198,8 +198,8 @@ class MatchController extends BaseController{
 		if( date( 'Y-m-d H:i:s' ) < date( 'Y-m-d H:i:s', strtotime( $oMatch->match_date . " - 1 day" ) ) ){
 			// 現在日時が試合予定日時より1日以上前ならチェック
 			if( $oLatestLastJoin ){
-				$dtLastJoin = date($oLatestLastJoin->join_date);
-				if( date('Y-m-d H:i:s') < date('Y-m-d H:i:s', strtotime($oLatestLastJoin->join_date . " + 5 day") ) ){
+				$dtLastJoin = date($oLatestLastJoin->joined_at);
+				if( date('Y-m-d H:i:s') < date('Y-m-d H:i:s', strtotime($oLatestLastJoin->joined_at . " + 5 day") ) ){
 					if( date('Y-m-d H:i:s') < date('Y-m-d H:i:s', strtotime( $oMatch->recruit_start_date . " + 1 day") ) ){
 						self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_REGIST_INTERVAL );
 						exit;
@@ -269,9 +269,9 @@ class MatchController extends BaseController{
 		
 		// 参加者が居れば履歴のテーブル更新
 		if( $oApplyTeamId ){
-			$oApplyTeam = new Team( $oDb, $oApplyTeamId );
+			$oApplyTeam = new Teams( $oDb, $oApplyTeamId );
 			$oLastJoin = $oApplyTeam->getLastJoin( $oDb );
-			$oLastJoin->state = LastJoin::STATE_CANCEL;
+			$oLastJoin->state = TeamJoin::STATE_CANCEL;
 			$oLastJoin->save();
 		}
 		
