@@ -12,8 +12,8 @@ $feature_games = [];
 $from       = UtilTime::now();                                                                             // 現在
 $dest       = UtilTime::timeToStr( UtilTime::addSecond($from,  86400 * Match::FEATURE_GAME_DATE_BEFORE) ); // 10日後
 $db         = new Db();
-//$prepareSql = "SELECT * FROM matches WHERE state = ?                                                               ORDER BY match_date DESC LIMIT " . Match::FEATURE_GAME_COUNT;
-$prepareSql = "SELECT * FROM matches WHERE state = ? AND '" .$from. "' <= match_date AND match_date <= '".$dest."' ORDER BY match_date DESC LIMIT " . Match::FEATURE_GAME_COUNT;
+//$prepareSql = "SELECT * FROM matches WHERE state = ?                                                               ORDER BY match_date ASC LIMIT " . Match::FEATURE_GAME_COUNT;
+$prepareSql = "SELECT * FROM matches WHERE state = ? AND '" .$from. "' <= match_date AND match_date <= '".$dest."' ORDER BY match_date ASC LIMIT " . Match::FEATURE_GAME_COUNT;
 $bindParam  = [ Match::MATCH_STATE_MATCHED ];
 $result     = $db->executePrepare( $prepareSql, "i", $bindParam );
 
