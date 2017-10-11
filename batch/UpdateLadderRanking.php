@@ -194,7 +194,7 @@ function updateTeamLadderCancel( $oDb, $oWinTeam, $oLoseTeam ){
 	writeLog("[updateTeamLadder][TeamId:" . $oWinTeam->id . ",TeamName:" . $oWinTeam->team_name . "]+1 Point");
 	writeLog("[updateTeamLadder][TeamId:" . $oLoseTeam->id . ",TeamName:" . $oLoseTeam->team_name . "]-1 Point");
 	$oWinLadder->point += 1;
-	if( $oLoseLeague->rank == League::LEAGUE_HIRA && $oLoseLadder->point < 0 ){
+	if( $oLoseLeague->rank == League::LEAGUE_HIRA && $oLoseLadder->point < 1 ){
 		$oLoseLadder->point = 0;
 	} else {
 		$oLoseLadder->point -= 1;
