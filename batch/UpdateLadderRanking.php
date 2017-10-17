@@ -170,7 +170,7 @@ function updateTeamLadderNormal( $oDb, $oWinTeam, $oLoseTeam ){
 		writeLog("[updateTeamLadder][TeamId:" . $oWinTeam->id . ",TeamName:" . $oLoseTeam->team_name . "]Down");
 		writeLog("[updateTeamLadder][TeamId:" . $oWinTeam->id . ",TeamName:" . $oLoseTeam->team_name . "]LeagueId:" . $oLoseLeague->id);
 		$oLoseLadder->league_id = $oLoseLeague->id;
-		$oLoseLadder->point = 0;
+		$oLoseLadder->point = 2;
 	}
 	
 	$oWinLadder->save();
@@ -212,7 +212,7 @@ function updateTeamLadderCancel( $oDb, $oWinTeam, $oLoseTeam ){
 		writeLog("[updateTeamLadder][TeamId:" . $oWinTeam->id . ",TeamName:" . $oLoseTeam->team_name . "]Down");
 		writeLog("[updateTeamLadder][TeamId:" . $oWinTeam->id . ",TeamName:" . $oLoseTeam->team_name . "]LeagueId:" . $oLoseLeague->id);
 		$oLoseLadder->league_id = $oLoseLeague->id;
-		$oLoseLadder->point = 0;
+		$oLoseLadder->point = 2;
 	}
 	
 	$oWinLadder->save();
