@@ -31,17 +31,27 @@
           <p>希望するマッチング条件を設定してください</p>
           <form method="post" action="/Match/confirm" class="form-horizontal" onSubmit="return check()">
             <div class="form-group">
-               <div class="col-md-12"><label>対戦募集階級</label></div>
-               <div class="col-md-3">
-                 <select name="type" class="form-control">
-                   <option value="2">同ブロック以下</option>
-                   <option value="4">２つ上のブロック以下</option>
-                   <option value="3">１つ上のブロック以下</option>
-                   <option value="1">どこからでも</option>
-                 </select>
-               </div>
+              <div class="col-md-12"><label>募集チーム</label></div>
+              <div class="col-md-5">
+                <select class="form-control" id="team_id" name="team_id">
+                  {foreach from=$teams item=team key=id}
+                  <option value="{$team.id}">{$team.name}</option>
+                  {/foreach}
+                </select>
+                </div>
             </div>
-            <div class="form-group" style="margin-bottom:5px;">
+            <div class="form-group">
+              <div class="col-md-12"><label>対戦募集階級</label></div>
+              <div class="col-md-3">
+                <select name="type" class="form-control">
+                  <option value="2">同ブロック以下</option>
+                  <option value="4">２つ上のブロック以下</option>
+                  <option value="3">１つ上のブロック以下</option>
+                  <option value="1">どこからでも</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
               <div class="col-md-12"><label>対戦希望日時</label></div>
               <input type="hidden" id="match_date" name="match_date" value="">
               <div class="col-md-2"><input type="text" id="date" class="form-control datepicker" placeholder="2017/05/12"></div>
@@ -51,6 +61,8 @@
                   <option value="01">1時</option>
                   <option value="02">2時</option>
                   <option value="03">3時</option>
+                  <option value="04">4時</option>
+                  <option value="05">5時</option>
                   <option value="06">6時</option>
                   <option value="07">7時</option>
                   <option value="08">8時</option>
@@ -80,7 +92,6 @@
                 </select>
               </div>
             </div>
-            <div style="margin-bottom:15px">＊AM04:00〜AM05:45については試合開始時間を設定することは出来ません。</div>
             <div class="form-group">
               <div class="col-md-12"><label>リーグを盛り上げるために配信に協力していただきたく、よろしくお願いします！！</label></div>
               <div class="col-md-5">
