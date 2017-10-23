@@ -112,6 +112,9 @@ class MatchCheckinController extends BaseController{
         // 権限あるチームがこの試合に出てるチームか
         $bMatchTeam = false;
         foreach( $ahsAuthorizedTeamInfo as $asAuthorizedTeamInfo ){
+            if( $iTeamId != $asAuthorizedTeamInfo["id"] ){
+                continue;
+            }
             if( $iTeamId == $match->host_team_id || $iTeamId == $match->apply_team_id ){
                 $bMatchTeam = true;
                 break;
