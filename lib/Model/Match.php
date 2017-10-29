@@ -35,6 +35,9 @@ class Match extends Base{
 	
 	const FEATURE_GAME_COUNT       =  5; // topページの最新ゲームで最大何件表示させるか
 	const FEATURE_GAME_DATE_BEFORE = 10; // topページの最新ゲームを取るときに、何日前までの試合を対象とするか
+	
+	const DISABLE_MATCH_HOUR_START = 4;
+	const DISABLE_MATCH_HOUR_END   = 6;
   
 	public function getMatchLastDay( $oDb ){
 		$sSelectMatchSql = "SELECT * FROM " . self::MAIN_TABLE . " WHERE state IN(?,?) AND match_date BETWEEN DATE_FORMAT(NOW() - INTERVAL " . INTERVAL_BATCH_TIME . ", '%Y-%m-%d 06:00:00') AND DATE_FORMAT(NOW() , '%Y-%m-%d 06:00:00') ORDER BY match_date ASC";
