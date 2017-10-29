@@ -35,9 +35,6 @@ class Match extends Base{
 	
 	const FEATURE_GAME_COUNT       =  5; // topページの最新ゲームで最大何件表示させるか
 	const FEATURE_GAME_DATE_BEFORE = 10; // topページの最新ゲームを取るときに、何日前までの試合を対象とするか
-
-	const DISABLE_MATCH_HOUR_START = 4;
-	const DISABLE_MATCH_HOUR_END   = 6;
   
 	public function getMatchLastDay( $oDb ){
 		$sSelectMatchSql = "SELECT * FROM " . self::MAIN_TABLE . " WHERE state IN(?,?) AND match_date BETWEEN DATE_FORMAT(NOW() - INTERVAL " . INTERVAL_BATCH_TIME . ", '%Y-%m-%d 06:00:00') AND DATE_FORMAT(NOW() , '%Y-%m-%d 06:00:00') ORDER BY match_date ASC";
@@ -147,29 +144,35 @@ class Match extends Base{
 	// 試合に参加可能かチェック
 	public function enableJoin( $iHostRank, $iApplyRank ){
 	    $bEnableJoin = true;
-		switch( $this->type ){
-			case Match::MATCH_TYPE_ANY:
-				// 何もしない
-				break;
-			case Match::MATCH_TYPE_LESS_SAME:
-				// ホストのランクが自分のランクより下ならエラー
-				if( $iHostRank > $iApplyRank ){
-					$bEnableJoin = false;
-				}
-				break;
-			case Match::MATCH_TYPE_LESS_ONE_ON_THE_SAME:
-				// ホストのランクが自分のランクから2つ以下ならエラー
-				if( $iHostRank > $iApplyRank + 1 ){
-					$bEnableJoin = false;
-				}
-				break;
-			case Match::MATCH_TYPE_LESS_TWO_ON_THE_SAME:
-				// ホストのランクが自分のランクから2つ以下ならエラー
-				if( $iHostRank > $iApplyRank + 2 ){
-					$bEnableJoin = false;
-				}
-				break;
-		}
+	    
+	    // 試合時間を過ぎていないかチェック
+	    if( date( 'Y-m-d H:i:s' ) > date( 'Y-m-d H:i:s', strtotime( $this->match_date ) ) ){
+	        $bEnableJoin = false;
+	    } else {
+    		switch( $this->type ){
+    			case Match::MATCH_TYPE_ANY:
+    				// 何もしない
+    				break;
+    			case Match::MATCH_TYPE_LESS_SAME:
+    				// ホストのランクが自分のランクより下ならエラー
+    				if( $iHostRank > $iApplyRank ){
+    					$bEnableJoin = false;
+    				}
+    				break;
+    			case Match::MATCH_TYPE_LESS_ONE_ON_THE_SAME:
+    				// ホストのランクが自分のランクから2つ以下ならエラー
+    				if( $iHostRank > $iApplyRank + 1 ){
+    					$bEnableJoin = false;
+    				}
+    				break;
+    			case Match::MATCH_TYPE_LESS_TWO_ON_THE_SAME:
+    				// ホストのランクが自分のランクから2つ以下ならエラー
+    				if( $iHostRank > $iApplyRank + 2 ){
+    					$bEnableJoin = false;
+    				}
+    				break;
+    		}
+    	}
 		
 		return $bEnableJoin;
 	}
@@ -209,18 +212,5 @@ class Match extends Base{
         }
         
         return $enableCheckin;
-    }
-
-    public function checkRecruitMatchDate($match_date){
-        if (empty($match_date)) {
-            return false;
-        }
-        
-        $hour = date('H', strtotime($match_date));
-        if (self::DISABLE_MATCH_HOUR_START <= $hour && $hour < self::DISABLE_MATCH_HOUR_END) {
-            return false;
-        }
-
-        return true;
     }
 }
