@@ -28,10 +28,22 @@
           <ul class="nav side">
             <li role="presentation">募集開始日時</li>
             <li role="presentation">{$match_info->recruit_start_date}</li>
-            {if $show_join}<li role="presentation"><a href="" onClick="join(); return false;">試合を申し込む</a></li>{/if}
-            {if false}{if $show_checkin}<li role="presentation"><a href="" onClick="checkin(); return false;">チェックイン(確定/修正)する</a></li>{/if}{/if}
-            {if $show_cancel}<li role="presentation"><a href="" onClick="cancel(); return false;">試合をキャンセル</a></li>{/if}
-            {if $show_register_result}<li role="presentation"><a href="" onClick="registerResult(); return false;">試合結果を登録</a></li>{/if}
+            {if count( $teams )}
+              <li role="presentation">実行チーム</li>
+              <li role="presentation">
+                <select class="form-control" id="team_id" name="team_id">
+                  {foreach from=$teams item=team key=id}
+                    <option value="{$team.id}">{$team.name}</option>
+                  {/foreach}
+                </select>
+              </li>
+              {foreach from=$teams item=team key=id}
+                {if $team.join}<li role="presentation" name="team_{$team.id}"><a href="" onClick="join(); return false;">試合を申し込む</a></li>{/if}
+                {if false}{if $team.checkin}<li role="presentation" name="team_{$team.id}"><a href="" onClick="checkin(); return false;">チェックイン(確定/修正)する</a></li>{/if}{/if}
+                {if $team.cancel}<li role="presentation" name="team_{$team.id}"><a href="" onClick="cancel(); return false;">試合をキャンセル</a></li>{/if}
+                {if $team.result}<li role="presentation" name="team_{$team.id}"><a href="" onClick="registerResult(); return false;">試合結果を登録</a></li>{/if}
+              {/foreach}
+            {/if}
           </ul>
         </div>
         <div class="col-lg-9">
@@ -127,6 +139,26 @@
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
   <script src="/js/jquery-1.11.3.min.js"></script>
   <script type="text/javascript">
+    $(document).ready( function(){
+        selectTeam();
+    });
+    $(function(){
+        $('#team_id').change(function(){
+            selectTeam();
+        });
+    });
+    
+    function selectTeam(){
+        var team_id = $('#team_id').children();
+        for( var i=0; i<team_id.length; i++ ){
+            if( $('#team_id').val() == team_id.eq(i).val() ){
+                $('[name="team_' + team_id.eq(i).val() + '"]').show();
+            }else{
+                $('[name="team_' + team_id.eq(i).val() + '"]').hide();
+            }
+        }
+    }
+    
     function join(){
       if( window.confirm( '試合を申し込みます。' ) ){
         document.form1.action = "/Match/Join";

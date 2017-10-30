@@ -38,78 +38,51 @@ class MatchController extends BaseController{
         }
         
         $oLoginUser = new User( $oDb, $_SESSION["id"] );
-        $oLoginTeam = $oLoginUser->getTeam();
-        $oLoginTeamLadder = null;
-        $oLoginTeamLeague = null;
-        if( $oLoginTeam ){
-            $oLoginTeamLadder = $oLoginTeam->getCurrentLadder( $oDb );
-            if( $oLoginTeamLadder ){
-                $oLoginTeamLeague = new League( $oDb, $oLoginTeamLadder->league_id );
+        
+        $ahsAuthorizedTeamInfo = $oLoginUser->getAuthorizedTeam();
+        
+        $ahsTeamInfo = [];
+        
+        foreach( $ahsAuthorizedTeamInfo as $asAuthorizedTeamInfo ){
+            $oTeam = new Teams( $oDb, $asAuthorizedTeamInfo["id"] );
+            $oTeamLadder = $oTeam->getCurrentLadder( $oDb );
+            
+            $asTeamInfo = [];
+            $asTeamInfo["id"]       = $oTeam->id;
+            $asTeamInfo["name"]     = $oTeam->team_name;
+            $asTeamInfo["cancel"]   = false;
+            $asTeamInfo["join"]     = false;
+            $asTeamInfo["checkin"]  = false;
+            $asTeamInfo["result"]   = false;
+            
+            if( !$oTeamLadder ){
+                continue;
+            }else{
+                $oTeamLeague = new League( $oDb, $oTeamLadder->league_id );
             }
-        }
-
-        $showJoin           = false;
-        $showCheckin        = false; // チェックインできるのはとりあえずteam_memberのみで。
-        $showCancel         = false;
-        $showRegsiterResult = false;
-        
-        // TODO 確認とかも権限処理必要
-        $bAuthorized = $oLoginUser->isAuthorized();
-        
-        if( $bAuthorized && $oLoginTeamLadder ){
-            switch( $oLoginTeam->id ){
-                case $iHostTeamId:
-                    // ホスト
-                    switch( $oMatch->state ){
-                        case Match::MATCH_STATE_RECRUIT:
-                            // 募集中
-                            $showCancel = true;
-                            break;
-                        case Match::MATCH_STATE_MATCHED:
-                            // 試合結果登録待ち
-                            if( $oMatch->enableCancel() ){
-                                $showCancel = true;
-                            }
-                            $showCheckin = $oMatch->enableCheckin();
-                            $showRegsiterResult = $oMatch->expirationRegistMatchResult();
-                            break;
+            
+            switch( $oMatch->state ){
+                case Match::MATCH_STATE_RECRUIT:
+                    // 募集中
+                    if(  $oTeam->id == $iHostTeamId ){
+                        $asTeamInfo["cancel"] = true;
+                    } else {
+                        $asTeamInfo["join"]   = $oMatch->enableJoin( $oHostTeamLeague->rank, $oTeamLeague->rank );
                     }
                     break;
-                case $oMatch->apply_team_id:
-                    // ゲスト
-                    switch( $oMatch->state ){
-                        case Match::MATCH_STATE_RECRUIT:
-                            // 募集中
-                            $showJoin = true;
-                            break;
-                        case Match::MATCH_STATE_MATCHED:
-                            // 試合結果登録待ち
-                            if( $oMatch->enableCancel() ){
-                                $showCancel = true;
-                            }
-                            $showCheckin = $oMatch->enableCheckin();
-                            $showRegsiterResult = $oMatch->expirationRegistMatchResult();
-                            break;
+                case Match::MATCH_STATE_MATCHED:
+                    if( $oTeam->id == $iHostTeamId || $oTeam->id == $oMatch->apply_team_id ){
+                        if( $oMatch->enableCancel() ){
+                            $asTeamInfo["cancel"] = true;
+                        }
+                        $asTeamInfo["checkin"]  = $oMatch->enableCheckin();
+                        $asTeamInfo["result"]   = $oMatch->expirationRegistMatchResult();
                     }
                     break;
-                default:
-                    // それ以外
-                    switch( $oMatch->state ){
-                        case Match::MATCH_STATE_RECRUIT:
-                            // 募集中
-                            if( date( 'Y-m-d H:i:s' ) < date( 'Y-m-d H:i:s', strtotime( $oMatch->match_date ) ) ){
-                                $showJoin = $oMatch->enableJoin( $oHostTeamLeague->rank, $oLoginTeamLeague->rank );
-                            }
-                            break;
-                        case Match::MATCH_STATE_MATCHED:
-                            // 試合結果登録待ち
-                            break;
-                    }
-                    break;
-                    
             }
+            
+            $ahsTeamInfo[] = $asTeamInfo;
         }
-        
         
         $ahsHostCheckins  = MatchCheckin::getByMatchIdTeamId( $iMatchId, $oHostTeam->id );
         $ahsApplyCheckins = null;
@@ -122,20 +95,17 @@ class MatchController extends BaseController{
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
         
-        $smarty->assign( "match_info",           $oMatch );
-        $smarty->assign( "host_team_name",       $oHostTeam->team_name );
+        $smarty->assign( "match_info"           , $oMatch );
+        $smarty->assign( "teams"                , $ahsTeamInfo );
+        $smarty->assign( "host_team_name"       , $oHostTeam->team_name );
         if( $oApplyTeam ){
-            $smarty->assign( "apply_team_name",  $oApplyTeam->team_name );
+            $smarty->assign( "apply_team_name"  , $oApplyTeam->team_name );
         }
-        $smarty->assign( "show_join",            $showJoin );
-        $smarty->assign( "show_checkin",         $showCheckin );
-        $smarty->assign( "show_cancel",          $showCancel );
-        $smarty->assign( "show_register_result", $showRegsiterResult );
         if( isset( $ahsHostCheckins ) ){
-            $smarty->assign( "host_checkin",     $ahsHostCheckins );
+            $smarty->assign( "host_checkin"     , $ahsHostCheckins );
         }
         if( isset( $ahsApplyCheckins ) ){
-            $smarty->assign( "apply_checkin",    $ahsApplyCheckins );
+            $smarty->assign( "apply_checkin"    , $ahsApplyCheckins );
         }
         
         $smarty->display('Match/MatchDetail.tmpl');
@@ -159,20 +129,26 @@ class MatchController extends BaseController{
         }
         
         $oLoginUser = new User( $oDb, $_SESSION["id"] );
-        $oLoginTeam = $oLoginUser->getTeam();
         
-        $oHostTeam = new Teams( $oDb, $oMatch->host_team_id );
-        $oApplyTeam = new Teams( $oDb, $oLoginTeam->id );
+        $oApplyTeam = new Teams( $oDb, $_REQUEST["team_id"] );
+        $authorized = $oApplyTeam->isAuthorized( $oLoginUser->id );
+        if( !$authorized ){
+            self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_PERMISSION );
+            exit;
+        }
+        
+        $oHostTeam  = new Teams( $oDb, $oMatch->host_team_id );
         // TODO エラー処理
         // TODO その内チームに所属リーグの情報引っ張ってくる関数作成
         $oHostTeamLadder = $oHostTeam->getCurrentLadder( $oDb );
         $oApplyTeamLadder = $oApplyTeam->getCurrentLadder( $oDb );
-                // 申請側チームが「大会に参加」を押していないと、laddersに登録されていない。この場合はだめ！
-                if( empty($oApplyTeamLadder) )
-                {
-                    self::displayCommonScreen( ERR_HEAD_COMMON, "「大会に参加」後に試合募集への応募をしてください。" );
-                    exit;
-                }
+        
+        // 申請側チームが「大会に参加」を押していないと、laddersに登録されていない。この場合はだめ！
+        if( empty($oApplyTeamLadder) ){
+            self::displayCommonScreen( ERR_HEAD_COMMON, "「大会に参加」後に試合募集への応募をしてください。" );
+            exit;
+        }
+        
         $oHostTeamLeague = new League( $oDb, $oHostTeamLadder->league_id );
         $oApplyTeamLeague = new League( $oDb, $oApplyTeamLadder->league_id );
         
@@ -181,7 +157,6 @@ class MatchController extends BaseController{
             self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_HOST_EQ_GUEST );
             exit;
         }
-        
         
         $bEnableJoin = $oMatch->enableJoin( $oHostTeamLeague->rank, $oApplyTeamLeague->rank );
         if( !$bEnableJoin ){
@@ -236,8 +211,15 @@ class MatchController extends BaseController{
         
         $oDb = new Db();
         $oLoginUser = new User( $oDb, $_SESSION["id"] );
-        $oLoginTeam = $oLoginUser->getTeam();
-        $iCurTeamId = $oLoginTeam->id;
+        
+        $oApplyTeam = new Teams( $oDb, $_REQUEST["team_id"] );
+        $authorized = $oApplyTeam->isAuthorized( $oLoginUser->id );
+        if( !$authorized ){
+            self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_PERMISSION );
+            exit;
+        }
+        
+        $iApplyTeamId = $oApplyTeam->id;
         
         // マッチ情報取得
         $oMatch = new Match( $oDb, $iMatchId );
@@ -245,7 +227,7 @@ class MatchController extends BaseController{
         $oDb->beginTransaction();
         $oApplyTeamId = $oMatch->apply_team_id;
         
-        switch( $iCurTeamId ){
+        switch( $iApplyTeamId ){
             case $oMatch->host_team_id:
                 // キャンセルしたのがホストだったらキャンセルステータスに変更
                 $oMatch->state = Match::MATCH_STATE_CANCEL;
@@ -391,12 +373,11 @@ class MatchController extends BaseController{
             self::displayCommonScreen( ERR_HEAD_COMMON, ERR_COMMON_INPUT );
             exit;
         }
-        
         if (!Match::checkRecruitMatchDate($_REQUEST["match_date"])) {
             self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_DISABLE_RECRUIT_TIME );
             exit;
         }
-        
+
         $oDb = new Db();
         $oUser = new User( $oDb, $_SESSION["id"] );
         
@@ -462,6 +443,7 @@ class MatchController extends BaseController{
             self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_DISABLE_RECRUIT_TIME );
             exit;
         }
+        
         $dtMatchDate = date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) );
 
         self::displayMatchingConfirm($_REQUEST["type"], $dtMatchDate, $_REQUEST["stream"], $oTeam);

@@ -3,27 +3,29 @@ require_once( PATH_MODEL . "Base.php" );
 require_once( PATH_MODEL . "TeamStaffs.php" );
 require_once( PATH_MODEL . "TeamJoin.php" );
 require_once( PATH_MODEL . "Ladder.php" );
+require_once( PATH_MODEL . "TeamContact.php" );
+require_once( PATH_MODEL . "TeamOwner.php" );
 
 class Teams extends Base{
-	const MAIN_TABLE			= "teams";
-	const COL_ID				= "id";
-	
-	// カラム
-	const DATA	= [
-		"id"				=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
-		"user_id"			=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
-		"team_name"			=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
-		"team_name_kana"	=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => true	, "null" => false	],
-		"team_tag"			=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => false	, "null" => true	],
-		"team_tag_kana"		=> [ "type" => "varchar"	, "min" => 1	,"max" => 256			, "required" => false	, "null" => true	],
-		"status"		    => [ "type" => "tinyint"	, "min" => 0	,"max" => 127			, "required" => false	, "null" => false	],
-	];
+    const MAIN_TABLE            = "teams";
+    const COL_ID                = "id";
+    
+    // カラム
+    const DATA  = [
+        "id"                => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false   ],
+        "user_id"           => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false   ],
+        "team_name"         => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => true    , "null" => false   ],
+        "team_name_kana"    => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => true    , "null" => false   ],
+        "team_tag"          => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
+        "team_tag_kana"     => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
+        "status"            => [ "type" => "tinyint"    , "min" => 0    ,"max" => 127           , "required" => false   , "null" => false   ],
+    ];
 
 
-	const COUNT_MAX_MEMBER      = 10;        // チームに所属できるメンバーの最大数
-	const COUNT_MAX_CONTACT     =  1;        // チームに所属できる連絡者の最大数
-	const COUNT_MAX_STAFF       =  1;        // チームに所属できるアナリストの最大数
-	const COUNT_MIN_JOIN_LADDER =  5;        // 大会に参加可能な最低選手人数
+    const COUNT_MAX_MEMBER      = 10;        // チームに所属できるメンバーの最大数
+    const COUNT_MAX_CONTACT     =  1;        // チームに所属できる連絡者の最大数
+    const COUNT_MAX_STAFF       =  1;        // チームに所属できるアナリストの最大数
+    const COUNT_MIN_JOIN_LADDER =  5;        // 大会に参加可能な最低選手人数
 
 
     /**
@@ -106,74 +108,115 @@ class Teams extends Base{
 
         return $teams;
     }
-	// スタッフ取得
-	public function getStaff(){
-		$oDb = new Db();
-		
-		$ahsStaff = TeamStaffs::getList( $oDb, [ [ "column" => "team_id",  "type" => "varchar", "value" => $this->id ] ] );
-		
-		return $ahsStaff;
-	}
-	
-	public function getSearchList(){
-		$oDb = new Db();
-		
-		$ahsTeams = Teams::getList( $oDb, [ [ "column" => "status",  "type" => "int", "value" => 0 ] ] );
-		
-		return $ahsTeams;
-	}
-	
-	public function getLastJoin( $oDb ){
-		$sSelectLastJoin = "SELECT id FROM " . TeamJoin::MAIN_TABLE . " WHERE team_id = ? AND state = ? ORDER BY joined_at DESC";
-		$ahsParameter = [ $this->id, TeamJoin::STATE_ENABLE ];
-		
-		$oResult = $this->db->executePrepare( $sSelectLastJoin, "ii", $ahsParameter );
-		
-		$oLastJoin = null;
-		while( $row = $oResult->fetch_array() ){
-			$iLastJoinId = $row["id"];
-			$oLastJoin = new TeamJoin( $oDb, $iLastJoinId );
-			break;
-		}
-		
-		return $oLastJoin;
-	}
-	
-	public function getLeague( $oDb ){
-		$oLadder = $this->getCurrentLadder( $oDb );
-		$oLeague = null;
-		if( $oLadder ){
-		    $oLeague = new League( $oDb, $oLadder->league_id );
-		}
-		
-		return $oLeague;
-	}
-	
-	public function getCurrentLadder( $oDb ){
-		$sSelectLadder = "SELECT * FROM " . Ladder::MAIN_TABLE . " WHERE team_id = ? ORDER BY term DESC";
-		$ahsParameter = [ $this->id ];
-		$oResult = $oDb->executePrepare( $sSelectLadder, "i", $ahsParameter );
-		
-		$oLadder = null;
-		while( $row = $oResult->fetch_array() ){
-			$oLadder = new Ladder( $oDb, $row["id"] );
-			break;
-		}
-		
-		return $oLadder;
-	}
-	
-	public function getTeamMembers( $oDb ){
-	    $sSelectTeamMember = "SELECT tm.team_id,us.id,us.summoner_id,us.tier,us.rank FROM team_members tm LEFT JOIN users us ON tm.user_id = us.id  WHERE team_id = ?";
-	    $ahsParameter = [ $this->id ];
-	    
-	    $oResult = $oDb->executePrepare( $sSelectTeamMember, "i", $ahsParameter );
-	    
-	    $ahsTeamMembers = null;
-	    while( $row = $oResult->fetch_assoc() ){
-	        $ahsTeamMembers[] = $row;
-	    }
-	    
-	    return $ahsTeamMembers;
-	}
+    // スタッフ取得
+    public function getStaff(){
+        $oDb = new Db();
+        
+        $ahsStaff = TeamStaffs::getList( $oDb, [ [ "column" => "team_id",  "type" => "varchar", "value" => $this->id ] ] );
+        
+        return $ahsStaff;
+    }
+    
+    public function getSearchList(){
+        $oDb = new Db();
+        
+        $ahsTeams = Teams::getList( $oDb, [ [ "column" => "status",  "type" => "int", "value" => 0 ] ] );
+        
+        return $ahsTeams;
+    }
+    
+    public function getLastJoin( $oDb ){
+        $sSelectLastJoin = "SELECT id FROM " . TeamJoin::MAIN_TABLE . " WHERE team_id = ? AND state = ? ORDER BY joined_at DESC";
+        $ahsParameter = [ $this->id, TeamJoin::STATE_ENABLE ];
+        
+        $oResult = $this->db->executePrepare( $sSelectLastJoin, "ii", $ahsParameter );
+        
+        $oLastJoin = null;
+        while( $row = $oResult->fetch_array() ){
+            $iLastJoinId = $row["id"];
+            $oLastJoin = new TeamJoin( $oDb, $iLastJoinId );
+            break;
+        }
+        
+        return $oLastJoin;
+    }
+    
+    public function getLeague( $oDb ){
+        $oLadder = $this->getCurrentLadder( $oDb );
+        $oLeague = null;
+        if( $oLadder ){
+            $oLeague = new League( $oDb, $oLadder->league_id );
+        }
+        
+        return $oLeague;
+    }
+    
+    public function getCurrentLadder( $oDb ){
+        $sSelectLadder = "SELECT * FROM " . Ladder::MAIN_TABLE . " WHERE team_id = ? ORDER BY term DESC";
+        $ahsParameter = [ $this->id ];
+        $oResult = $oDb->executePrepare( $sSelectLadder, "i", $ahsParameter );
+        
+        $oLadder = null;
+        while( $row = $oResult->fetch_array() ){
+            $oLadder = new Ladder( $oDb, $row["id"] );
+            break;
+        }
+        
+        return $oLadder;
+    }
+    
+    public function getTeamMembers( $oDb ){
+        $sSelectTeamMember = "SELECT tm.team_id,us.id,us.summoner_id,us.tier,us.rank FROM team_members tm LEFT JOIN users us ON tm.user_id = us.id  WHERE team_id = ?";
+        $ahsParameter = [ $this->id ];
+        
+        $oResult = $oDb->executePrepare( $sSelectTeamMember, "i", $ahsParameter );
+        
+        $ahsTeamMembers = null;
+        while( $row = $oResult->fetch_assoc() ){
+            $ahsTeamMembers[] = $row;
+        }
+        
+        return $ahsTeamMembers;
+    }
+    
+    public function getTeamContact(){
+        $teamContact = null;
+        $db = new Db();
+        
+        $result = TeamContact::getList( $db, [ [ "column" => "team_id",  "type" => "int", "value" => $this->id ] ] );
+        
+        if( $result ){
+            $teamContact = new TeamContact( $db, $result[0]["id"] );
+        }
+        
+        return $teamContact;
+    }
+    
+    public function getTeamOwner(){
+        $teamContact = null;
+        $db = new Db();
+        
+        $result = TeamOwner::getList( $db, [ [ "column" => "team_id",  "type" => "int", "value" => $this->id ] ] );
+        if( $result ){
+            $teamOwner = new TeamOwner( $db, $result[0]["id"] );
+        }
+        
+        return $teamOwner;
+    }
+
+    public function isAuthorized( $userId ){
+        $authorized = false;
+        
+        $teamContact    = $this->getTeamContact();
+        if( $teamContact && $teamContact->user_id == $userId ){
+            $authorized = true;
+        }
+        
+        $teamOwner      = $this->getTeamOwner();
+        if( $teamOwner && $teamOwner->user_id == $userId ){
+            $authorized = true;
+        }
+        
+        return $authorized;
+    }
 }
