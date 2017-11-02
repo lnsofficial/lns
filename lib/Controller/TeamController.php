@@ -55,7 +55,7 @@ class TeamController extends BaseController{
 		
 		// DBに登録
         $team_id = self::insertTeam( $oDb, $user_id );
-		if( false === $team_id ){
+		if( !$team_id ){
 			self::displayError();
 			exit;
 		}
