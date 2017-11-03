@@ -176,12 +176,6 @@ class Base{
             }
         }
         
-        // IDは更新しないので消す
-        array_shift( $asColumn );
-        array_shift( $asValue );
-        array_shift( $asType );
-        array_shift( $asPlaceholder );
-        
         $sColumn        = implode( ",", $asColumn );
         $sPlaceholder   = implode( ",", $asPlaceholder );
         
