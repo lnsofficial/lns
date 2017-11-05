@@ -323,24 +323,8 @@ class MatchController extends BaseController{
         }
         
         $oUser = new User( $oDb, $_SESSION["id"] );
-        $oLoginTeam = $oUser->getTeam();
         
-        $bJoinedLadder = false;
-        $ahsAuthorizedTeamInfo = null;
-        $oLatestLastJoin = null;
-        if( $oLoginTeam ){
-            $oLatestLastJoin = $oLoginTeam->getLastJoin( $oDb );
-            $ahsUserInfo = User::info( $oUser->id );
-            
-            $ahsAuthorizedTeamInfo = $oUser->getAuthorizedTeam();
-            
-            foreach( $ahsAuthorizedTeamInfo as $asTeamInfo ){
-                if( $asTeamInfo["ladder"] ){
-                    $bJoinedLadder = true;
-                    break;
-                }
-            }
-        }
+        $ahsAuthorizedTeamInfo = $oUser->getAuthorizedTeam();
         
         $smarty = new Smarty();
         
@@ -348,10 +332,8 @@ class MatchController extends BaseController{
         $smarty->compile_dir  = PATH_TMPL_C;
         
         $smarty->assign( "match_recruit_list"   , $ahsMatchList );
-        $smarty->assign( "is_joined_ladder" , $bJoinedLadder );
-        if( $oLatestLastJoin ){
-            $smarty->assign( "last_join_date"   , $oLatestLastJoin->joined_at );
-        }
+        $smarty->assign( "teams"                , $ahsAuthorizedTeamInfo );
+        
         if( isset( $iState ) ){
             $smarty->assign( "state"            , $iState );
         }
