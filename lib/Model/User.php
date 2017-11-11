@@ -89,15 +89,28 @@ class User extends Base{
 	    $ahsUserInfo = self::info( $this->id );
 	    
 	    foreach( $ahsUserInfo['team_owners'] as $asOwnerTeam ){
-	        $ahsTeam[] = self::getTeamInfo($asOwnerTeam["team_id"]);
+	        $hsTeam = self::getTeamInfo($asOwnerTeam["team_id"]);
+	        $ahsTeam[ $hsTeam["id"] ] = $hsTeam;
 	    }
 	    foreach( $ahsUserInfo['team_contacts'] as $asContactTeam ){
-	        $ahsTeam[] = self::getTeamInfo($asContactTeam["team_id"]);
+	        $hsTeam = self::getTeamInfo($asContactTeam["team_id"]);
+	        $ahsTeam[ $hsTeam["id"] ] = $hsTeam;
 	    }
 	    
 		return $ahsTeam;
 	}
-	
+
+    public function isAuthorized(){
+        $bAuthorized = false;
+        $ahsAuthorizedTeamInfo = $this->getAuthorizedTeam();
+
+        if( count( $ahsAuthorizedTeamInfo ) > 0 ){
+            $bAuthorized = true;
+        }
+
+        return $bAuthorized;
+    }
+
 	private function getTeamInfo( $iTeamId ){
 	    $oDb = new Db();
 	    

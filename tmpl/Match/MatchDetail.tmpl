@@ -27,15 +27,27 @@
         <div class="col-lg-2 about-menu">
           <ul class="nav side">
             <li role="presentation">募集開始日時</li>
-            <li role="presentation">{$recruit_start_date}</li>
-            {if $show_join}<li role="presentation"><a href="" onClick="join(); return false;">試合を申し込む</a></li>{/if}
-            {if false}{if $show_checkin}<li role="presentation"><a href="" onClick="checkin(); return false;">チェックイン(確定/修正)する</a></li>{/if}{/if}
-            {if $show_cancel}<li role="presentation"><a href="" onClick="cancel(); return false;">試合をキャンセル</a></li>{/if}
-            {if $show_register_result}<li role="presentation"><a href="" onClick="registerResult(); return false;">試合結果を登録</a></li>{/if}
+            <li role="presentation">{$match_info->recruit_start_date}</li>
+            {if count( $teams )}
+              <li role="presentation">実行チーム</li>
+              <li role="presentation">
+                <select class="form-control" id="team_id" name="team_id">
+                  {foreach from=$teams item=team key=id}
+                    <option value="{$team.id}">{$team.name}</option>
+                  {/foreach}
+                </select>
+              </li>
+              {foreach from=$teams item=team key=id}
+                {if $team.join}<li role="presentation" name="team_{$team.id}"><a href="" onClick="join(); return false;">試合を申し込む</a></li>{/if}
+                {if false}{if $team.checkin}<li role="presentation" name="team_{$team.id}"><a href="" onClick="checkin(); return false;">チェックイン(確定/修正)する</a></li>{/if}{/if}
+                {if $team.cancel}<li role="presentation" name="team_{$team.id}"><a href="" onClick="cancel(); return false;">試合をキャンセル</a></li>{/if}
+                {if $team.result}<li role="presentation" name="team_{$team.id}"><a href="" onClick="registerResult(); return false;">試合結果を登録</a></li>{/if}
+              {/foreach}
+            {/if}
           </ul>
         </div>
         <div class="col-lg-9">
-          <input type="hidden" name="match_id" value="{$match_id}">
+          <input type="hidden" name="match_id" value="{$match_info->id}">
           <div class="form-group">
           </div>
           <h2>募集チーム</h2>
@@ -45,33 +57,80 @@
           <h2>募集条件</h2>
           <div class="form-group">
              <label for="leader">試合日時</label>
-             <input type="text" id="match_date" class="form-control datepicker" value="{$match_date}" disabled>
+             <input type="text" id="match_date" class="form-control datepicker" value="{$match_info->match_date}" disabled>
           </div>
           <div class="form-group">
              <label for="mail_address">ブロック指定</label>
              <select class="form-control" disabled>
-               <option {if $type == MATCH::MATCH_TYPE_ANY}selected{/if}>どこからでも</option>
-               <option {if $type == MATCH::MATCH_TYPE_LESS_TWO_ON_THE_SAME}selected{/if}>２つ上のブロック以下</option>
-               <option {if $type == MATCH::MATCH_TYPE_LESS_ONE_ON_THE_SAME}selected{/if}>１つ上のブロック以下</option>
-               <option {if $type == MATCH::MATCH_TYPE_LESS_SAME}selected{/if}>同ブロック以下</option>
+               <option {if $match_info->type == MATCH::MATCH_TYPE_ANY}selected{/if}>どこからでも</option>
+               <option {if $match_info->type == MATCH::MATCH_TYPE_LESS_TWO_ON_THE_SAME}selected{/if}>２つ上のブロック以下</option>
+               <option {if $match_info->type == MATCH::MATCH_TYPE_LESS_ONE_ON_THE_SAME}selected{/if}>１つ上のブロック以下</option>
+               <option {if $match_info->type == MATCH::MATCH_TYPE_LESS_SAME}selected{/if}>同ブロック以下</option>
              </select>
           </div>
           <div class="form-group">
              <label for="team_name">配信可否</label>
              <select class="form-control" disabled>
-               <option {if $stream}selected{/if}>配信を希望する</option>
-               <option {if !$stream}selected{/if}>配信を希望しない</option>
+               <option {if $match_info->stream}selected{/if}>配信を希望する</option>
+               <option {if !$match_info->stream}selected{/if}>配信を希望しない</option>
              </select>
           </div>
-          {if $image_path != ""}
+          {if $match_info->image_path != ""}
           <div class="form-group">
              <label for="team_name">試合結果画像</label>
-             <img class="img-thumbnail" src="/img/result/{$image_path}" width="30%" height="30%">
+             <img class="img-thumbnail" src="/img/result/{$match_info->image_path}" width="30%" height="30%">
           </div>
           {/if}
           <div class="form-group">
             ※試合結果は、試合日時後の朝6時までに登録してください
           </div>
+          {if false}
+          {if $match_info->state == MATCH::MATCH_STATE_MATCHED}
+          <h2>チェックイン状況</h2>
+          <div class="form-group">
+            <label for="team_name">{$host_team_name}</label>
+            <table  class="table-bordered">
+              <tr>
+                <th>サモナーネーム　</th>
+                <th>メインロール　</th>
+              </tr>
+              {foreach from=$host_checkin item=member key=member_id}
+              <tr>
+                <td>{$member.summoner_name}</td>
+                <td>
+                {if $member.main_role == 1}Top{/if}
+                {if $member.main_role == 2}Jungle{/if}
+                {if $member.main_role == 3}Mid{/if}
+                {if $member.main_role == 4}ADC{/if}
+                {if $member.main_role == 5}Support{/if}
+                </td>
+              </tr>
+              {/foreach}
+            </table>
+          </div>
+          <div class="form-group">
+            <label for="team_name">{$apply_team_name}</label>
+            <table  class="table-bordered">
+              <tr>
+                <th>サモナーネーム　</th>
+                <th>メインロール　</th>
+              </tr>
+              {foreach from=$apply_checkin item=member key=member_id}
+              <tr>
+                <td>{$member.summoner_name}</td>
+                <td>
+                {if $member.main_role == 1}Top{/if}
+                {if $member.main_role == 2}Jungle{/if}
+                {if $member.main_role == 3}Mid{/if}
+                {if $member.main_role == 4}ADC{/if}
+                {if $member.main_role == 5}Support{/if}
+                </td>
+              </tr>
+              {/foreach}
+            </table>
+          </div>
+          {/if}
+          {/if}
         </div>
       </div>
     </form>
@@ -80,6 +139,26 @@
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
   <script src="/js/jquery-1.11.3.min.js"></script>
   <script type="text/javascript">
+    $(document).ready( function(){
+        selectTeam();
+    });
+    $(function(){
+        $('#team_id').change(function(){
+            selectTeam();
+        });
+    });
+    
+    function selectTeam(){
+        var team_id = $('#team_id').children();
+        for( var i=0; i<team_id.length; i++ ){
+            if( $('#team_id').val() == team_id.eq(i).val() ){
+                $('[name="team_' + team_id.eq(i).val() + '"]').show();
+            }else{
+                $('[name="team_' + team_id.eq(i).val() + '"]').hide();
+            }
+        }
+    }
+    
     function join(){
       if( window.confirm( '試合を申し込みます。' ) ){
         document.form1.action = "/Match/Join";
@@ -88,7 +167,7 @@
     }
     function checkin(){
       if( window.confirm( '試合に参加するメンバーを確定させる手続きに入ります。' ) ){
-        document.form1.action = "/Match/Checkin_form";
+        document.form1.action = "/MatchCheckin/Form";
         document.form1.submit();
       }
     }

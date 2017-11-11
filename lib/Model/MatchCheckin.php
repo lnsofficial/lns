@@ -1,33 +1,28 @@
 <?php
 require_once( PATH_MODEL . "Base.php" );
+require_once( PATH_MODEL . "User.php" );
 
 class MatchCheckin extends Base
 {
-	const MAIN_TABLE			= "match_checkins";
-	const COL_ID				= "id";
+    const MAIN_TABLE    = "match_checkins";
+    const COL_ID        = "id";
 
-	// カラム
-	const DATA	= [
-		"id"				=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
-		"match_id"			=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
-		"team_id"			=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
-		"user_id"			=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
-
-		"summoner_id"		=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
-		"champion_id"		=> [ "type" => "int"		, "min" => 1	,"max" => 2147483647	, "required" => true	, "null" => false	],
-
-		"created_at"		=> [ "type" => "varchar"	, "min" => 0	,"max" => 65535			, "required" => true	, "null" => false	],
-		"updated_at"		=> [ "type" => "varchar"	, "min" => 0	,"max" => 65535			, "required" => true	, "null" => false	],
-	];
-
-
+    // カラム
+    const DATA	= [
+        "id"            => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false ],
+        "match_id"      => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false ],
+        "team_id"       => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false ],
+        "user_id"       => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false ],
+        "summoner_id"   => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false ],
+        "champion_id"   => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false ],
+        "created_at"    => [ "type" => "varchar"    , "min" => 0    ,"max" => 65535         , "required" => true    , "null" => false ],
+        "updated_at"    => [ "type" => "varchar"    , "min" => 0    ,"max" => 65535         , "required" => true    , "null" => false ],
+    ];
 
     /**
      * get○○系 ：複数レコード期待できるやつ
      * find○○系：単一レコード期待できるやつ
      */
-
-
 
     /**
      * // 3つ指定。
@@ -51,6 +46,7 @@ class MatchCheckin extends Base
 
 
     /**
+     * TODO モデル的にはマッチかチームのどっちかに入ってるべきな関数なのでその内移動
      * // チームのチェックイン一覧
      * 
      * @param  int                  $match_id               // matches.id
@@ -59,19 +55,22 @@ class MatchCheckin extends Base
      */
     static function getByMatchIdTeamId( $match_id, $team_id )
     {
-        $db = new Db();
-
-        $prepareSql = "SELECT * FROM " . static::MAIN_TABLE . " WHERE match_id = ? AND team_id = ?";
-        $bindParam  = [ $match_id, $team_id ];
-
-        $result = $db->executePrepare( $prepareSql, "ii", $bindParam );
-
-        $match_checkins = [];
-        while( $match_checkin = $result->fetch_assoc() )
-        {
-            $match_checkins[] = $match_checkin;
+        $oDb = new Db();
+        $ahsResult = static::getList(
+            $oDb,
+            [
+                [ "column" => "match_id",  "type" => "int", "value" => $match_id ],
+                [ "column" => "team_id",   "type" => "int", "value" => $team_id ]
+            ]
+        );
+        $ahsMatchCheckins = [];
+        foreach( $ahsResult as $hsResult ){
+            $oUser                      = new User( $oDb, $hsResult["user_id"] );
+            $hsResult["summoner_name"]  = $oUser->summoner_name;
+            $hsResult["main_role"]      = $oUser->main_role;
+            $ahsMatchCheckins[]         = $hsResult;
         }
 
-        return $match_checkins;
+        return $ahsMatchCheckins;
     }
 }

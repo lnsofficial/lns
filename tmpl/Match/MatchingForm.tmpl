@@ -31,15 +31,25 @@
           <p>希望するマッチング条件を設定してください</p>
           <form method="post" action="/Match/confirm" class="form-horizontal" onSubmit="return check()">
             <div class="form-group">
-               <div class="col-md-12"><label>対戦募集階級</label></div>
-               <div class="col-md-3">
-                 <select name="type" class="form-control">
-                   <option value="2">同ブロック以下</option>
-                   <option value="4">２つ上のブロック以下</option>
-                   <option value="3">１つ上のブロック以下</option>
-                   <option value="1">どこからでも</option>
-                 </select>
-               </div>
+              <div class="col-md-12"><label>募集チーム</label></div>
+              <div class="col-md-5">
+                <select class="form-control" id="team_id" name="team_id">
+                  {foreach from=$teams item=team key=id}
+                  <option value="{$team.id}">{$team.name}</option>
+                  {/foreach}
+                </select>
+                </div>
+            </div>
+            <div class="form-group">
+              <div class="col-md-12"><label>対戦募集階級</label></div>
+              <div class="col-md-3">
+                <select name="type" class="form-control">
+                  <option value="2">同ブロック以下</option>
+                  <option value="4">２つ上のブロック以下</option>
+                  <option value="3">１つ上のブロック以下</option>
+                  <option value="1">どこからでも</option>
+                </select>
+              </div>
             </div>
             <div class="form-group" style="margin-bottom:5px;">
               <div class="col-md-12"><label>対戦希望日時</label></div>

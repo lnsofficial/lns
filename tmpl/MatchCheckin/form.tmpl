@@ -32,12 +32,11 @@
       </div>
 
       <div class="col-lg-9">
-        <form name="form2" method="post" action="/Match/checkin_commit" onSubmit="return chkCheckin()">
+        <form name="form2" method="post" action="/MatchCheckin/commit" onSubmit="return chkCheckin()">
         <input type="hidden" name="match_id" value="{$match->id}" />
-        <input type="hidden" name="team_id"  value="" />
         
         <h2>チーム</h2>
-        <select class="form-control" id="team_list">
+        <select class="form-control" id="team_id" name="team_id">
           {foreach from=$teams item=team key=id}
           <option value="{$team.id}">{$team.name}</option>
           {/foreach}
@@ -85,20 +84,18 @@
         selectTeam();
     });
     $(function(){
-        $('#team_list').change(function(){
+        $('#team_id').change(function(){
             selectTeam();
         });
     });
     
     function selectTeam(){
-        var team_list = $('#team_list').children();
-        for( var i=0; i<team_list.length; i++ ){
-            console.log(team_list.eq(i).val());
-            if( $('#team_list').val() == team_list.eq(i).val() ){
-                $('[name="team_' + team_list.eq(i).val() + '"]').show();
-                $('[name="team_id"]').val(team_list.eq(i).val());
+        var team_id = $('#team_id').children();
+        for( var i=0; i<team_id.length; i++ ){
+            if( $('#team_id').val() == team_id.eq(i).val() ){
+                $('[name="team_' + team_id.eq(i).val() + '"]').show();
             }else{
-                $('[name="team_' + team_list.eq(i).val() + '"]').hide();
+                $('[name="team_' + team_id.eq(i).val() + '"]').hide();
             }
         }
     }

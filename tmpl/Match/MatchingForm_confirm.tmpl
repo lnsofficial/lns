@@ -28,6 +28,10 @@
         <p>こちらでよろしいでしょうか？</p>
         <table class="table">
           <tr>
+            <td>募集チーム</td>
+            <td>{$team->team_name}</td>
+          </tr>
+          <tr>
             <td>対戦募集階級</td>
             <td>
               {if $type == 1}
@@ -58,6 +62,7 @@
         </table>
         <div style="display:inline-flex;text-align:center;">
             <form method="post" action="commit">
+              <input type="hidden" name="team_id" value="{$team->id}">
               <input type="hidden" name="type" value="{$type}">
               <input type="hidden" name="match_date" value="{$match_date}">
               <input type="hidden" name="stream" value="{$stream}">
