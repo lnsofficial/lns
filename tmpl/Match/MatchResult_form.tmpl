@@ -35,6 +35,7 @@
           <h2>試合結果を登録</h2>
           <form method="post" action="/MatchResult/Confirm" onSubmit="return check()" enctype="multipart/form-data">
           <input type="hidden" name="match_id" value="{$match_id}">
+          <input type="hidden" name="team_id" value="{$team_id}">
           <div class="form-group">
             試合結果は勝利チームが登録を行ってください。
           </div>
