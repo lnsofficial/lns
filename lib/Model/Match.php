@@ -147,29 +147,35 @@ class Match extends Base{
 	// 試合に参加可能かチェック
 	public function enableJoin( $iHostRank, $iApplyRank ){
 	    $bEnableJoin = true;
-		switch( $this->type ){
-			case Match::MATCH_TYPE_ANY:
-				// 何もしない
-				break;
-			case Match::MATCH_TYPE_LESS_SAME:
-				// ホストのランクが自分のランクより下ならエラー
-				if( $iHostRank > $iApplyRank ){
-					$bEnableJoin = false;
-				}
-				break;
-			case Match::MATCH_TYPE_LESS_ONE_ON_THE_SAME:
-				// ホストのランクが自分のランクから2つ以下ならエラー
-				if( $iHostRank > $iApplyRank + 1 ){
-					$bEnableJoin = false;
-				}
-				break;
-			case Match::MATCH_TYPE_LESS_TWO_ON_THE_SAME:
-				// ホストのランクが自分のランクから2つ以下ならエラー
-				if( $iHostRank > $iApplyRank + 2 ){
-					$bEnableJoin = false;
-				}
-				break;
-		}
+	    
+	    // 試合時間を過ぎていないかチェック
+	    if( date( 'Y-m-d H:i:s' ) > date( 'Y-m-d H:i:s', strtotime( $this->match_date ) ) ){
+	        $bEnableJoin = false;
+	    } else {
+    		switch( $this->type ){
+    			case Match::MATCH_TYPE_ANY:
+    				// 何もしない
+    				break;
+    			case Match::MATCH_TYPE_LESS_SAME:
+    				// ホストのランクが自分のランクより下ならエラー
+    				if( $iHostRank > $iApplyRank ){
+    					$bEnableJoin = false;
+    				}
+    				break;
+    			case Match::MATCH_TYPE_LESS_ONE_ON_THE_SAME:
+    				// ホストのランクが自分のランクから2つ以下ならエラー
+    				if( $iHostRank > $iApplyRank + 1 ){
+    					$bEnableJoin = false;
+    				}
+    				break;
+    			case Match::MATCH_TYPE_LESS_TWO_ON_THE_SAME:
+    				// ホストのランクが自分のランクから2つ以下ならエラー
+    				if( $iHostRank > $iApplyRank + 2 ){
+    					$bEnableJoin = false;
+    				}
+    				break;
+    		}
+    	}
 		
 		return $bEnableJoin;
 	}
