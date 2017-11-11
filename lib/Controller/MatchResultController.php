@@ -20,8 +20,15 @@ class MatchResultController extends BaseController{
 		
 		$iMatchId = intval( $_REQUEST["match_id"] );
 		$oLoginUser = new User( $oDb, $_SESSION["id"] );
-		$oLoginTeam = $oLoginUser->getTeam();
-		$iCurTeamId = $oLoginTeam->id;
+        
+		$iCurTeamId = $_REQUEST["team_id"];
+        
+        $oApplyTeam = new Teams( $oDb, $iCurTeamId );
+        $authorized = $oApplyTeam->isAuthorized( $oLoginUser->id );
+        if( !$authorized ){
+            self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_PERMISSION );
+            exit;
+        }
 		
 		// マッチ情報取得
 		$oMatch = new Match( $oDb, $iMatchId );
@@ -47,6 +54,7 @@ class MatchResultController extends BaseController{
 		$smarty->compile_dir  = PATH_TMPL_C;
 		
 		$smarty->assign( "match_id", $iMatchId );
+		$smarty->assign( "team_id", $iCurTeamId );
 		$smarty->assign( "host_team_name", $oHostTeam->team_name );
 		$smarty->assign( "host_team_id", $oHostTeam->id );
 		$smarty->assign( "apply_team_name", $oApplyTeam->team_name );
@@ -65,8 +73,15 @@ class MatchResultController extends BaseController{
 		$iMatchId = intval( $_REQUEST["match_id"] );
 		$iWinnerTeamId = intval( $_REQUEST["winner_team"] );
 		$oLoginUser = new User( $oDb, $_SESSION["id"] );
-		$oLoginTeam = $oLoginUser->getTeam();
-		$iCurTeamId = $oLoginTeam->id;
+		
+		$iCurTeamId = $_REQUEST["team_id"];
+        
+        $oApplyTeam = new Teams( $oDb, $iCurTeamId );
+        $authorized = $oApplyTeam->isAuthorized( $oLoginUser->id );
+        if( !$authorized ){
+            self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_PERMISSION );
+            exit;
+        }
 		
 		// マッチ情報取得
 		$oMatch = new Match( $oDb, $iMatchId );
@@ -119,6 +134,7 @@ class MatchResultController extends BaseController{
 		$smarty->compile_dir  = PATH_TMPL_C;
 		
 		$smarty->assign( "match_id", $iMatchId );
+		$smarty->assign( "team_id", $iCurTeamId );
 		$smarty->assign( "winner_team_id", $iWinnerTeamId );
 		$smarty->assign( "winner_team_name", $oWinnerTeam->team_name );
 		$smarty->assign( "image_extension", $sExtension );
@@ -136,8 +152,16 @@ class MatchResultController extends BaseController{
 		$iMatchId = intval( $_REQUEST["match_id"] );
 		$iWinnerTeamId = intval( $_REQUEST["winner_team"] );
 		$oLoginUser = new User( $oDb, $_SESSION["id"] );
-		$oLoginTeam = $oLoginUser->getTeam();
-		$iCurTeamId = $oLoginTeam->id;
+        
+		$iCurTeamId = $_REQUEST["team_id"];
+        
+        $oApplyTeam = new Teams( $oDb, $iCurTeamId );
+        $authorized = $oApplyTeam->isAuthorized( $oLoginUser->id );
+        if( !$authorized ){
+            self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_PERMISSION );
+            exit;
+        }
+		
 		$sResultImageName = $_REQUEST["result_image_name"];
 		
 		// マッチ情報取得
