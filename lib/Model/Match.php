@@ -35,7 +35,7 @@ class Match extends Base{
 	
 	const FEATURE_GAME_COUNT       =  5; // topページの最新ゲームで最大何件表示させるか
 	const FEATURE_GAME_DATE_BEFORE = 10; // topページの最新ゲームを取るときに、何日前までの試合を対象とするか
-	
+
 	const DISABLE_MATCH_HOUR_START = 4;
 	const DISABLE_MATCH_HOUR_END   = 6;
   
@@ -215,5 +215,18 @@ class Match extends Base{
         }
         
         return $enableCheckin;
+    }
+
+    public function checkRecruitMatchDate($match_date){
+        if (empty($match_date)) {
+            return false;
+        }
+        
+        $hour = date('H', strtotime($match_date));
+        if (self::DISABLE_MATCH_HOUR_START <= $hour && $hour < self::DISABLE_MATCH_HOUR_END) {
+            return false;
+        }
+
+        return true;
     }
 }
