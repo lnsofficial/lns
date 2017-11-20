@@ -444,10 +444,10 @@ class MatchController extends BaseController{
     
     private function validation(){
         $bResult    = true;
-        if(!$_REQUEST["type"]){
+        if( empty( $_REQUEST["type"] ) ){
             $bResult = false;
         }
-        if(!$_REQUEST["match_date"]){
+        if( empty( $_REQUEST["match_date"] ) ){
             $bResult = false;
         } else {
             // 試合日時が現在日時より後の場合はエラー
@@ -455,7 +455,7 @@ class MatchController extends BaseController{
                 $bResult = false;
             }
         }
-        if(!$_REQUEST["deadline_date"]){
+        if( empty( $_REQUEST["deadline_date"] ) ){
             $bResult = false;
         } else {
             // 応募受付期限が現在日時より前、または試合日時より後の場合はエラー
