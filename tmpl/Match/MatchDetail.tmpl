@@ -59,10 +59,12 @@
              <label for="leader">試合日時</label>
              <input type="text" id="match_date" class="form-control datepicker" value="{$match_info->match_date}" disabled>
           </div>
+          {if $match_info->deadline_date}
           <div class="form-group">
              <label for="leader">応募受付期限</label>
              <input type="text" id="deadline_date" class="form-control datepicker" value="{$match_info->deadline_date}" disabled>
           </div>
+          {/if}
           <div class="form-group">
              <label for="mail_address">ブロック指定</label>
              <select class="form-control" disabled>

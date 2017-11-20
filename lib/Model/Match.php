@@ -152,7 +152,7 @@ class Match extends Base{
         // 試合時間を過ぎていないかチェック
         if( date( 'Y-m-d H:i:s' ) > date( 'Y-m-d H:i:s', strtotime( $this->match_date ) ) ){
             $bEnableJoin = false;
-        } elseif( date( 'Y-m-d H:i:s' ) > date( 'Y-m-d H:i:s', strtotime( $this->deadline_date ) ) ) {
+        } elseif( $this->deadline_date && date( 'Y-m-d H:i:s' ) > date( 'Y-m-d H:i:s', strtotime( $this->deadline_date ) ) ){
             // 応募受付期限を過ぎていないかチェック
             $bEnableJoin = false;
         } else {
