@@ -51,16 +51,18 @@
                 </select>
               </div>
             </div>
-            <div class="form-group" style="margin-bottom:5px;">
+            <div class="form-group">
               <div class="col-md-12"><label>対戦希望日時</label></div>
               <input type="hidden" id="match_date" name="match_date" value="">
-              <div class="col-md-2"><input type="text" id="date" class="form-control datepicker" placeholder="2017/05/12"></div>
+              <div class="col-md-2"><input type="text" id="match_day" class="form-control datepicker" placeholder="2017/05/12"></div>
               <div class="col-md-2">
-                <select id="hour" class="form-control">
+                <select id="match_hour" class="form-control">
                   <option value="00">0時</option>
                   <option value="01">1時</option>
                   <option value="02">2時</option>
                   <option value="03">3時</option>
+                  <option value="04">4時</option>
+                  <option value="05">5時</option>
                   <option value="06">6時</option>
                   <option value="07">7時</option>
                   <option value="08">8時</option>
@@ -82,7 +84,7 @@
                 </select>
               </div>
               <div class="col-md-2">
-                <select id="minute" class="form-control">
+                <select id="match_minute" class="form-control">
                   <option value="00">0分</option>
                   <option value="15">15分</option>
                   <option value="30">30分</option>
@@ -90,7 +92,47 @@
                 </select>
               </div>
             </div>
-            <div style="margin-bottom:15px">＊AM04:00〜AM05:45については試合開始時間を設定することは出来ません。</div>
+            <div class="form-group">
+              <div class="col-md-12"><label>応募受付期限</label></div>
+              <input type="hidden" id="deadline_date" name="deadline_date" value="">
+              <div class="col-md-2"><input type="text" id="deadline_day" class="form-control datepicker" placeholder="2017/05/12"></div>
+              <div class="col-md-2">
+                <select id="deadline_hour" class="form-control">
+                  <option value="00">0時</option>
+                  <option value="01">1時</option>
+                  <option value="02">2時</option>
+                  <option value="03">3時</option>
+                  <option value="04">4時</option>
+                  <option value="05">5時</option>
+                  <option value="06">6時</option>
+                  <option value="07">7時</option>
+                  <option value="08">8時</option>
+                  <option value="09">9時</option>
+                  <option value="10">10時</option>
+                  <option value="11">11時</option>
+                  <option value="12">12時</option>
+                  <option value="13">13時</option>
+                  <option value="14">14時</option>
+                  <option value="15">15時</option>
+                  <option value="16">16時</option>
+                  <option value="17">17時</option>
+                  <option value="18">18時</option>
+                  <option value="19">19時</option>
+                  <option value="20" selected>20時</option>
+                  <option value="21">21時</option>
+                  <option value="22">22時</option>
+                  <option value="23">23時</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select id="deadline_minute" class="form-control">
+                  <option value="00">0分</option>
+                  <option value="15">15分</option>
+                  <option value="30">30分</option>
+                  <option value="45">45分</option>
+                </select>
+              </div>
+            </div>
             <div class="form-group">
               <div class="col-md-12"><label>リーグを盛り上げるために配信に協力していただきたく、よろしくお願いします！！</label></div>
               <div class="col-md-5">
@@ -132,7 +174,8 @@
       if( result == false ){
         alert("項目が未入力です。");
       } else {
-        $("#match_date").val( $("#date").val() + " " + $("#hour").val() + ":" + $("#minute").val() + ":00" );
+        $("#match_date").val( $("#match_day").val() + " " + $("#match_hour").val() + ":" + $("#match_minute").val() + ":00" );
+        $("#deadline_date").val( $("#deadline_day").val() + " " + $("#deadline_hour").val() + ":" + $("#deadline_minute").val() + ":00" );
       }
       
       return result;
