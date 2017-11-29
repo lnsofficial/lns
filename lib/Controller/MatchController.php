@@ -375,6 +375,7 @@ class MatchController extends BaseController{
         $oMatch->host_team_id       = $iTeamId;
         $oMatch->match_date         = $_REQUEST["match_date"];
         $oMatch->recruit_start_date = date( 'Y-m-d H:i:s' );
+        $oMatch->deadline_date      = $_REQUEST["deadline_date"];
         $oMatch->type               = $_REQUEST["type"];
         $oMatch->stream             = $_REQUEST["stream"];
         $oMatch->state              = Match::MATCH_STATE_RECRUIT;
@@ -426,9 +427,10 @@ class MatchController extends BaseController{
             exit;
         }
         
-        $dtMatchDate = date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) );
+        $dtMatchDate    = date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) );
+        $dtDeadlineDate = date( 'Y-m-d H:i:s', strtotime( $_REQUEST["deadline_date"] ) );
 
-        self::displayMatchingConfirm($_REQUEST["type"], $dtMatchDate, $_REQUEST["stream"], $oTeam);
+        self::displayMatchingConfirm($_REQUEST["type"], $dtMatchDate, $_REQUEST["stream"], $oTeam, $dtDeadlineDate);
     }
 
     public function checkRecruitEnable( $sMatchDate, $host_id ){
@@ -442,14 +444,23 @@ class MatchController extends BaseController{
     
     private function validation(){
         $bResult    = true;
-        if(!$_REQUEST["type"]){
+        if( empty( $_REQUEST["type"] ) ){
             $bResult = false;
         }
-        if(!$_REQUEST["match_date"]){
+        if( empty( $_REQUEST["match_date"] ) ){
             $bResult = false;
         } else {
             // 試合日時が現在日時より後の場合はエラー
             if( date( 'Y-m-d H:i:s' ) > date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) ) ){
+                $bResult = false;
+            }
+        }
+        if( empty( $_REQUEST["deadline_date"] ) ){
+            $bResult = false;
+        } else {
+            // 応募受付期限が現在日時より前、または試合日時より後の場合はエラー
+            if( ( date( 'Y-m-d H:i:s' ) > date( 'Y-m-d H:i:s', strtotime( $_REQUEST["deadline_date"] ) ) ) || 
+                ( date( 'Y-m-d H:i:s', strtotime( $_REQUEST["deadline_date"] ) ) > date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) ) ) ){
                 $bResult = false;
             }
         }
@@ -490,15 +501,16 @@ class MatchController extends BaseController{
         $smarty->display('Match/MatchingForm.tmpl');
     }
     
-    public function displayMatchingConfirm($type, $match_date, $stream, $oTeam){
+    public function displayMatchingConfirm($type, $match_date, $stream, $oTeam, $deadline_date){
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
 
-        $smarty->assign("team",       $oTeam);
-        $smarty->assign("type",       $type);
-        $smarty->assign("match_date", $match_date);
-        $smarty->assign("stream",     $stream);
+        $smarty->assign("team",             $oTeam);
+        $smarty->assign("type",             $type);
+        $smarty->assign("match_date",       $match_date);
+        $smarty->assign("deadline_date",    $deadline_date);
+        $smarty->assign("stream",           $stream);
 
         $smarty->display('Match/MatchingForm_confirm.tmpl');
     }
