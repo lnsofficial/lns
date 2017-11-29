@@ -1,6 +1,6 @@
 ﻿@charset "utf-8";
 .header-image {
-	background-image: url(../img/AhriSuits_season3_end.jpg);
+	background-image: url(../img/AhriSuits.jpg);
 	background-repeat: no-repeat;
 	background-size: 45
 # auto;
@@ -14,7 +14,7 @@
 	border-bottom: 4px solid #00CCCC;
 }
 .header-image-jinx {
-	background-image: url(../img/JinxSuits2_season3_end.jpg);
+	background-image: url(../img/JinxSuits2.jpg);
 	background-repeat: no-repeat;
 	background-size: 45
 # auto;
@@ -28,7 +28,7 @@
 	border-bottom: 4px solid #00CCCC;
 }
 .header-image-teemo {
-	background-image: url(../img/Deadline_Teemo_season3_end.jpg);
+	background-image: url(../img/Deadline_Teemo.jpg);
 	background-repeat: no-repeat;
 	background-size: 45
 # auto;
@@ -42,7 +42,7 @@
 	border-bottom: 4px solid #00CCCC;
 }
 .header-image-anie {
-	background-image: url(../img/AnieSuits_season3_end.jpg);
+	background-image: url(../img/AnieSuits.jpg);
 	background-repeat: no-repeat;
 	background-size: 45
 # auto;
