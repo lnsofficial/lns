@@ -42,3 +42,6 @@
 	define( "ERR_MATCH_OVER_RESULT_REGIST"	, "試合結果の登録可能時間を過ぎているため、登録できません" );
 	define( "ERR_MATCH_DISABLE_RECRUIT_TIME", "試合募集不可時間のため、登録できません" );
 	define( "ERR_MATCH_WINNER_NOT_PART"		, "勝者が参加チームのどちらでもありません" );
+
+    // データ
+	define( "LEAGUE_END_DATE" , "2017-12-04 00:00:00" );

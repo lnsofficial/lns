@@ -454,6 +454,11 @@ class MatchController extends BaseController{
             if( date( 'Y-m-d H:i:s' ) > date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) ) ){
                 $bResult = false;
             }
+
+            // 試合日時が終了日より後だったらエラー
+            if( date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) ) >= LEAGUE_END_DATE ){
+                $bResult = false;
+            }
         }
         if( empty( $_REQUEST["deadline_date"] ) ){
             $bResult = false;
