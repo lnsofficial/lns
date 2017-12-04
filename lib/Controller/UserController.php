@@ -13,6 +13,13 @@ class UserController extends BaseController{
         $smarty->compile_dir  = PATH_TMPL_C;
         $smarty->display('User/form.tmpl');
     }
+
+    public function displayBlockUserForm() {
+        $smarty = new Smarty();
+        $smarty->template_dir = PATH_TMPL;
+        $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->display('User/block_form.tmpl');
+    }
     
     public function editForm(){
         session_set_save_handler( new MysqlSessionHandler() );
@@ -261,12 +268,23 @@ class UserController extends BaseController{
     public function form(){
         session_set_save_handler( new MysqlSessionHandler() );
         require_unlogined_session();
+        
+        if ( BLOCK_USER_REGISTER ) {
+            self::displayBlockUserForm();
+            exit;
+        }
+
         self::displayUserForm();
     }
 
     public function confirm(){
         session_set_save_handler( new MysqlSessionHandler() );
         require_unlogined_session();
+
+        if ( BLOCK_USER_REGISTER ) {
+            self::displayBlockUserForm();
+            exit;
+        }
         
         $sErrorMessage = "";
         // バリデーション（今のとこ必須チェックだけ）
@@ -309,6 +327,11 @@ class UserController extends BaseController{
     public function register(){
         session_set_save_handler( new MysqlSessionHandler() );
         require_unlogined_session();
+
+        if ( BLOCK_USER_REGISTER ) {
+            self::displayBlockUserForm();
+            exit;
+        }
         
         if( !self::checkRequire() ){
             self::displayError();
