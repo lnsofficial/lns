@@ -38,7 +38,7 @@
           <li role="presentation"><a href="/Team/apply/?team_id={$team_id}&type=3">アナリスト申請</a></li>
           {/if}
           {if $isThisTeamEnableJoinLadder }
-          <li role="presentation"><a href="/Ladder/Join/?team_id={$team_id}">大会へ参加</a></li>
+          <!-- <li role="presentation"><a href="/Ladder/Join/?team_id={$team_id}">大会へ参加</a></li> -->
           {/if}
           {/if}
         </ul>
@@ -84,7 +84,8 @@
             </tr>
           {/foreach}
         </table>
-        <p>メンバー全員の情報を運営が確認次第、大会への参加が可能となります。</p>
+        <p>メンバー全員の情報を運営が確認次第、<s>大会への参加が可能</s>となります。</p>
+        <p style="color:red">大会への参加は次のSeasonをお待ち下さい</p>
         <p>確認状況がエラーの場合、サモナーネームを誤って登録している可能性があります。</p>
 
         <h2>代表者</h2>

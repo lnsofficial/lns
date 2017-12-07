@@ -45,3 +45,4 @@
 
     // データ
 	define( "LEAGUE_END_DATE" , "2017-12-04 00:00:00" );
+	define( "BLOCK_USER_REGISTER" , true );
