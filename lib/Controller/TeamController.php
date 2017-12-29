@@ -690,6 +690,11 @@ class TeamController extends BaseController{
                     self::displayError();
                     exit;
                 }
+                // 代表だったら脱退不可
+                if( $ahsTeamMemberInfo["owner"] ){
+                    self::displayError();
+                    exit;
+                }
                 
                 $ahsTeamMemberInfo["member"]->delete();
                 break;
