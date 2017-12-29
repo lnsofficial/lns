@@ -191,9 +191,7 @@ class Base{
     }
     
     public function delete(){
-        // IDは更新しないので消す
         $id = static::COL_ID;
-        
         $sDeleteSql = "DELETE FROM " . static::MAIN_TABLE . " WHERE " . $id . " = ?";
         
         $asValue[]  = $this->$id;
