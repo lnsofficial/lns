@@ -243,19 +243,25 @@ class TeamController extends BaseController{
         $smarty->assign( "team"             , $oTeam );
         $smarty->assign( "logo_file"        , $logo_file );
         if( isset( $user ) ){
-            $smarty->assign( "user"      , $user );
+            $smarty->assign( "user"         , $user );
+            
+            $ahsTeamMemberInfo = $oTeam->getTeamMemberInfoById( $user_id );
+            
+            $isThisTeamMember       = !empty( $ahsTeamMemberInfo["member"] );
             $isThisTeamContact      = count( array_filter($user['team_contacts'],function($item)use($team_id){ return $item['team_id']==$team_id; }) );
             $isThisTeamStaff        = count( array_filter($user['team_staffs'],  function($item)use($team_id){ return $item['team_id']==$team_id; }) );
             $isTeamMemberApply      = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_MEMBER; }) );
             $isThisTeamContactApply = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_CONTACT && $item['team_id']==$team_id; }) );
             $isThisTeamStaffApply   = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_STAFF   && $item['team_id']==$team_id; }) );
-            $smarty->assign( "isThisTeamContact"      , $isThisTeamContact );
-            $smarty->assign( "isThisTeamStaff"        , $isThisTeamStaff );
-            $smarty->assign( "isTeamMemberApply"      , $isTeamMemberApply );
-            $smarty->assign( "isThisTeamContactApply" , $isThisTeamContactApply );
-            $smarty->assign( "isThisTeamStaffApply"   , $isThisTeamStaffApply );
-            $smarty->assign( "isThisTeamEnableJoinLadder", $isThisTeamEnableJoinLadder );
-            $smarty->assign( "isThisTeamJoinedLadder", $isThisTeamJoinedLadder );
+            
+            $smarty->assign( "isThisTeamMember"             , $isThisTeamMember );
+            $smarty->assign( "isThisTeamContact"            , $isThisTeamContact );
+            $smarty->assign( "isThisTeamStaff"              , $isThisTeamStaff );
+            $smarty->assign( "isTeamMemberApply"            , $isTeamMemberApply );
+            $smarty->assign( "isThisTeamContactApply"       , $isThisTeamContactApply );
+            $smarty->assign( "isThisTeamStaffApply"         , $isThisTeamStaffApply );
+            $smarty->assign( "isThisTeamEnableJoinLadder"   , $isThisTeamEnableJoinLadder );
+            $smarty->assign( "isThisTeamJoinedLadder"       , $isThisTeamJoinedLadder );
         }
 
         $smarty->display('Team/TeamDetail.tmpl');
@@ -690,8 +696,9 @@ class TeamController extends BaseController{
                     self::displayError();
                     exit;
                 }
+                
                 // 代表だったら脱退不可
-                if( $ahsTeamMemberInfo["owner"] ){
+                if( !empty( $ahsTeamMemberInfo["owner"] ) ){
                     self::displayError();
                     exit;
                 }
