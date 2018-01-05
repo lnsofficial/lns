@@ -189,4 +189,17 @@ class Base{
         $this->$pk = $this->db->getLastInsertId();
         return $oResult;
     }
+    
+    public function delete(){
+        $id = static::COL_ID;
+        $sDeleteSql = "DELETE FROM " . static::MAIN_TABLE . " WHERE " . $id . " = ?";
+        
+        $asValue[]  = $this->$id;
+        $asType[]   = "i";
+        $sType      = implode( $asType );
+        
+        $oResult = $this->db->executePrepare( $sDeleteSql, $sType, $asValue );
+        
+        return $oResult;
+    }
 }
