@@ -40,9 +40,11 @@
           {elseif !$isThisTeamStaff && !$isThisTeamStaffApply && count($team_staffs) < Teams::COUNT_MAX_STAFF}
           <li role="presentation"><a href="/Team/apply/?team_id={$team->id}&type=3">アナリスト申請</a></li>
           {/if}
+{if false}
           {if $user.id == $team_owner->id}
           <li role="presentation"><a href="/Team/delete?team_id={$team->id}" onclick="return chkDelete()">チーム倒産</a></li>
           {/if}
+{/if}
           {if $isThisTeamEnableJoinLadder }
           <li role="presentation"><a href="/Ladder/Join/?team_id={$team->id}">大会へ参加</a></li>
           {/if}
