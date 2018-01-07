@@ -26,17 +26,17 @@
           {if isset($user)}
           <li role="presentation">チームへ参加</li>
           {if $isThisTeamMember && $user.id != $team_owner->id}
-          <li role="presentation"><a href="/Team/leave/?team_id={$team->id}&type=1" onclick="return chkLeave()">選手脱退</a></li>
+          <li role="presentation"><a href="/Team/leave/?team_id={$team->id}&type=1" onclick="return chkLeave(1)">選手脱退</a></li>
           {elseif !$user['team_member'] && !$isTeamMemberApply && count($team_members) < Teams::COUNT_MAX_MEMBER}
           <li role="presentation"><a href="/Team/apply/?team_id={$team->id}&type=1">選手申請</a></li>
           {/if}
           {if $isThisTeamContact}
-          <li role="presentation"><a href="/Team/leave/?team_id={$team->id}&type=2" onclick="return chkLeave()">連絡係脱退</a></li>
+          <li role="presentation"><a href="/Team/leave/?team_id={$team->id}&type=2" onclick="return chkLeave(2)">連絡係脱退</a></li>
           {elseif !$isThisTeamContact && !$isThisTeamContactApply && count($team_contacts) < Teams::COUNT_MAX_CONTACT}
           <li role="presentation"><a href="/Team/apply/?team_id={$team->id}&type=2">連絡係申請</a></li>
           {/if}
           {if $isThisTeamStaff}
-          <li role="presentation"><a href="/Team/leave/?team_id={$team->id}&type=3" onclick="return chkLeave()">アナリスト脱退</a></li>
+          <li role="presentation"><a href="/Team/leave/?team_id={$team->id}&type=3" onclick="return chkLeave(3)">アナリスト脱退</a></li>
           {elseif !$isThisTeamStaff && !$isThisTeamStaffApply && count($team_staffs) < Teams::COUNT_MAX_STAFF}
           <li role="presentation"><a href="/Team/apply/?team_id={$team->id}&type=3">アナリスト申請</a></li>
           {/if}
@@ -244,8 +244,22 @@
         }
     }
     
-    function chkLeave(){
-        return confirm("チームから脱退します。よろしいですか？");
+    function chkLeave(type){
+        position = "";
+        switch( type ){
+            case 1:
+                position = "選手";
+                break;
+            case 2:
+                position = "連絡係";
+                break;
+            case 3:
+                position = "アナリスト";
+                break;
+            default:
+                break;
+        }
+        return confirm( position + "を辞職します。よろしいですか？" );
     }
     function chkDelete(){
         return confirm("チームを削除します。よろしいですか？");
