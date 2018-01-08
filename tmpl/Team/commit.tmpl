@@ -30,9 +30,7 @@
           <h2>チーム作成完了</h2>
           <p>チームを作成しました。</p>
 
-          <form method="post" action="/Team/detail/{$team_id}" class="form-horizontal">
-            <button type="submit" class="btn btn-default">チーム詳細画面へ</button>
-          </form>
+          <button class="btn btn-default" onClick="location.href='/Team/detail/{$team_id}'">チーム詳細画面へ</button>
 
         </div>
       </div>

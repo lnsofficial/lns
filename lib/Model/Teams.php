@@ -219,4 +219,58 @@ class Teams extends Base{
         
         return $authorized;
     }
+    
+    public function getTeamMemberInfoById( $user_id ){
+        $ahsMemberInfo = [];
+        
+        // オーナーから取得
+        $ahsOwnerParameter = [
+            [ "column" => "team_id",  "type" => "int", "value" => $this->id ],
+            [ "column" => "user_id",  "type" => "int", "value" => $user_id ],
+        ];
+        $ownerResult = TeamOwner::getList( $this->db, $ahsOwnerParameter );
+        
+        if( $ownerResult ){
+            $teamOwner = new TeamOwner( $this->db, $ownerResult[0]["id"] );
+            $ahsMemberInfo["owner"] = $teamOwner;
+        }
+        
+        // メンバーから取得
+        $ahsMemberParameter = [
+            [ "column" => "team_id",  "type" => "int", "value" => $this->id ],
+            [ "column" => "user_id",  "type" => "int", "value" => $user_id ],
+        ];
+        $memberResult = TeamMembers::getList( $this->db, $ahsMemberParameter );
+        
+        if( $memberResult ){
+            $teamMember = new TeamMembers( $this->db, $memberResult[0]["id"] );
+            $ahsMemberInfo["member"] = $teamMember;
+        }
+        
+        // アナリストから取得
+        $ahsStaffParameter = [
+            [ "column" => "team_id",  "type" => "int", "value" => $this->id ],
+            [ "column" => "user_id",  "type" => "int", "value" => $user_id ],
+        ];
+        $staffResult = TeamStaffs::getList( $this->db, $ahsStaffParameter );
+        
+        if( $staffResult ){
+            $teamStaff = new TeamStaffs( $this->db, $staffResult[0]["id"] );
+            $ahsMemberInfo["staff"] = $teamStaff;
+        }
+        
+        // 連絡先から取得
+        $ahsContactParameter = [
+            [ "column" => "team_id",  "type" => "int", "value" => $this->id ],
+            [ "column" => "user_id",  "type" => "int", "value" => $user_id ],
+        ];
+        $contactResult = TeamContact::getList( $this->db, $ahsContactParameter );
+        
+        if( $contactResult ){
+            $teamContact = new TeamContact( $this->db, $contactResult[0]["id"] );
+            $ahsMemberInfo["contact"] = $teamContact;
+        }
+        
+        return $ahsMemberInfo;
+    }
 }
