@@ -95,6 +95,7 @@ class TeamController extends BaseController{
         $oTeams->team_name_kana = $_REQUEST["inputTeamNmKana"];
         $oTeams->team_tag = $_REQUEST["inputTeamTag"];
         $oTeams->team_tag_kana = $_REQUEST["inputTeamTagKana"];
+        $oTeams->comment = $_REQUEST["inputComment"];
         $oTeams->save();
     
         return $oTeams->id;
@@ -121,11 +122,13 @@ class TeamController extends BaseController{
         
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         
         $smarty->assign("inputTeamNm", $_REQUEST["inputTeamNm"]);
         $smarty->assign("inputTeamNmKana", $_REQUEST["inputTeamNmKana"]);
         $smarty->assign("inputTeamTag", $_REQUEST["inputTeamTag"]);
         $smarty->assign("inputTeamTagKana", $_REQUEST["inputTeamTagKana"]);
+        $smarty->assign("inputComment", $_REQUEST["inputComment"]);
         
         $smarty->display('Team/confirm.tmpl');
     }
@@ -134,6 +137,8 @@ class TeamController extends BaseController{
         
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
+        
         $smarty->assign("inputTeamNm", $_REQUEST["inputTeamNm"]);
         $smarty->assign("inputTeamNmKana", $_REQUEST["inputTeamNmKana"]);
         $smarty->assign("inputTeamTag", $_REQUEST["inputTeamTag"]);
@@ -149,6 +154,7 @@ class TeamController extends BaseController{
         
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         
         $smarty->display('TeamRegister_err.tmpl');
     }
@@ -171,6 +177,8 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
+        
         $smarty->assign("error", $error);
         $smarty->display('commonError.tmpl');
     }
@@ -234,6 +242,9 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
+        $smarty->default_modifiers[] = 'nl2br';
+        
         $smarty->assign( "login"            , $bLogin );
         $smarty->assign( "team_members"     , $team_members );
         $smarty->assign( "team_owner"       , $team_owner );
@@ -284,6 +295,7 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         $smarty->display('Team/form.tmpl');
     }
     
@@ -301,6 +313,7 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         $smarty->assign( "team_list" , $aoTeamList );
         $smarty->assign( "team", $oTeam );
         
@@ -386,6 +399,7 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         $smarty->assign( "user_team_apply"	, $user_team_apply );
         $smarty->display('Team/apply_complete.tmpl');
     }
@@ -461,6 +475,7 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         $smarty->assign( "user_team_apply"	, $user_team_apply );
         $smarty->display('Team/apply_accept.tmpl');
     }
@@ -655,6 +670,7 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         $smarty->assign( "user_team_apply"	, $user_team_apply );
         $smarty->display('Team/apply_deny.tmpl');
     }
@@ -735,6 +751,7 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         $smarty->assign( "team_id"  , $team_id );
         $smarty->assign( "type"     , $type );
         $smarty->display('Team/TeamLeave_complete.tmpl');
@@ -782,6 +799,7 @@ class TeamController extends BaseController{
         
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         
         $smarty->assign( "logo_file" , $logo_file);
         $smarty->display('Team/LogoUploaded.tmpl');
