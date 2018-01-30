@@ -34,8 +34,10 @@ class UserController extends BaseController{
         $smarty->compile_dir  = PATH_TMPL_C;
         
         $smarty->assign("summoner_name", $oUser->summoner_name );
+        $smarty->assign("summoner_name_kana", $oUser->summoner_name_kana );
         $smarty->assign("main_role", $oUser->main_role );
         $smarty->assign("discord_id", $oUser->discord_id );
+        $smarty->assign("comment", $oUser->comment );
         
         $smarty->display('User/edit_form.tmpl');
     }
@@ -55,6 +57,9 @@ class UserController extends BaseController{
         }
         if( !$_REQUEST["summoner_name"] ){
             $sErrorMessage = "サモナー名が空です";
+        }
+        if( !$_REQUEST["summoner_name_kana"] ){
+            $sErrorMessage = "サモナー名（かな）が空です";
         }
         
         // DiscordIDの重複チェック
@@ -81,8 +86,10 @@ class UserController extends BaseController{
             
             $smarty->assign("error_message", $sErrorMessage);
             $smarty->assign("summoner_name", $_REQUEST["summoner_name"]);
+            $smarty->assign("summoner_name_kana", $_REQUEST["summoner_name_kana"]);
             $smarty->assign("main_role", $_REQUEST["main_role"]);
             $smarty->assign("discord_id", $_REQUEST["discord_id"]);
+            $smarty->assign("comment", $_REQUEST["comment"]);
             
             $smarty->display('User/edit_form.tmpl');
         } else {
@@ -106,6 +113,10 @@ class UserController extends BaseController{
             exit;
         }
         if( !$_REQUEST["summoner_name"] ){
+            self::displayError();
+            exit;
+        }
+        if( !$_REQUEST["summoner_name_kana"] ){
             self::displayError();
             exit;
         }
@@ -136,8 +147,10 @@ class UserController extends BaseController{
             
             $smarty->assign("error_message", $sErrorMessage);
             $smarty->assign("summoner_name", $_REQUEST["summoner_name"]);
+            $smarty->assign("summoner_name_kana", $_REQUEST["summoner_name_kana"]);
             $smarty->assign("main_role", $_REQUEST["main_role"]);
             $smarty->assign("discord_id", $_REQUEST["discord_id"]);
+            $smarty->assign("comment", $_REQUEST["comment"]);
             
             $smarty->display('User/edit_form.tmpl');
         } else {
@@ -153,8 +166,10 @@ class UserController extends BaseController{
             }
             
             $oLoginUser->summoner_name = $_REQUEST["summoner_name"];
+            $oLoginUser->summoner_name_kana = $_REQUEST["summoner_name_kana"];
             $oLoginUser->main_role = $_REQUEST["main_role"];
             $oLoginUser->discord_id = $_REQUEST["discord_id"];
+            $oLoginUser->comment = $_REQUEST["comment"];
             $oLoginUser->save();
             
             $oDb->commit();
@@ -308,20 +323,26 @@ class UserController extends BaseController{
         }
         
         // 画面表示
+        $smarty = new Smarty();
+        $smarty->template_dir = PATH_TMPL;
+        $smarty->compile_dir  = PATH_TMPL_C;
+        
+        $smarty->assign("login_id", $_REQUEST["login_id"]);
+        $smarty->assign("summoner_name", $_REQUEST["summoner_name"]);
+        $smarty->assign("summoner_name_kana", $_REQUEST["summoner_name_kana"]);
+        $smarty->assign("main_role", $_REQUEST["main_role"]);
+        //$smarty->assign("main_champion", $_REQUEST["main_champion"]);
+        $smarty->assign("discord_id", $_REQUEST["discord_id"]);
+        $smarty->assign("comment", $_REQUEST["comment"]);
+        
         if( $sErrorMessage ){
-            $smarty = new Smarty();
-            $smarty->template_dir = PATH_TMPL;
-            $smarty->compile_dir  = PATH_TMPL_C;
             $smarty->assign("error_message", $sErrorMessage);
-            $smarty->assign("login_id", $_REQUEST["login_id"]);
-            $smarty->assign("summoner_name", $_REQUEST["summoner_name"]);
-            $smarty->assign("main_role", $_REQUEST["main_role"]);
-            //$smarty->assign("main_champion", $_REQUEST["main_champion"]);
-            $smarty->assign("discord_id", $_REQUEST["discord_id"]);
             $smarty->display('User/form.tmpl');
         } else {
-            self::displayConfirm();
+            $smarty->assign("password", $_REQUEST["password"]);
+            $smarty->display('User/confirm.tmpl');
         }
+        
     }
     
     public function register(){
@@ -361,13 +382,15 @@ class UserController extends BaseController{
         
         $oUser = new User( $oDb );
         
-        $oUser->login_id      = $_REQUEST["login_id"];
-        $oUser->password      = password_hash( $_REQUEST["password"], CRYPT_SHA256 );
-        $oUser->state         = 1;
-        $oUser->discord_id    = $_REQUEST["discord_id"];
-        $oUser->summoner_name = null;
-        $oUser->summoner_name = $_REQUEST["summoner_name"];
-        $oUser->main_role     = $_REQUEST["main_role"];
+        $oUser->login_id            = $_REQUEST["login_id"];
+        $oUser->password            = password_hash( $_REQUEST["password"], CRYPT_SHA256 );
+        $oUser->state               = 1;
+        $oUser->discord_id          = $_REQUEST["discord_id"];
+        $oUser->summoner_name       = null;                             // TODO ここ何でnull入れてんだっけ？
+        $oUser->summoner_name       = $_REQUEST["summoner_name"];
+        $oUser->summoner_name_kana  = $_REQUEST["summoner_name_kana"];
+        $oUser->main_role           = $_REQUEST["main_role"];
+        $oUser->comment             = $_REQUEST["comment"];
         
         $oUser->save();
         
@@ -440,9 +463,11 @@ class UserController extends BaseController{
         $smarty->assign("login_id", $_REQUEST["login_id"]);
         $smarty->assign("password", $_REQUEST["password"]);
         $smarty->assign("summoner_name", $_REQUEST["summoner_name"]);
+        $smarty->assign("summoner_name_kana", $_REQUEST["summoner_name_kana"]);
         $smarty->assign("main_role", $_REQUEST["main_role"]);
         //$smarty->assign("main_champion", $_REQUEST["main_champion"]);
         $smarty->assign("discord_id", $_REQUEST["discord_id"]);
+        $smarty->assign("comment", $_REQUEST["comment"]);
         
         $smarty->display('User/confirm.tmpl');
     }
@@ -455,8 +480,10 @@ class UserController extends BaseController{
         $smarty->compile_dir  = PATH_TMPL_C;
         
         $smarty->assign("summoner_name", $_REQUEST["summoner_name"]);
+        $smarty->assign("summoner_name_kana", $_REQUEST["summoner_name_kana"]);
         $smarty->assign("main_role", $_REQUEST["main_role"]);
         $smarty->assign("discord_id", $_REQUEST["discord_id"]);
+        $smarty->assign("comment", $_REQUEST["comment"]);
         
         $smarty->display('User/edit_confirm.tmpl');
     }
