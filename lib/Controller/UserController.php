@@ -4,8 +4,12 @@ require_once( PATH_MODEL . 'User.php' );
 require_once( PATH_MODEL . 'UserTeamApply.php' );
 require_once( PATH_MODEL . 'ApiQueues.php' );
 require_once( PATH_LIB . '/common/UtilTime.php');
+require_once( PATH_RIOTAPI . 'SummonersByName.php' );
+require_once( PATH_MODEL . 'UserPasswordApply.php' );
 
 class UserController extends BaseController{
+    const DISPLAY_DIR_PATH    = "Match";
+    const DISPLAY_FILE_PATH    = "Match_common";
 
     public function displayUserForm(){
         $smarty = new Smarty();
@@ -32,6 +36,7 @@ class UserController extends BaseController{
         
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         
         $smarty->assign("summoner_name", $oUser->summoner_name );
         $smarty->assign("summoner_name_kana", $oUser->summoner_name_kana );
@@ -83,6 +88,7 @@ class UserController extends BaseController{
             $smarty = new Smarty();
             $smarty->template_dir = PATH_TMPL;
             $smarty->compile_dir  = PATH_TMPL_C;
+            $smarty->default_modifiers[] = 'escape:html';
             
             $smarty->assign("error_message", $sErrorMessage);
             $smarty->assign("summoner_name", $_REQUEST["summoner_name"]);
@@ -144,6 +150,7 @@ class UserController extends BaseController{
             $smarty = new Smarty();
             $smarty->template_dir = PATH_TMPL;
             $smarty->compile_dir  = PATH_TMPL_C;
+            $smarty->default_modifiers[] = 'escape:html';
             
             $smarty->assign("error_message", $sErrorMessage);
             $smarty->assign("summoner_name", $_REQUEST["summoner_name"]);
@@ -188,6 +195,7 @@ class UserController extends BaseController{
         
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         
         $smarty->assign("summoner_name", $oUser->summoner_name );
         $smarty->assign("main_role", $oUser->main_role );
@@ -203,6 +211,8 @@ class UserController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
+        
         $smarty->display('User/login.tmpl');
     }
     
@@ -226,6 +236,7 @@ class UserController extends BaseController{
             $smarty = new Smarty();
             $smarty->template_dir = PATH_TMPL;
             $smarty->compile_dir  = PATH_TMPL_C;
+            $smarty->default_modifiers[] = 'escape:html';
             
             $smarty->assign("error_message", "ログインID/パスワードが一致しません");
             
@@ -270,6 +281,7 @@ class UserController extends BaseController{
 
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
 
         $smarty->assign("user", $oUser );
         $smarty->assign("team", $oTeam );
@@ -326,6 +338,7 @@ class UserController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         
         $smarty->assign("login_id", $_REQUEST["login_id"]);
         $smarty->assign("summoner_name", $_REQUEST["summoner_name"]);
@@ -459,6 +472,7 @@ class UserController extends BaseController{
         
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         
         $smarty->assign("login_id", $_REQUEST["login_id"]);
         $smarty->assign("password", $_REQUEST["password"]);
@@ -478,6 +492,7 @@ class UserController extends BaseController{
         
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         
         $smarty->assign("summoner_name", $_REQUEST["summoner_name"]);
         $smarty->assign("summoner_name_kana", $_REQUEST["summoner_name_kana"]);
@@ -566,6 +581,7 @@ class UserController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
 
         $smarty->assign( "user_team_apply" , $user_team_apply );
 
@@ -589,6 +605,7 @@ class UserController extends BaseController{
         $smarty               = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
 
         $smarty->assign( "other", $other );
         $smarty->assign( "user" , $user );
@@ -596,6 +613,247 @@ class UserController extends BaseController{
         $smarty->display('User/show_user.tmpl');
     }
 
+    public function PasswordResetForm(){
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_unlogined_session();
+        
+        $smarty = new Smarty();
+        $smarty->template_dir = PATH_TMPL;
+        $smarty->compile_dir  = PATH_TMPL_C;
+        
+        $smarty->display('User/password_reset.tmpl');
+    }
+    
+    public function PasswordResetRequest(){
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_unlogined_session();
+        
+        $oDb = new Db();
+        $status = ApiCallStatus::getStatus($oDb, RIOTAPIKEY);
+        $check  = $status->checkLimit( false );
+        if( !$check['enable'] ){
+            // レートリミット引っかかってたらエラー
+            self::displayCommonError([
+                'message' => "APIの実効制限に引っかかりました。<br>カップ麺を食い終わった頃にもう一度試してください。",
+                'button'   => [
+                    'href'      => "/User/PasswordResetForm" ,
+                    'name'      => "パスワード再設定画面へ戻る",
+                ],
+            ]);
+            exit();
+        }
+        
+        $summoner_name = $_REQUEST["summoner_name"];
+        
+        // 指定したサモナー名のユーザーが居るか確認
+        $oUser = User::getUserFromSummonerName($summoner_name);
+        
+        if( empty( $oUser ) ){
+            self::displayCommonError([
+                'message' => "指定したサモナー名は存在しません。",
+                'button'   => [
+                    'href'      => "/User/PasswordResetForm" ,
+                    'name'      => "パスワード再設定画面へ戻る",
+                ],
+            ]);
+            exit();
+        }
+        
+        $api = new SummonersByName();
+        $api->setParams( [ "name" => $summoner_name ] );
+        
+        $json = $api->execApi();
+        
+        if( empty( $json) ){
+            self::displayCommonError([
+                'message' => "API実行時にエラーが発生しました。",
+                'button'   => [
+                    'href'      => "/User/PasswordResetForm" ,
+                    'name'      => "パスワード再設定画面へ戻る",
+                ],
+            ]);
+            exit();
+        }
+        
+        $oDb = new Db();
+        $oDb->beginTransaction();
+        
+        $oUserPasswordApply = new UserPasswordApply($oDb);
+        $oUserPasswordApply->user_id = $oUser->id;
+        $oUserPasswordApply->icon_id = $json["profileIconId"];
+        $oUserPasswordApply->code    = hash( "sha256", time() );
+        $oUserPasswordApply->state   = userPasswordAPply::STATE_APPLY;
+        
+        $oUserPasswordApply->save();
+        
+        $oDb->commit();
+        
+        $smarty = new Smarty();
+        $smarty->template_dir = PATH_TMPL;
+        $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
+        
+        $smarty->assign( "id"   , $oUser->id );
+        $smarty->assign( "code" , $oUserPasswordApply->code );
+        
+        $smarty->display('User/password_request.tmpl');
+    }
+    
+    public function PasswordReset(){
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_unlogined_session();
+        
+        // TODO APIキーの制限引っかかってたらエラー
+        $oDb = new Db();
+        $status = ApiCallStatus::getStatus($oDb, RIOTAPIKEY);
+        $check  = $status->checkLimit( false );
+        if( !$check['enable'] ){
+            // レートリミット引っかかってたらエラー
+            self::displayCommonError([
+                'message' => "APIの実効制限に引っかかりました。<br>カップ麺を食い終わった頃にもう一度試してください。",
+                'button'   => [
+                    'href'      => "/User/PasswordResetForm" ,
+                    'name'      => "パスワード再設定画面へ戻る",
+                ],
+            ]);
+            exit();
+        }
+        
+        $id = $_REQUEST["id"];
+        $code = $_REQUEST["code"];
+        
+        
+        // サモナー取得
+        $oDb->beginTransaction();
+        $oUser = new User( $oDb, $id );
+        
+        if( empty( $oUser ) ){
+            self::displayCommonError([
+                'message' => "パスワード再申請でエラーが発生しました。",
+                'button'   => [
+                    'href'      => "/User/PasswordResetForm" ,
+                    'name'      => "パスワード再設定画面へ戻る",
+                ],
+            ]);
+            exit();
+        }
+        
+        // パスワード申請取得
+        $oUserPasswordApply = UserPasswordApply::getUserPasswordApplyByUserIdCode( $oDb, $id, $code );
+        
+        if( empty( $oUserPasswordApply ) ){
+            self::displayCommonError([
+                'message' => "パスワード再申請でエラーが発生しました。",
+                'button'   => [
+                    'href'      => "/User/PasswordResetForm" ,
+                    'name'      => "パスワード再設定画面へ戻る",
+                ],
+            ]);
+            exit();
+        }
+        
+        if( date( 'Y-m-d H:i:s', strtotime( $oUserPasswordApply->updated_at . " + " . PASSWORD_RESET_PERIOD ) ) < date( 'Y-m-d H:i:s' ) ){
+            self::displayCommonError([
+                'message' => "パスワード再設定可能時間が過ぎています。<br>最初からやり直してください",
+                'button'   => [
+                    'href'      => "/User/PasswordResetForm" ,
+                    'name'      => "パスワード再設定画面へ戻る",
+                ],
+            ]);
+            exit();
+        }
+        
+        $api = new SummonersByName();
+        $api->setParams( [ "name" => $oUser->summoner_name ] );
+        
+        $json = $api->execApi();
+        
+        if( empty( $json ) ){
+            self::displayCommonError([
+                'message' => "API実行時にエラーが発生しました。",
+                'button'   => [
+                    'href'      => "/User/PasswordResetForm" ,
+                    'name'      => "パスワード再設定画面へ戻る",
+                ],
+            ]);
+            exit();
+        }
+        
+        if( $json["profileIconId"] == $oUserPasswordApply->icon_id ){
+            self::displayCommonError([
+                'message' => "アイコンが変更されていません。<br>もう一度やり直してください",
+                'button'   => [
+                    'href'      => "/User/PasswordResetForm" ,
+                    'name'      => "パスワード再設定画面へ戻る",
+                ],
+            ]);
+            exit();
+        }
+        
+        $oUserPasswordApply->state   = userPasswordAPply::STATE_SUCCESS;
+        
+        $oUserPasswordApply->save();
+        
+        $oDb->commit();
+        
+        // ログイン
+        session_regenerate_id(true);
+        $_SESSION["id"] = $oUser->id;
+        
+        $smarty = new Smarty();
+        $smarty->template_dir = PATH_TMPL;
+        $smarty->compile_dir  = PATH_TMPL_C;
+        
+        $smarty->display('User/password_form.tmpl');
+    }
+    
+    public function editPassword(){
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+        
+        $oDb = new Db();
+        $oUser = new User( $oDb, $_SESSION["id"] );
+        
+        
+        $password = $_REQUEST["password"];
+        $oUser->password = password_hash( $password, CRYPT_SHA256 );
+        $oUser->save();
+        
+        $oDb->commit();
+        
+        header('Location: /User/MyPage');
+    }
+    
+    public function editPasswordForm(){
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+        
+        $smarty = new Smarty();
+        
+        $smarty->template_dir = PATH_TMPL;
+        $smarty->compile_dir  = PATH_TMPL_C;
+        
+        $smarty->display('User/password_form.tmpl');
+    }
 
+    // TODO TeamControllerから流用、その内BaseControllerに移植
+    public function displayCommonError( $param = [] )
+    {
+        $param_org = [
+            'title'   => "エラーが発生しました。",
+            'message' => "もう一度やり直してください。",
+            'button'   => [
+                'href'      => "/index.html",
+                'name'      => "戻る",
+            ],
+        ];
+        $error = array_merge( $param_org, $param );
+        $smarty = new Smarty();
+        $smarty->template_dir = PATH_TMPL;
+        $smarty->compile_dir  = PATH_TMPL_C;
+        
+        $smarty->assign("error", $error);
+        $smarty->display('commonError.tmpl');
+    }
 
 }
