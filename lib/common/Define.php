@@ -31,6 +31,7 @@
 	define( "MSG_MATCH_RECRUIT_COMPLETE"	, "試合の募集が完了しました。" );
 	define( "MSG_MATCH_RESULT_COMPLETE"		, "試合結果の登録が完了しました" );
 	define( "MSG_MATCH_CANCEL"				, "試合のキャンセルが完了しました" );
+	define( "MSG_MATCH_PENALTY_CANCEL"		, "試合の当日キャンセルが完了しました" );
 	define( "ERR_COMMON_INPUT"				, "入力に誤りがあります。再度やり直してください" );
 	define( "ERR_MATCH_NOT_RECRUITE"		, "募集中でないマッチです" );
 	define( "ERR_MATCH_HOST_EQ_GUEST"		, "自分の募集には登録できません" );
