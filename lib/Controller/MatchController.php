@@ -292,11 +292,11 @@ class MatchController extends BaseController{
         
         switch( $iApplyTeamId ){
             case $oMatch->host_team_id:
-                // キャンセルしたのがホストだったらキャンセルステータスに変更
+                // キャンセルしたのがホストだったらゲスト勝利
                 $oMatch->winner = $oMatch->apply_team_id;
                 break;
             case $oMatch->apply_team_id:
-                // キャンセルしたのがゲストだったら参加の取り消しのみ、募集は残す
+                // キャンセルしたのがゲストだったらホスト勝利
                 $oMatch->winner = $oMatch->host_team_id;
                 break;
             default:
