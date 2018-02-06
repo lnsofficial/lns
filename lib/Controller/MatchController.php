@@ -75,7 +75,7 @@ class MatchController extends BaseController{
                     if( $oTeam->id == $iHostTeamId || $oTeam->id == $oMatch->apply_team_id ){
                         if( $oMatch->enableCancel() ){
                             $asTeamInfo["cancel"] = true;
-                        } else {
+                        } elseif ( $oMatch->enablePenaltyCancel() ) {
                             // 通常のキャンセルができない場合は、直前キャンセル
                             $asTeamInfo["penalty_cancel"] = true;
                         }

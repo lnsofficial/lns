@@ -144,6 +144,20 @@ class Match extends Base{
         
         return $bResult;
     }
+
+    // 当日キャンセル可能な時間かチェック
+    public function enablePenaltyCancel(){
+        $bResult = true;
+        // 試合日時の1日以内
+        $enableCancelDate = date('Y-m-d H:i:s', strtotime( $this->match_date . " - 24 hour" ) );
+        $now = date( 'Y-m-d H:i:s' );
+
+        if( $now < $enableCancelDate || $now > $this->match_date){
+            $bResult = false;
+        }
+        
+        return $bResult;
+    }
     
     // 試合に参加可能かチェック
     public function enableJoin( $iHostRank, $iApplyRank ){
