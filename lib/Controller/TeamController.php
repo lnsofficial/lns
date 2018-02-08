@@ -7,6 +7,7 @@ require_once( PATH_MODEL . 'TeamMembers.php' );
 require_once( PATH_MODEL . 'UserTeamApply.php' );
 require_once( PATH_MODEL . 'User.php' );
 require_once( PATH_LIB . '/common/UtilTime.php');
+require_once( PATH_MODEL . 'UserRank.php' );
 // TODO 最低限の共通化、全コントローラーで共通部分はBaseControllerにまとめる
 // 特別に処理を入れる場合のみ、各Controllerに追記する形で開発する
 class TeamController extends BaseController{
@@ -212,7 +213,10 @@ class TeamController extends BaseController{
         $team_staffs = TeamStaffs::getByTeamId( $oTeam->id );
         // users
         
+
+        // 「大会に参加する」ボタンの表示可否
         $bLogin = false;
+        $oUserRank = new UserRank( $oDb );
         $isThisTeamJoinedLadder = false;
         if( isset( $_SESSION["id"] ) ){
             $bLogin = true;
@@ -227,12 +231,21 @@ class TeamController extends BaseController{
                 $isThisTeamJoinedLadder = true;
                 $isThisTeamEnableJoinLadder = false;
             }
-            
-            if( count( $team_members ) ){
-                foreach( $team_members as $member ){
-                    if( !isset( $member["summoner_id"] ) || !isset( $member["tier"] ) || !isset( $member["rank"] ) ){
-                        $isThisTeamEnableJoinLadder = false;
-                        break;
+            // 既に"今期"大会に参加済み( $oTeam->getCurrentLadder( $oDb )==true相当 )だったらここのチェックはしない。
+            else
+            {
+                if( count( $team_members ) )
+                {
+                    foreach( $team_members as $member )
+                    {
+                        // 現在ランクと前シーズンランクの情報があるか？
+                        $user_rank_now    = $oUserRank->findByUserId            ($member['user_id']);
+                        $user_rank_before = $oUserRank->findBeforeSeasonByUserId($member['user_id']);
+                        if( !isset( $member["summoner_id"] ) || empty( $user_rank_now ) || empty( $user_rank_before ) )
+                        {
+                            $isThisTeamEnableJoinLadder = false;
+                            break;
+                        }
                     }
                 }
             }

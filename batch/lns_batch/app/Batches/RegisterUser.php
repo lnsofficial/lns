@@ -128,13 +128,6 @@ class RegisterUser extends QueueBase
 			$user_rank_before->rank    = $opgg_tierrank['rank'];
 			$user_rank_before->save();
 
-			// 高い方のtier/rank
-			if( UserRank::RANK_LIST[$opgg_tierrank['tier']][$opgg_tierrank['rank']] > UserRank::RANK_LIST[$tier][$rank] )
-			{
-				$tier = $opgg_tierrank['tier'];
-				$rank = $opgg_tierrank['rank'];
-			}
-
 
 			//////////////////////////
 			// ユーザー情報を設定する
@@ -144,8 +137,6 @@ class RegisterUser extends QueueBase
 			$user->summoner_name = $sm_json['name'];
 			$user->summoner_id   = $sm_json['id'];
 			$user->account_id    = $sm_json['accountId'];
-			$user->tier          = $tier;
-			$user->rank          = $rank;
 			$user->save();
 			$dest = $user->toArray();
 
