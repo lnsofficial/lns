@@ -19,7 +19,7 @@ class Teams extends Base{
         "team_tag"          => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
         "team_tag_kana"     => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
         "comment"           => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
-        "status"            => [ "type" => "tinyint"    , "min" => 0    ,"max" => 127           , "required" => false   , "null" => false   ],
+        "status"            => [ "type" => "int"        , "min" => 0    ,"max" => 127           , "required" => false   , "null" => false   ],
     ];
 
 
@@ -165,7 +165,7 @@ class Teams extends Base{
         
         return $oLadder;
     }
-
+    
     public function getBeforeSeasonLadder()
     {
         $sSelectLadder = "SELECT * FROM " . Ladder::MAIN_TABLE . " WHERE team_id = ? AND season = '" . SEASON_BEFORE . "' ORDER BY term DESC";

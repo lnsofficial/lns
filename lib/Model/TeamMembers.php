@@ -34,7 +34,9 @@ class TeamMembers extends Base{
         {
             $oUser = new User( $db, $team_member["user_id"] );
             $oLastApiQueue = $oUser->getLastApiQueue();
+            $team_member["summoner_name_kana"] = $oUser->summoner_name_kana;
             $team_member["last_api_queue_state"] = $oLastApiQueue->state;
+            $team_member["comment"] = $oUser->comment;
             $team_members[] = $team_member;
         }
 

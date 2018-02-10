@@ -31,6 +31,130 @@ class TeamController extends BaseController{
         self::_displayConfirm();
     }
     
+    public function editForm(){
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+        
+        $team_id    = $_REQUEST["team_id"];
+        
+        $oDb = new Db();
+        
+        $oLoginUser = new User( $oDb, $_SESSION["id"] );
+        
+        $oTeam = new Teams( $oDb, $team_id );
+        
+        $authorized = $oTeam->isAuthorized( $oLoginUser->id );
+        if( !$authorized ){
+            self::displayCommonError([
+                'message' => "権限がありません。",
+                'button'   => [
+                    'href'      => "/Team/detail/" . $team_id,
+                    'name'      => "チーム詳細へ戻る",
+                ],
+            ]);
+            exit;
+        }
+        
+        $smarty = new Smarty();
+        $smarty->template_dir = PATH_TMPL;
+        $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
+        
+        $smarty->assign("team", $oTeam);
+        
+        $smarty->display('Team/edit_form.tmpl');
+    }
+    
+    public function editConfirm(){
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+        
+        $team_id    = $_REQUEST["team_id"];
+        
+        $oDb = new Db();
+        
+        $oLoginUser = new User( $oDb, $_SESSION["id"] );
+        
+        $oTeam = new Teams( $oDb, $team_id );
+        
+        $authorized = $oTeam->isAuthorized( $oLoginUser->id );
+        if( !$authorized ){
+            self::displayCommonError([
+                'message' => "権限がありません。",
+                'button'   => [
+                    'href'      => "/Team/detail/" . $team_id,
+                    'name'      => "チーム詳細へ戻る",
+                ],
+            ]);
+            exit;
+        }
+        
+        // バリデーション（今のとこ必須チェックだけ）
+        if( !self::validation() ){
+            self::displayError();
+            exit;
+        }
+        
+        // 画面表示
+        $smarty = new Smarty();
+        $smarty->template_dir = PATH_TMPL;
+        $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
+        
+        $smarty->assign("team_id", $team_id);
+        $smarty->assign("inputTeamNm", $_REQUEST["inputTeamNm"]);
+        $smarty->assign("inputTeamNmKana", $_REQUEST["inputTeamNmKana"]);
+        $smarty->assign("inputTeamTag", $_REQUEST["inputTeamTag"]);
+        $smarty->assign("inputTeamTagKana", $_REQUEST["inputTeamTagKana"]);
+        $smarty->assign("inputComment", $_REQUEST["inputComment"]);
+        
+        $smarty->display('Team/edit_confirm.tmpl');
+    }
+    
+    public function editComplete(){
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+        // バリデーション（今のとこ必須チェックだけ）
+        if( !self::validation() ){
+            self::displayError();
+            exit;
+        }
+        
+        $team_id    = $_REQUEST["team_id"];
+        
+        $oDb = new Db();
+        
+        $oLoginUser = new User( $oDb, $_SESSION["id"] );
+        
+        $oTeam = new Teams( $oDb, $team_id );
+        
+        $authorized = $oTeam->isAuthorized( $oLoginUser->id );
+        if( !$authorized ){
+            self::displayCommonError([
+                'message' => "権限がありません。",
+                'button'   => [
+                    'href'      => "/Team/detail/" . $team_id,
+                    'name'      => "チーム詳細へ戻る",
+                ],
+            ]);
+            exit;
+        }
+        
+        $oDb->beginTransaction();
+        
+        $oTeam->team_name       = $_REQUEST["inputTeamNm"];
+        $oTeam->team_name_kana  = $_REQUEST["inputTeamNmKana"];
+        $oTeam->team_tag        = $_REQUEST["inputTeamTag"];
+        $oTeam->team_tag_kana   = $_REQUEST["inputTeamTagKana"];
+        $oTeam->comment         = $_REQUEST["inputComment"];
+        
+        $oTeam->save();
+        $oDb->commit();
+        
+        // 画面表示
+        header('Location: /Team/Detail/' . $team_id);
+    }
+    
     public function register(){
         session_set_save_handler( new MysqlSessionHandler() );
         require_logined_session();
@@ -159,6 +283,7 @@ class TeamController extends BaseController{
         
         $smarty->display('TeamRegister_err.tmpl');
     }
+    
     /**
      * // [SubFunction]汎用エラー画面だすやつ
      *
@@ -183,6 +308,7 @@ class TeamController extends BaseController{
         $smarty->assign("error", $error);
         $smarty->display('commonError.tmpl');
     }
+    
     public function detail( $team_id = 0 ){
         session_set_save_handler( new MysqlSessionHandler() );
         @session_start();
@@ -239,12 +365,12 @@ class TeamController extends BaseController{
                     foreach( $team_members as $member )
                     {
                         // 現在ランクと前シーズンランクの情報があるか？
-                        $user_rank_now    = $oUserRank->findByUserId            ($member['user_id']);
+                        $user_rank_now    = $oUserRank->findByUserId($member['user_id']);
                         $user_rank_before = $oUserRank->findBeforeSeasonByUserId($member['user_id']);
                         if( !isset( $member["summoner_id"] ) || empty( $user_rank_now ) || empty( $user_rank_before ) )
                         {
-                            $isThisTeamEnableJoinLadder = false;
-                            break;
+                        $isThisTeamEnableJoinLadder = false;
+                        break;
                         }
                     }
                 }
