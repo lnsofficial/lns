@@ -5,6 +5,7 @@ require_once( PATH_MODEL . 'Teams.php' );
 require_once( PATH_MODEL . 'User.php' );
 require_once( PATH_MODEL . 'League.php' );
 require_once( PATH_MODEL . 'TeamOwner.php' );
+require_once( PATH_MODEL . 'UserRank.php' );
 
 class LadderController extends BaseController{
 
@@ -92,25 +93,46 @@ class LadderController extends BaseController{
             exit;
         }
         
-        $iCalcCount = 0;
-        $iTotalTeamPower = 0;
-        foreach( $ahsTeamMembers as $asMember ){
-            if( $asMember["tier"] == "UNRANK" ){
-                continue;
-            }
-            $iCalcCount++;
-            $iTotalTeamPower += User::RANK_LIST[$asMember["tier"]][$asMember["rank"]];
+
+        // このチームが既存チームなのか新規チームなのかチェック
+        $beforeseason_ladder = $oTeam->getBeforeSeasonLadder();
+
+        // 既存チーム(S3でリーグに参加済み)の場合
+        if( !empty($beforeseason_ladder) )
+        {
+            // 前期最終ブロックを取ってくる
+            $oLeague = new League( $oDb, $beforeseason_ladder->league_id );
         }
-        
-        $iTeamPower = $iTotalTeamPower / $iCalcCount;
-        
-        $oLeague = League::getAssignLeague( $oDb, $iTeamPower );
-        
+        // 新規参画チーム(今回S4からリーグに参加)の場合
+        else
+        {
+            // 各メンバーのtier/rankからチーム力を算出する
+            $oUserRank = new UserRank($oDb);
+            $iCalcCount = 0;
+            $iTotalTeamPower = 0;
+            foreach( $ahsTeamMembers as $asMember )
+            {
+                $user_rank = $oUserRank->findHigherByUserId( $asMember['user_id'] );
+                if( $user_rank['tier'] == 'UNRANK' )
+                {
+                    continue;
+                }
+                $iCalcCount++;
+                $iTotalTeamPower += User::RANK_LIST[$user_rank['tier']][$user_rank['rank']];
+            }
+            
+            $iTeamPower = $iTotalTeamPower / $iCalcCount;
+            // 適切なリーグを取ってくる
+            $oLeague = League::getAssignLeague( $oDb, $iTeamPower );
+        }
+
+
         $oDb->beginTransaction();
         
         $oLadder = new Ladder( $oDb );
         $oLadder->team_id   = $oTeam->id;
         $oLadder->league_id = $oLeague->id;
+        $oLadder->season    = SEASON_NOW;
         $oLadder->term      = Ladder::getCurrentTerm( $oDb );
         $oLadder->point     = 0;
         $oLadder->save();

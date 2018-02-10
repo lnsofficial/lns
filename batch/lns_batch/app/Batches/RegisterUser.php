@@ -11,6 +11,9 @@ use App\Models\LnsDB;
 use App\Libs\RiotApi\SummonersByName;
 use App\Libs\RiotApi\PositionsBySummoner;
 use App\Models\User;
+use App\Libs\OpggWebpage;
+use App\Models\UserRank;
+use App\Models\LolSeason;
 
 /**
  * // ユーザー情報(users)について初回登録時にサモネからsummoner_id問い合わせて確定させるみたいなやつ。
@@ -71,6 +74,20 @@ class RegisterUser extends QueueBase
 		}
 		\Log::debug('$json = '.print_r($sr_json,true));
 
+		// OPGGからsummoner_nameを元に前シーズンのランク情報データひっぱってくる
+		$opgg     = new OpggWebpage( $user->summoner_name );
+		// "サモナーが存在しません"が帰ってきたらエラー
+		if( !$opgg->isExistSummoner() )
+		{
+			// キューを失敗にして次へ。
+			$this->log('失敗。OPGGでデータ見つからなかった系。$user->summoner_name:'.$user->summoner_name);
+			$queue->result = '失敗。OPGGでデータ見つからなかった系。$user->summoner_name:'.$user->summoner_name;
+			$queue->state  = ApiQueue::STATE_FAILED;
+			$queue->save();
+			return false;
+		}
+		// それ以外で前シーズンrankが取れなかった場合はUNRANK
+		$opgg_tierrank = $opgg->extractBeforeSeasonTierRank();
 
 
 		// ちゃんと取れたので更新
@@ -78,27 +95,55 @@ class RegisterUser extends QueueBase
 		{
 			LnsDB::beginTransaction();
 
+			//////////////////////////
+			// ランク情報を設定する
+			//////////////////////////
+			$user_rank_now    = UserRank::findByUserId( $user->id );
+			$user_rank_before = UserRank::findBeforeSeasonByUserId( $user->id );
+
+			// 現在ランク
+			// Unrankの場合は空配列で帰ってくる。
+			$tier = 'UNRANK';
+			$rank = 'UNRANK';
+			if( !empty($sr_json) )
+			{
+				// SoloQ/FlexQ両方帰ってきてるので、SoloQランクを参照する。
+				foreach( $sr_json as $record )
+				{
+					if( $record['queueType'] == 'RANKED_SOLO_5x5')
+					{
+						$tier = $record['tier'];
+						$rank = $record['rank'];
+						break;
+					}
+					// FlexQしか返ってきてなかったらUNRANK扱いで。
+				}
+			}
+			$user_rank_now->tier    = $tier;
+			$user_rank_now->rank    = $rank;
+			$user_rank_now->save();
+
+			// 前シーズンランク
+			$user_rank_before->tier    = $opgg_tierrank['tier'];
+			$user_rank_before->rank    = $opgg_tierrank['rank'];
+			$user_rank_before->save();
+
+
+			//////////////////////////
+			// ユーザー情報を設定する
+			//////////////////////////
 			$from = $user->toArray();
 			// サモナー情報更新して、
 			$user->summoner_name = $sm_json['name'];
 			$user->summoner_id   = $sm_json['id'];
 			$user->account_id    = $sm_json['accountId'];
-
-			// Unrankの場合は空配列で帰ってくる。
-			$rank = 'UNRANK';
-			$tier = 'UNRANK';
-			if( !empty($sr_json) )
-			{
-				$rank = $sr_json[0]['rank'];
-				$tier = $sr_json[0]['tier'];
-			}
-			$user->rank    = $rank;
-			$user->tier    = $tier;
-
-
 			$user->save();
 			$dest = $user->toArray();
+
+
+			//////////////////////////
 			// キューを完了にする
+			//////////////////////////
 			$this->log('$id = '.$queue->id.' is Finished. go to next.');
 			$queue->result = json_encode(['from'=>$from,'desc'=>$dest], JSON_UNESCAPED_UNICODE);
 			$queue->state  = ApiQueue::STATE_FINISHED;

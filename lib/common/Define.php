@@ -21,6 +21,8 @@
 	
 	// バッチ関連
 	define( "INTERVAL_BATCH_TIME"	, "1 DAY" );
+	define( "SEASON_NOW",             "S4" );
+	define( "SEASON_BEFORE",          "S3" );
 	
 	
 	// 見出し

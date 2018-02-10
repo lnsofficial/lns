@@ -26,13 +26,10 @@ class User extends Base{
         "password"              => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => true    , "null" => false   ],
         "summoner_id"           => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false   ],
         "account_id"            => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false   ],
-        "tier"                  => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => true    , "null" => false   ],
-        "rank"                  => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => true    , "null" => false   ],
         "summoner_name"         => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => true    , "null" => false   ],
         "summoner_name_kana"    => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => true    , "null" => false   ],
         "discord_id"            => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => true    , "null" => false   ],
         "main_role"             => [ "type" => "int"        , "min" => 1    ,"max" => 256           , "required" => true    , "null" => false   ],
-        "main_champion"         => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => true    , "null" => false   ],
         "comment"               => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => true    , "null" => false   ],
     ];
     
@@ -161,26 +158,21 @@ class User extends Base{
     {
         $db = new Db();
 
-//      $prepareSql = "SELECT tm.id AS id,tm.team_id AS team_id,tm.user_id AS user_id,u.summoner_id AS summoner_id,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role,u. main_champion AS  main_champion FROM team_members AS tm LEFT JOIN users AS u ON tm.user_id=u.id WHERE user_id = ?";
         // User
         $prepareSql = "SELECT * FROM users WHERE id = ?";
         $bindParam  = [ $user_id ];
         $user = $db->executePrepare( $prepareSql, "i", $bindParam )->fetch_assoc();
-//var_dump($user);
         if( empty($user) )
         {
             return false;
         }
 
         // TeamMember
-//      $db = new Db();
         $prepareSql  = "SELECT * FROM team_members WHERE user_id = ?";
         $bindParam   = [ $user_id ];
         $team_member = $db->executePrepare( $prepareSql, "i", $bindParam )->fetch_assoc();
-//var_dump($team_member);
 
         // TeamOwner
-//      $db = new Db();
         $prepareSql  = "SELECT * FROM team_owner WHERE user_id = ?";
         $bindParam   = [ $user_id ];
         $result      = $db->executePrepare( $prepareSql, "i", $bindParam );
@@ -189,10 +181,8 @@ class User extends Base{
         {
             $team_owners[] = $team_owner;
         }
-//var_dump($team_owners);
 
         // TeamStaff
-//      $db = new Db();
         $prepareSql  = "SELECT * FROM team_staffs WHERE user_id = ?";
         $bindParam   = [ $user_id ];
         $result      = $db->executePrepare( $prepareSql, "i", $bindParam );
@@ -201,7 +191,6 @@ class User extends Base{
         {
             $team_staffs[] = $team_staff;
         }
-//var_dump($team_staffs);
 
         // TeamContact
         $prepareSql  = "SELECT * FROM teams_contact WHERE user_id = ?";
