@@ -7,6 +7,7 @@ require_once( PATH_MODEL . 'Ladder.php' );
 require_once( PATH_MODEL . 'TeamJoin.php' );
 require_once( PATH_MODEL . 'League.php' );
 require_once( PATH_MODEL . 'MatchCheckin.php' );
+require_once( PATH_MODEL . 'Settings.php' );
 
 class MatchController extends BaseController{
     const DISPLAY_DIR_PATH    = "Match";
@@ -51,6 +52,7 @@ class MatchController extends BaseController{
             $asTeamInfo["id"]       = $oTeam->id;
             $asTeamInfo["name"]     = $oTeam->team_name;
             $asTeamInfo["cancel"]   = false;
+            $asTeamInfo["penalty_cancel"] = false;
             $asTeamInfo["join"]     = false;
             $asTeamInfo["checkin"]  = false;
             $asTeamInfo["result"]   = false;
@@ -74,6 +76,9 @@ class MatchController extends BaseController{
                     if( $oTeam->id == $iHostTeamId || $oTeam->id == $oMatch->apply_team_id ){
                         if( $oMatch->enableCancel() ){
                             $asTeamInfo["cancel"] = true;
+                        } elseif ( $oMatch->enablePenaltyCancel() ) {
+                            // 通常のキャンセルができない場合は、直前キャンセル
+                            $asTeamInfo["penalty_cancel"] = true;
                         }
                         $asTeamInfo["checkin"]  = $oMatch->enableCheckin();
                         $asTeamInfo["result"]   = $oMatch->expirationRegistMatchResult();
@@ -84,10 +89,10 @@ class MatchController extends BaseController{
             $ahsTeamInfo[] = $asTeamInfo;
         }
         
-        $ahsHostCheckins  = MatchCheckin::getByMatchIdTeamId( $iMatchId, $oHostTeam->id );
+        $ahsHostCheckins  = $oMatch->getCheckinByTeamId( $oHostTeam->id );
         $ahsApplyCheckins = null;
         if( $oApplyTeam ){
-            $ahsApplyCheckins = MatchCheckin::getByMatchIdTeamId( $iMatchId, $oApplyTeam->id );
+            $ahsApplyCheckins = $oMatch->getCheckinByTeamId( $oApplyTeam->id );
         }
 
         $smarty = new Smarty();
@@ -256,6 +261,64 @@ class MatchController extends BaseController{
         $oDb->commit();
         
         self::displayCommonScreen( MSG_HEAD_MATCH_CANCEL, MSG_MATCH_CANCEL );
+    }
+    
+    public function cancelPenalty(){
+        // TODO この辺共通処理に移動
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+        
+        $iMatchId = intval( $_REQUEST["match_id"] );
+        
+        $oDb = new Db();
+        $oLoginUser = new User( $oDb, $_SESSION["id"] );
+        
+        $oApplyTeam = new Teams( $oDb, $_REQUEST["team_id"] );
+        $authorized = $oApplyTeam->isAuthorized( $oLoginUser->id );
+        if( !$authorized ){
+            self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_PERMISSION );
+            exit;
+        }
+        
+        $iApplyTeamId = $oApplyTeam->id;
+        
+        // マッチ情報取得
+        $oMatch = new Match( $oDb, $iMatchId );
+        
+        $oDb->beginTransaction();
+        $oApplyTeamId = $oMatch->apply_team_id;
+
+        // 相手チームの不戦勝
+        $oMatch->state = Match::MATCH_STATE_ABSTAINED;
+        
+        switch( $iApplyTeamId ){
+            case $oMatch->host_team_id:
+                // キャンセルしたのがホストだったらゲスト勝利
+                $oMatch->winner = $oMatch->apply_team_id;
+                break;
+            case $oMatch->apply_team_id:
+                // キャンセルしたのがゲストだったらホスト勝利
+                $oMatch->winner = $oMatch->host_team_id;
+                break;
+            default:
+                // 試合のホスト・ゲスト以外がキャンセルしようとしたらエラー
+                self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_PERMISSION );
+                exit;
+        }
+        
+        $oMatch->save();
+        
+        // 参加者が居れば履歴のテーブル更新
+        if( $oApplyTeamId ){
+            $oApplyTeam = new Teams( $oDb, $oApplyTeamId );
+            $oLastJoin = $oApplyTeam->getLastJoin( $oDb );
+            $oLastJoin->state = TeamJoin::STATE_CANCEL;
+            $oLastJoin->save();
+        }
+        
+        $oDb->commit();
+        
+        self::displayCommonScreen( MSG_HEAD_MATCH_CANCEL, MSG_MATCH_PENALTY_CANCEL );
     }
     
     public function recruitList(){
@@ -447,16 +510,21 @@ class MatchController extends BaseController{
         if( empty( $_REQUEST["type"] ) ){
             $bResult = false;
         }
+        
+        $season_start_date  = Settings::getSettingValue( Settings::SEASON_START_DATE );
+        $season_end_date    = Settings::getSettingValue( Settings::SEASON_END_DATE );
+        
         if( empty( $_REQUEST["match_date"] ) ){
             $bResult = false;
         } else {
+            $match_date = date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) );
             // 試合日時が現在日時より後の場合はエラー
-            if( date( 'Y-m-d H:i:s' ) > date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) ) ){
+            if( date( 'Y-m-d H:i:s' ) > $match_date ){
                 $bResult = false;
             }
 
-            // 試合日時が終了日より後だったらエラー
-            if( date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) ) >= LEAGUE_END_DATE ){
+            // 試合日時がリーグの開催期間外の場合はエラー
+            if( $match_date < $season_start_date || $match_date > $season_end_date ){
                 $bResult = false;
             }
         }
@@ -464,8 +532,9 @@ class MatchController extends BaseController{
             $bResult = false;
         } else {
             // 応募受付期限が現在日時より前、または試合日時より後の場合はエラー
-            if( ( date( 'Y-m-d H:i:s' ) > date( 'Y-m-d H:i:s', strtotime( $_REQUEST["deadline_date"] ) ) ) || 
-                ( date( 'Y-m-d H:i:s', strtotime( $_REQUEST["deadline_date"] ) ) > date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) ) ) ){
+            $deadline_date = date( 'Y-m-d H:i:s', strtotime( $_REQUEST["deadline_date"] ) );
+            if( ( date( 'Y-m-d H:i:s' ) > $deadline_date ) || 
+                ( $deadline_date > date( 'Y-m-d H:i:s', strtotime( $_REQUEST["match_date"] ) ) ) ){
                 $bResult = false;
             }
         }
@@ -518,5 +587,32 @@ class MatchController extends BaseController{
         $smarty->assign("stream",           $stream);
 
         $smarty->display('Match/MatchingForm_confirm.tmpl');
+    }
+    
+    public function noticeResult(){
+        $body = file_get_contents('php://input');
+        $result = json_decode($body);
+        
+        $db = new Db();
+        $db->beginTransaction();
+        
+        $match = Match::getMatchByTournamentCode( $db, $result->shortCode );
+        
+        if($match){
+            $winnerTeamSummonerId = $result->winningTeam[0]->summonerId;
+            $winner_team_id = $match->getMatchWinnerTeamBySummonerId( $winnerTeamSummonerId );
+            $match_id = $result->gameId;
+            
+            if($winner_team_id > 0){
+                $match->winner   = $winner_team_id;
+                $match->state    = Match::MATCH_STATE_FINISHED;
+                $match->match_id = $match_id;
+                $match->save();
+            }else{
+                $match->state   = Match::MATCH_STATE_ERROR;
+            }
+        }
+        
+        $db->commit();
     }
 }

@@ -18,7 +18,8 @@ class Teams extends Base{
         "team_name_kana"    => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => true    , "null" => false   ],
         "team_tag"          => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
         "team_tag_kana"     => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
-        "status"            => [ "type" => "tinyint"    , "min" => 0    ,"max" => 127           , "required" => false   , "null" => false   ],
+        "comment"           => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
+        "status"            => [ "type" => "int"        , "min" => 0    ,"max" => 127           , "required" => false   , "null" => false   ],
     ];
 
 
@@ -152,7 +153,7 @@ class Teams extends Base{
     }
     
     public function getCurrentLadder( $oDb ){
-        $sSelectLadder = "SELECT * FROM " . Ladder::MAIN_TABLE . " WHERE team_id = ? ORDER BY term DESC";
+        $sSelectLadder = "SELECT * FROM " . Ladder::MAIN_TABLE . " WHERE team_id = ? AND season = '" . SEASON_NOW . "' ORDER BY term DESC";
         $ahsParameter = [ $this->id ];
         $oResult = $oDb->executePrepare( $sSelectLadder, "i", $ahsParameter );
         
@@ -165,6 +166,21 @@ class Teams extends Base{
         return $oLadder;
     }
     
+    public function getBeforeSeasonLadder()
+    {
+        $sSelectLadder = "SELECT * FROM " . Ladder::MAIN_TABLE . " WHERE team_id = ? AND season = '" . SEASON_BEFORE . "' ORDER BY term DESC";
+        $ahsParameter = [ $this->id ];
+        $oResult = $this->db->executePrepare( $sSelectLadder, "i", $ahsParameter );
+        
+        $oLadder = null;
+        while( $row = $oResult->fetch_array() ){
+            $oLadder = new Ladder( $this->db, $row["id"] );
+            break;
+        }
+        
+        return $oLadder;
+    }
+
     public function getTeamMembers( $oDb ){
         $sSelectTeamMember = "SELECT tm.team_id,us.id,us.summoner_id,us.tier,us.rank FROM team_members tm LEFT JOIN users us ON tm.user_id = us.id  WHERE team_id = ?";
         $ahsParameter = [ $this->id ];

@@ -36,7 +36,7 @@ class TeamContact extends Base{
     {
         $db = new Db();
 
-        $prepareSql = "SELECT tc.id AS id,tc.team_id AS team_id,tc.user_id AS user_id,u.summoner_id AS summoner_id,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role,u.main_champion AS main_champion FROM teams_contact AS tc LEFT JOIN users AS u ON tc.user_id=u.id WHERE team_id = ?";
+        $prepareSql = "SELECT tc.id AS id,tc.team_id AS team_id,tc.user_id AS user_id,u.summoner_id AS summoner_id,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role FROM teams_contact AS tc LEFT JOIN users AS u ON tc.user_id=u.id WHERE team_id = ?";
         $bindParam  = [ $team_id ];
 
         $result = $db->executePrepare( $prepareSql, "i", $bindParam );

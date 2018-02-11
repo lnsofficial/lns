@@ -25,7 +25,7 @@ class TeamStaffs extends Base{
     {
         $db = new Db();
 
-        $prepareSql = "SELECT ts.id AS id,ts.team_id AS team_id,ts.user_id AS user_id,u.summoner_id AS summoner_id,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role,u.main_champion AS main_champion FROM team_staffs AS ts LEFT JOIN users AS u ON ts.user_id=u.id WHERE team_id = ?";
+        $prepareSql = "SELECT ts.id AS id,ts.team_id AS team_id,ts.user_id AS user_id,u.summoner_id AS summoner_id,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role FROM team_staffs AS ts LEFT JOIN users AS u ON ts.user_id=u.id WHERE team_id = ?";
         $bindParam  = [ $team_id ];
 
         $result = $db->executePrepare( $prepareSql, "i", $bindParam );

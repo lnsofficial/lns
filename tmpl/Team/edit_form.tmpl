@@ -22,43 +22,45 @@
     {include file='header.tmpl' login=true}
     <div class="container-fluid">
       <div class="row">
-        <div class="col-lg-3">
-          <div>
-          </div>
+        <div class="col-lg-2 about-menu">
+          <ul class="nav side">
+            <li role="presentation">チーム情報修正</li>
+          </ul>
         </div>
         <div class="col-lg-9">
-          <h2>チーム作成</h2>
-          <p>登録内容を入力してください。</p>
-          <form method="post" action="/Team/confirm" onSubmit="return check()" class="form-horizontal">
+          <h2>チーム情報修正</h2>
+          <p>変更内容を入力してください。</p>
+          <form method="post" action="/Team/editConfirm" onSubmit="return check()" class="form-horizontal">
+            <input type="hidden" id="team_id" name="team_id" value="{$team->id}">
             <div class="form-group">
               <label for="inputTeamNm" class="col-sm-3 control-label">チーム名</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" id="inputTeamNm" name="inputTeamNm" placeholder="チーム名">
+                <input type="text" class="form-control" id="inputTeamNm" name="inputTeamNm" placeholder="チーム名" value="{$team->team_name}">
               </div>
             </div>
             <div class="form-group">
               <label for="inputTeamNmKana" class="col-sm-3 control-label">チーム名（かな）</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" pattern="^[ぁ-んー]+$" id="inputTeamNmKana" name="inputTeamNmKana" placeholder="チーム名（かな）">
+                <input type="text" class="form-control" pattern="^[ぁ-んー]+$" id="inputTeamNmKana" name="inputTeamNmKana" placeholder="チーム名（かな）" value="{$team->team_name_kana}">
               </div>
             </div>
             <div class="form-group">
               <label for="inputTeamTag" class="col-sm-3 control-label">チーム名略称</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" pattern="^[a-zA-Z0-9]+$" maxlength="4" id="inputTeamTag" name="inputTeamTag" placeholder="チーム名略称">
+                <input type="text" class="form-control" pattern="^[a-zA-Z0-9]+$" maxlength="4" id="inputTeamTag" name="inputTeamTag" placeholder="チーム名略称" value="{$team->team_tag}">
                 <p>※英数字で4文字以下で入力してください</p>
               </div>
             </div>
             <div class="form-group">
               <label for="inputTeamTagKana" class="col-sm-3 control-label">チーム名略称（かな）</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" pattern="^[ぁ-んー]+$" id="inputTeamTagKana" name="inputTeamTagKana" placeholder="チーム名略称（かな）">
+                <input type="text" class="form-control" pattern="^[ぁ-んー]+$" id="inputTeamTagKana" name="inputTeamTagKana" placeholder="チーム名略称（かな）" value="{$team->team_tag_kana}">
               </div>
             </div>
             <div class="form-group">
               <label for="inputComment" class="col-sm-3 control-label">紹介文</label>
               <div class="col-sm-9">
-                <textarea class="form-control" id="inputComment" name="inputComment" rows="4" cols="40"></textarea>
+                <textarea class="form-control" id="inputComment" name="inputComment" rows="4" cols="40">{$team->comment}</textarea>
               </div>
             </div>
             {*

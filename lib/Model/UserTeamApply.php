@@ -91,7 +91,7 @@ class UserTeamApply extends Base
     {
         $db = new Db();
 
-        $prepareSql = "SELECT uta.id AS id,uta.team_id AS team_id,uta.user_id AS user_id,uta.type AS type,uta.state AS state,u.summoner_id AS summoner_id,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role,u. main_champion AS  main_champion FROM user_team_applys AS uta LEFT JOIN users AS u ON uta.user_id=u.id WHERE team_id = ? AND deleted_at IS NULL";
+        $prepareSql = "SELECT uta.id AS id,uta.team_id AS team_id,uta.user_id AS user_id,uta.type AS type,uta.state AS state,u.summoner_id AS summoner_id,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role FROM user_team_applys AS uta LEFT JOIN users AS u ON uta.user_id=u.id WHERE team_id = ? AND deleted_at IS NULL";
         $bindParam  = [ $team_id ];
 
         $result = $db->executePrepare( $prepareSql, "i", $bindParam );

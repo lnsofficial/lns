@@ -22,83 +22,68 @@
     {include file='header.tmpl' login=true}
     <div class="container-fluid">
       <div class="row">
-        <div class="col-lg-3">
-          <div>
-          </div>
+        <div class="col-lg-2 about-menu">
+          <ul class="nav side">
+            <li role="presentation">チーム情報修正</li>
+          </ul>
         </div>
         <div class="col-lg-9">
-          <h2>チーム作成</h2>
-          <p>登録内容を入力してください。</p>
-          <form method="post" action="/Team/confirm" onSubmit="return check()" class="form-horizontal">
+          <h2>チーム情報修正</h2>
+          <p>以下の内容でよろしければ「送信」ボタンを押して下さい。</p>
+          <form method="post" action="/Team/editComplete" class="form-horizontal">
+            <input type="hidden" id="team_id" name="team_id" value="{$team_id}">
             <div class="form-group">
               <label for="inputTeamNm" class="col-sm-3 control-label">チーム名</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" id="inputTeamNm" name="inputTeamNm" placeholder="チーム名">
+                <input type="text" class="form-control" id="inputTeamNm" name="inputTeamNm" value="{$inputTeamNm}"  placeholder="チーム名" readonly>
               </div>
             </div>
             <div class="form-group">
               <label for="inputTeamNmKana" class="col-sm-3 control-label">チーム名（かな）</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" pattern="^[ぁ-んー]+$" id="inputTeamNmKana" name="inputTeamNmKana" placeholder="チーム名（かな）">
+                <input type="text" class="form-control" id="inputTeamNmKana" name="inputTeamNmKana" value="{$inputTeamNmKana}" placeholder="チーム名（かな）" readonly>
               </div>
             </div>
             <div class="form-group">
               <label for="inputTeamTag" class="col-sm-3 control-label">チーム名略称</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" pattern="^[a-zA-Z0-9]+$" maxlength="4" id="inputTeamTag" name="inputTeamTag" placeholder="チーム名略称">
-                <p>※英数字で4文字以下で入力してください</p>
+                <input type="text" class="form-control" id="inputTeamTag" name="inputTeamTag" value="{$inputTeamTag}" placeholder="チーム名略称" readonly>
               </div>
             </div>
             <div class="form-group">
               <label for="inputTeamTagKana" class="col-sm-3 control-label">チーム名略称（かな）</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" pattern="^[ぁ-んー]+$" id="inputTeamTagKana" name="inputTeamTagKana" placeholder="チーム名略称（かな）">
+                <input type="text" class="form-control" id="inputTeamTagKana" name="inputTeamTagKana" value="{$inputTeamTagKana}" placeholder="チーム名略称（かな）" readonly>
               </div>
             </div>
             <div class="form-group">
               <label for="inputComment" class="col-sm-3 control-label">紹介文</label>
               <div class="col-sm-9">
-                <textarea class="form-control" id="inputComment" name="inputComment" rows="4" cols="40"></textarea>
+                <textarea class="form-control" id="inputComment" name="inputComment" rows="4" cols="40" readonly>{$inputComment}</textarea>
               </div>
             </div>
             {*
             <div class="form-group">
               <label for="inputTeamLogo" class="col-sm-3 control-label">チームロゴ</label>
               <div class="col-sm-9">
-                <input type="file" id="inputTeamLogo" name="inputTeamLogo">
+                <img src="/img/ico_Xinzhao.jpg" class="img-responsive" id="inputTeamLogo" alt="チームロゴ">
               </div>
             </div>
             *}
             <div class="form-group">
               <div class="col-sm-offset-3 col-sm-9">
                 <button type="button" class="btn btn-default" onclick="history.back()">戻る</button>
-                <button type="submit" class="btn btn-default">確認画面へ</button>
+                <button type="submit" class="btn btn-default">送信</button>
               </div>
             </div>
           </form>
         </div>
       </div>
     </div>
+
     {include file='footer.tmpl'}
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
     <script src="/js/jquery-1.11.3.min.js"></script>
-    <script type="text/javascript">
-        function check(){
-            var result = true;
-            if( $("#inputTeamNm").val() == "" ){
-                result = false;
-            }
-            if( $("#inputTeamNmKana").val() == "" ){
-                result = false;
-            }
-            if( $("#inputTeamTag").val() == "" ){
-                result = false;
-            }
-            if( $("#inputTeamTagKana").val() == "" ){
-                result = false;
-            }
-        }
-    </script>
     <!-- Include all compiled plugins (below), or include individual files as needed --> 
     <script src="/js/bootstrap.js"></script>
   </body>

@@ -1,6 +1,8 @@
 <?php
 	define( "PATH_BASE"			, getenv('BASE_PATH') );
 	define( "PATH_LIB"			, PATH_BASE . "lib/" );
+    define( "PATH_COMMON"       , PATH_LIB . "common/" );
+    define( "PATH_RIOTAPI"      , PATH_COMMON . "RiotApi/" );
 	define( "PATH_CONTROLLER"	, PATH_LIB . "Controller/" );
 	define( "PATH_MODEL"		, PATH_LIB . "Model/" );
 	define( "PATH_TMP_IMAGE"	, PATH_BASE . "htdocs/tmp/image/" );
@@ -19,6 +21,8 @@
 	
 	// バッチ関連
 	define( "INTERVAL_BATCH_TIME"	, "1 DAY" );
+	define( "SEASON_NOW",             "S4" );
+	define( "SEASON_BEFORE",          "S3" );
 	
 	
 	// 見出し
@@ -31,6 +35,7 @@
 	define( "MSG_MATCH_RECRUIT_COMPLETE"	, "試合の募集が完了しました。" );
 	define( "MSG_MATCH_RESULT_COMPLETE"		, "試合結果の登録が完了しました" );
 	define( "MSG_MATCH_CANCEL"				, "試合のキャンセルが完了しました" );
+	define( "MSG_MATCH_PENALTY_CANCEL"		, "試合の当日キャンセルが完了しました" );
 	define( "ERR_COMMON_INPUT"				, "入力に誤りがあります。再度やり直してください" );
 	define( "ERR_MATCH_NOT_RECRUITE"		, "募集中でないマッチです" );
 	define( "ERR_MATCH_HOST_EQ_GUEST"		, "自分の募集には登録できません" );
@@ -42,9 +47,13 @@
 	define( "ERR_MATCH_OVER_RESULT_REGIST"	, "試合結果の登録可能時間を過ぎているため、登録できません" );
 	define( "ERR_MATCH_DISABLE_RECRUIT_TIME", "試合募集不可時間のため、登録できません" );
 	define( "ERR_MATCH_WINNER_NOT_PART"		, "勝者が参加チームのどちらでもありません" );
-
-    // データ
-	define( "LEAGUE_END_DATE" , "2017-12-04 00:00:00" );
     
     // ユーザー登録ブロックフラグ
 	define( "BLOCK_USER_REGISTER" , false );
+    
+    // API関連
+    define( "RIOTAPIKEY"    , getenv('RIOTAPIKEY') );
+    
+    // パスワード再設定
+    define( "PASSWORD_RESET_PERIOD", "1 HOUR" );
+    

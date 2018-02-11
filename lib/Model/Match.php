@@ -1,5 +1,6 @@
 <?php
 require_once( PATH_MODEL . "Base.php" );
+require_once( PATH_MODEL . "MatchCheckin.php" );
 
 class Match extends Base{
     const MAIN_TABLE    = "matches";
@@ -18,6 +19,8 @@ class Match extends Base{
         "state"                 => [ "type" => "int"        , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
         "winner"                => [ "type" => "int"        , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
         "screen_shot_url"       => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
+        "tournament_code"       => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
+        "match_id"              => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false   ],
     ];
     
     const MATCH_TYPE_ANY                    = 1;
@@ -31,6 +34,7 @@ class Match extends Base{
     const MATCH_STATE_CANCEL    = 3;
     const MATCH_STATE_FINISHED  = 4;
     const MATCH_STATE_ABSTAINED = 5;
+    const MATCH_STATE_ERROR     = 99;
     
     const MAX_MATCH_RECRUIT_COUNT = 5;
     
@@ -145,6 +149,20 @@ class Match extends Base{
         return $bResult;
     }
     
+    // 当日キャンセル可能な時間かチェック
+    public function enablePenaltyCancel(){
+        $bResult = true;
+        // 試合日時の1日以内
+        $enableCancelDate = date('Y-m-d H:i:s', strtotime( $this->match_date . " - 24 hour" ) );
+        $now = date( 'Y-m-d H:i:s' );
+
+        if( $now < $enableCancelDate || $now > $this->match_date){
+            $bResult = false;
+        }
+        
+        return $bResult;
+    }
+    
     // 試合に参加可能かチェック
     public function enableJoin( $iHostRank, $iApplyRank ){
         $bEnableJoin = true;
@@ -232,5 +250,107 @@ class Match extends Base{
         }
 
         return true;
+    }
+    
+    public function getCheckinStatus(){
+        $checkinStatus = false;
+        $host_team_checkins = $this->getCheckinByTeamId( $this->host_team_id );
+        $apply_team_checkins = $this->getCheckinByTeamId( $this->apply_team_id );
+        
+        if( $host_team_checkins && $apply_team_checkins ){
+            $checkinStatus = true;
+        }
+        
+        return $checkinStatus;
+    }
+
+    /**
+     * TODO モデル的にはマッチかチームのどっちかに入ってるべきな関数なのでその内移動
+     * // チームのチェックイン一覧
+     * 
+     * @param  int                  $team_id                // teams.id
+     * @return MatchCheckin[]
+     */
+    public function getCheckinByTeamId( $team_id ){
+        if( empty( $team_id ) ){
+            return null;
+        }
+        
+        $oDb = new Db();
+        $ahsResult = MatchCheckin::getList(
+            $oDb,
+            [
+                [ "column" => "match_id",  "type" => "int", "value" => $this->id ],
+                [ "column" => "team_id",   "type" => "int", "value" => $team_id ]
+            ]
+        );
+        
+        $ahsMatchCheckins = [];
+        foreach( $ahsResult as $hsResult ){
+            $oUser                      = new User( $oDb, $hsResult["user_id"] );
+            $hsResult["summoner_name"]  = $oUser->summoner_name;
+            $hsResult["main_role"]      = $oUser->main_role;
+            $ahsMatchCheckins[]         = $hsResult;
+        }
+
+        return $ahsMatchCheckins;
+    }
+    
+    public function getCheckinMemberSummonerId( $db ){
+        $asMatchCheckins = [];
+        
+        $ahsResult = MatchCheckin::getList(
+            $db,
+            [
+                [ "column" => "match_id",  "type" => "int", "value" => $this->id ]
+            ]
+        );
+        
+        foreach( $ahsResult as $hsResult ){
+            $oUser              = new User( $db, $hsResult["user_id"] );
+            $asMatchCheckins[]  = $oUser->summoner_id;
+        }
+
+        return $asMatchCheckins;
+    }
+    
+    public function getMatchByTournamentCode( $oDb, $tournament_code ){
+        $match = null;
+        
+        $ahsResult = Match::getList(
+            $oDb,
+            [
+                [ "column" => "tournament_code",  "type" => "varchar", "value" => $tournament_code ]
+            ]
+        );
+        
+        if( $ahsResult ){
+            $match = new Match( $oDb, $ahsResult[0]["id"] );
+        }
+        return $match;
+    }
+    
+    public function getMatchWinnerTeamBySummonerId( $summoner_id ){
+        $winner_team_id = 0;
+        
+        $ahsHostMembers     = $this->getCheckinByTeamId( $this->host_team_id );
+        $ahsApplyMembers    = $this->getCheckinByTeamId( $this->apply_team_id );
+        
+        if( self::getMatchTeamBySummonerId( $ahsHostMembers, $summoner_id) ){
+            $winner_team_id = $this->host_team_id;
+        }elseif( self::getMatchTeamBySummonerId( $ahsApplyMembers, $summoner_id) ){
+            $winner_team_id = $this->apply_team_id;
+        }
+        
+        return $winner_team_id;
+    }
+    
+    public function getMatchTeamBySummonerId( $member_list, $summoner_id ){
+        foreach( $member_list as $member ){
+            if( $member = $summoner_id ){
+                return true;
+            }
+        }
+        return false;
     }
 }

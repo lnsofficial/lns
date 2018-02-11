@@ -49,6 +49,12 @@
               </div>
             </div>
             <div class="form-group">
+              <label for="inputSNKana" class="col-sm-3 control-label">サモナー名（かな：必須）</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" id="inputSNKana" name="summoner_name_kana" placeholder="サモナー名（かな）" value="{$summoner_name_kana}" disabled>
+              </div>
+            </div>
+            <div class="form-group">
               <label for="inputMainRole" class="col-sm-3 control-label">メインロール（必須）</label>
               <div class="col-sm-9">
                 <select class="form-control"  id="inputMainRole" name="main_role" placeholder="メインロール" disabled>
@@ -67,12 +73,20 @@
               </div>
             </div>
             <div class="form-group">
+              <label for="inputComment" class="col-sm-3 control-label">意気込み</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" id="inputComment" name="comment" value="{$comment}" disabled>
+              </div>
+            </div>
+            <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
                 <input type="hidden" name="login_id" value="{$login_id}">
                 <input type="hidden" name="password" value="{$password}">
                 <input type="hidden" name="summoner_name" value="{$summoner_name}">
+                <input type="hidden" name="summoner_name_kana" value="{$summoner_name_kana}">
                 <input type="hidden" name="main_role" value="{$main_role}">
                 <input type="hidden" name="discord_id" value="{$discord_id}">
+                <input type="hidden" name="comment" value="{$comment}">
                 <button type="button" class="btn btn-default" onclick="history.back()">戻る</button>
                 <button type="submit" class="btn btn-default">送信</button>
               </div>

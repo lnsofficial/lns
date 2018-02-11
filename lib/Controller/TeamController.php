@@ -7,6 +7,7 @@ require_once( PATH_MODEL . 'TeamMembers.php' );
 require_once( PATH_MODEL . 'UserTeamApply.php' );
 require_once( PATH_MODEL . 'User.php' );
 require_once( PATH_LIB . '/common/UtilTime.php');
+require_once( PATH_MODEL . 'UserRank.php' );
 // TODO 最低限の共通化、全コントローラーで共通部分はBaseControllerにまとめる
 // 特別に処理を入れる場合のみ、各Controllerに追記する形で開発する
 class TeamController extends BaseController{
@@ -28,6 +29,130 @@ class TeamController extends BaseController{
         
         // 画面表示
         self::_displayConfirm();
+    }
+    
+    public function editForm(){
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+        
+        $team_id    = $_REQUEST["team_id"];
+        
+        $oDb = new Db();
+        
+        $oLoginUser = new User( $oDb, $_SESSION["id"] );
+        
+        $oTeam = new Teams( $oDb, $team_id );
+        
+        $authorized = $oTeam->isAuthorized( $oLoginUser->id );
+        if( !$authorized ){
+            self::displayCommonError([
+                'message' => "権限がありません。",
+                'button'   => [
+                    'href'      => "/Team/detail/" . $team_id,
+                    'name'      => "チーム詳細へ戻る",
+                ],
+            ]);
+            exit;
+        }
+        
+        $smarty = new Smarty();
+        $smarty->template_dir = PATH_TMPL;
+        $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
+        
+        $smarty->assign("team", $oTeam);
+        
+        $smarty->display('Team/edit_form.tmpl');
+    }
+    
+    public function editConfirm(){
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+        
+        $team_id    = $_REQUEST["team_id"];
+        
+        $oDb = new Db();
+        
+        $oLoginUser = new User( $oDb, $_SESSION["id"] );
+        
+        $oTeam = new Teams( $oDb, $team_id );
+        
+        $authorized = $oTeam->isAuthorized( $oLoginUser->id );
+        if( !$authorized ){
+            self::displayCommonError([
+                'message' => "権限がありません。",
+                'button'   => [
+                    'href'      => "/Team/detail/" . $team_id,
+                    'name'      => "チーム詳細へ戻る",
+                ],
+            ]);
+            exit;
+        }
+        
+        // バリデーション（今のとこ必須チェックだけ）
+        if( !self::validation() ){
+            self::displayError();
+            exit;
+        }
+        
+        // 画面表示
+        $smarty = new Smarty();
+        $smarty->template_dir = PATH_TMPL;
+        $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
+        
+        $smarty->assign("team_id", $team_id);
+        $smarty->assign("inputTeamNm", $_REQUEST["inputTeamNm"]);
+        $smarty->assign("inputTeamNmKana", $_REQUEST["inputTeamNmKana"]);
+        $smarty->assign("inputTeamTag", $_REQUEST["inputTeamTag"]);
+        $smarty->assign("inputTeamTagKana", $_REQUEST["inputTeamTagKana"]);
+        $smarty->assign("inputComment", $_REQUEST["inputComment"]);
+        
+        $smarty->display('Team/edit_confirm.tmpl');
+    }
+    
+    public function editComplete(){
+        session_set_save_handler( new MysqlSessionHandler() );
+        require_logined_session();
+        // バリデーション（今のとこ必須チェックだけ）
+        if( !self::validation() ){
+            self::displayError();
+            exit;
+        }
+        
+        $team_id    = $_REQUEST["team_id"];
+        
+        $oDb = new Db();
+        
+        $oLoginUser = new User( $oDb, $_SESSION["id"] );
+        
+        $oTeam = new Teams( $oDb, $team_id );
+        
+        $authorized = $oTeam->isAuthorized( $oLoginUser->id );
+        if( !$authorized ){
+            self::displayCommonError([
+                'message' => "権限がありません。",
+                'button'   => [
+                    'href'      => "/Team/detail/" . $team_id,
+                    'name'      => "チーム詳細へ戻る",
+                ],
+            ]);
+            exit;
+        }
+        
+        $oDb->beginTransaction();
+        
+        $oTeam->team_name       = $_REQUEST["inputTeamNm"];
+        $oTeam->team_name_kana  = $_REQUEST["inputTeamNmKana"];
+        $oTeam->team_tag        = $_REQUEST["inputTeamTag"];
+        $oTeam->team_tag_kana   = $_REQUEST["inputTeamTagKana"];
+        $oTeam->comment         = $_REQUEST["inputComment"];
+        
+        $oTeam->save();
+        $oDb->commit();
+        
+        // 画面表示
+        header('Location: /Team/Detail/' . $team_id);
     }
     
     public function register(){
@@ -95,6 +220,7 @@ class TeamController extends BaseController{
         $oTeams->team_name_kana = $_REQUEST["inputTeamNmKana"];
         $oTeams->team_tag = $_REQUEST["inputTeamTag"];
         $oTeams->team_tag_kana = $_REQUEST["inputTeamTagKana"];
+        $oTeams->comment = $_REQUEST["inputComment"];
         $oTeams->save();
     
         return $oTeams->id;
@@ -121,11 +247,13 @@ class TeamController extends BaseController{
         
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         
         $smarty->assign("inputTeamNm", $_REQUEST["inputTeamNm"]);
         $smarty->assign("inputTeamNmKana", $_REQUEST["inputTeamNmKana"]);
         $smarty->assign("inputTeamTag", $_REQUEST["inputTeamTag"]);
         $smarty->assign("inputTeamTagKana", $_REQUEST["inputTeamTagKana"]);
+        $smarty->assign("inputComment", $_REQUEST["inputComment"]);
         
         $smarty->display('Team/confirm.tmpl');
     }
@@ -134,6 +262,8 @@ class TeamController extends BaseController{
         
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
+        
         $smarty->assign("inputTeamNm", $_REQUEST["inputTeamNm"]);
         $smarty->assign("inputTeamNmKana", $_REQUEST["inputTeamNmKana"]);
         $smarty->assign("inputTeamTag", $_REQUEST["inputTeamTag"]);
@@ -149,9 +279,11 @@ class TeamController extends BaseController{
         
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         
         $smarty->display('TeamRegister_err.tmpl');
     }
+    
     /**
      * // [SubFunction]汎用エラー画面だすやつ
      *
@@ -171,9 +303,12 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
+        
         $smarty->assign("error", $error);
         $smarty->display('commonError.tmpl');
     }
+    
     public function detail( $team_id = 0 ){
         session_set_save_handler( new MysqlSessionHandler() );
         @session_start();
@@ -204,7 +339,10 @@ class TeamController extends BaseController{
         $team_staffs = TeamStaffs::getByTeamId( $oTeam->id );
         // users
         
+
+        // 「大会に参加する」ボタンの表示可否
         $bLogin = false;
+        $oUserRank = new UserRank( $oDb );
         $isThisTeamJoinedLadder = false;
         if( isset( $_SESSION["id"] ) ){
             $bLogin = true;
@@ -219,12 +357,21 @@ class TeamController extends BaseController{
                 $isThisTeamJoinedLadder = true;
                 $isThisTeamEnableJoinLadder = false;
             }
-            
-            if( count( $team_members ) ){
-                foreach( $team_members as $member ){
-                    if( !isset( $member["summoner_id"] ) || !isset( $member["tier"] ) || !isset( $member["rank"] ) ){
+            // 既に"今期"大会に参加済み( $oTeam->getCurrentLadder( $oDb )==true相当 )だったらここのチェックはしない。
+            else
+            {
+                if( count( $team_members ) )
+                {
+                    foreach( $team_members as $member )
+                    {
+                        // 現在ランクと前シーズンランクの情報があるか？
+                        $user_rank_now    = $oUserRank->findByUserId($member['user_id']);
+                        $user_rank_before = $oUserRank->findBeforeSeasonByUserId($member['user_id']);
+                        if( !isset( $member["summoner_id"] ) || empty( $user_rank_now ) || empty( $user_rank_before ) )
+                        {
                         $isThisTeamEnableJoinLadder = false;
                         break;
+                        }
                     }
                 }
             }
@@ -234,6 +381,9 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
+        $smarty->default_modifiers[] = 'nl2br';
+        
         $smarty->assign( "login"            , $bLogin );
         $smarty->assign( "team_members"     , $team_members );
         $smarty->assign( "team_owner"       , $team_owner );
@@ -284,6 +434,7 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         $smarty->display('Team/form.tmpl');
     }
     
@@ -301,6 +452,7 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         $smarty->assign( "team_list" , $aoTeamList );
         $smarty->assign( "team", $oTeam );
         
@@ -386,6 +538,7 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         $smarty->assign( "user_team_apply"	, $user_team_apply );
         $smarty->display('Team/apply_complete.tmpl');
     }
@@ -461,6 +614,7 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         $smarty->assign( "user_team_apply"	, $user_team_apply );
         $smarty->display('Team/apply_accept.tmpl');
     }
@@ -655,6 +809,7 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         $smarty->assign( "user_team_apply"	, $user_team_apply );
         $smarty->display('Team/apply_deny.tmpl');
     }
@@ -735,6 +890,7 @@ class TeamController extends BaseController{
         $smarty = new Smarty();
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         $smarty->assign( "team_id"  , $team_id );
         $smarty->assign( "type"     , $type );
         $smarty->display('Team/TeamLeave_complete.tmpl');
@@ -782,6 +938,7 @@ class TeamController extends BaseController{
         
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
         
         $smarty->assign( "logo_file" , $logo_file);
         $smarty->display('Team/LogoUploaded.tmpl');

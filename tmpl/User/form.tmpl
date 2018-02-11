@@ -54,6 +54,12 @@
               </div>
             </div>
             <div class="form-group">
+              <label for="inputSNKana" class="col-sm-3 control-label">サモナー名（かな：必須）</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" pattern="^[ぁ-んー]+$" id="inputSNKana" name="summoner_name_kana" placeholder="サモナー名（かな）" value="{if isset($summoner_name_kana)}{$summoner_name_kana}{/if}">
+              </div>
+            </div>
+            <div class="form-group">
               <label for="inputMainRole" class="col-sm-3 control-label">メインロール（必須）</label>
               <div class="col-sm-9">
                 <select class="form-control"  id="inputMainRole" name="main_role" placeholder="メインロール">
@@ -73,6 +79,12 @@
               </div>
             </div>
             <div class="form-group">
+              <label for="inputComment" class="col-sm-3 control-label">意気込み</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" id="inputComment" name="comment" placeholder="意気込み" value="{if isset($comment)}{$comment}{/if}">
+              </div>
+            </div>
+            <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
                 <button type="submit" class="btn btn-default">確認画面へ</button>
               </div>
@@ -87,6 +99,7 @@
     <script src="/js/jquery-1.11.3.min.js"></script>
     <script type="text/javascript">
         function check(){
+            return true;
             var result = true;
             if( $("#inputID").val() == "" ){
                 result = false;
