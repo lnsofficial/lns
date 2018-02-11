@@ -181,7 +181,6 @@ class UserController extends BaseController{
             
             $oDb->commit();
             
-            exit();
             header('Location: /User/MyPage');
         }
     }
