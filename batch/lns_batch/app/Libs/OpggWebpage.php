@@ -76,9 +76,12 @@ class OpggWebpage
 			$season = LolSeason::findBeforeSeason();
 
 			// シーズンランク情報が1シーズンのみか2シーズン以上かで構造が違う
-			if( isset($arr["body"]["li"]["@attributes"]) && isset($arr["body"]["li"]["b"]) && $arr["body"]["li"]["b"] == $season->season )
+			if( isset($arr["body"]["li"]["@attributes"]) && isset($arr["body"]["li"]["b"]) )
 			{
-				$tierrank = $this->__extractTireRank($arr["body"]["li"]);
+				if( $arr["body"]["li"]["b"] == $season->season )
+				{
+					$tierrank = $this->__extractTireRank($arr["body"]["li"]);
+				}
 			}
 			else
 			{
