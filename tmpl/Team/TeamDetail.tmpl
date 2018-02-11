@@ -99,7 +99,7 @@
               {if $member.main_role == 5}Support{/if}
               </td>
               <td>{$member.comment}</td>
-              <td>{if $member.summoner_id}確認済み{else}{if $member.last_api_queue_state == ApiQueues::STATE_UNTREATED}未確認{elseif $member.last_api_queue_state == ApiQueues::STATE_FAILED}エラー{/if}{/if}</td>
+              <td>{if isset( $member.now_rank ) && isset( $member.before_rank ) }確認済み{else}{if ( $member.last_api_queue_state == ApiQueues::STATE_UNTREATED ) || ( !isset( $member.now_rank ) && !isset( $member.before_rank ) ) }未確認{elseif $member.last_api_queue_state == ApiQueues::STATE_FAILED}エラー{/if}{/if}</td>
             </tr>
           {/foreach}
         </table>

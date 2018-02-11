@@ -32,11 +32,14 @@ class TeamMembers extends Base{
         $team_members = [];
         while( $team_member = $result->fetch_assoc() )
         {
+            $oUserRank = new UserRank( $db );
             $oUser = new User( $db, $team_member["user_id"] );
             $oLastApiQueue = $oUser->getLastApiQueue();
             $team_member["summoner_name_kana"] = $oUser->summoner_name_kana;
             $team_member["last_api_queue_state"] = $oLastApiQueue->state;
             $team_member["comment"] = $oUser->comment;
+            $team_member["now_rank"] = $oUserRank->findByUserId($team_member['user_id']);
+            $team_member["before_rank"] = $oUserRank->findBeforeSeasonByUserId($team_member['user_id']);
             $team_members[] = $team_member;
         }
 

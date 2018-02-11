@@ -342,7 +342,6 @@ class TeamController extends BaseController{
 
         // 「大会に参加する」ボタンの表示可否
         $bLogin = false;
-        $oUserRank = new UserRank( $oDb );
         $isThisTeamJoinedLadder = false;
         if( isset( $_SESSION["id"] ) ){
             $bLogin = true;
@@ -365,12 +364,10 @@ class TeamController extends BaseController{
                     foreach( $team_members as $member )
                     {
                         // 現在ランクと前シーズンランクの情報があるか？
-                        $user_rank_now    = $oUserRank->findByUserId($member['user_id']);
-                        $user_rank_before = $oUserRank->findBeforeSeasonByUserId($member['user_id']);
-                        if( !isset( $member["summoner_id"] ) || empty( $user_rank_now ) || empty( $user_rank_before ) )
+                        if( !isset( $member["summoner_id"] ) || empty( $member["now_rank"] ) || empty( $member["before_rank"] ) )
                         {
-                        $isThisTeamEnableJoinLadder = false;
-                        break;
+                            $isThisTeamEnableJoinLadder = false;
+                            break;
                         }
                     }
                 }
