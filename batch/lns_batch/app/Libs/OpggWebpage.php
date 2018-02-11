@@ -62,8 +62,8 @@ class OpggWebpage
 	{
 		// PastRankListタグがあるなら、いずれかの過去シーズンのランクデータがある。
 		preg_match('/PastRankList">(.+?)<\/ul/s', $this->html, $matches);
-		$tier = "UNRANK";
-		$rank = "UNRANK";
+		$tierrank["tier"] = "UNRANK";
+		$tierrank["rank"] = "UNRANK";
 
 		if( !empty($matches[1]) )
 		{
@@ -74,46 +74,71 @@ class OpggWebpage
 			$arr    = json_decode(json_encode($xmlObj), true);
 
 			$season = LolSeason::findBeforeSeason();
-			foreach( $arr["body"]["li"] as $li )
+
+			// シーズンランク情報が1シーズンのみか2シーズン以上かで構造が違う
+			if( isset($arr["body"]["li"]["@attributes"]) && isset($arr["body"]["li"]["b"]) )
 			{
-				if( $li["b"] == $season->season )
+				$tierrank = $this->__extractTireRank($arr["body"]["li"]);
+			}
+			else
+			{
+				foreach( $arr["body"]["li"] as $li )
 				{
-					$tmp = explode(" ", $li["@attributes"]["title"]);
-			
-					$tier = mb_strtoupper($tmp[0]);
-					// tierがちゃれますならrankはI固定。
-					if( $tier == "CHALLENGER" || $tier == "MASTER" )
+					if( $li["b"] == $season->season )
 					{
-						$rank = "I";
+						$tierrank = $this->__extractTireRank($li);
+						break;
 					}
-					else
-					{
-						switch($tmp[1])
-						{
-							case "1":
-									$rank = "I";
-									break;
-							case "2":
-									$rank = "II";
-									break;
-							case "3":
-									$rank = "III";
-									break;
-							case "4":
-									$rank = "IV";
-									break;
-							case "5":
-									$rank = "V";
-									break;
-						}
-					}
-					break;
 				}
 			}
 		}
+		return $tierrank;
+	}
+
+
+	/**
+	 * // 
+	 *
+	 * @param  array                           // [@attribute,b]
+	 * @return array                           // [tier,rank]
+	 */
+	private function __extractTireRank( $li_block )
+	{
+		$tier = "UNRANK";
+		$rank = "UNRANK";
+	
+		$tmp = explode(" ", $li_block["@attributes"]["title"]);
+	
+		$tier = mb_strtoupper($tmp[0]);
+		if( $tier == "CHALLENGER" || $tier == "MASTER" )
+		{
+			$rank = "Ⅰ";
+		}
+		else
+		{
+			switch($tmp[1])
+			{
+				case "1":
+					$rank = "Ⅰ";
+					break;
+				case "2":
+					$rank = "Ⅱ";
+					break;
+				case "3":
+					$rank = "Ⅲ";
+					break;
+				case "4":
+					$rank = "Ⅳ";
+					break;
+				case "5":
+					$rank = "Ⅴ";
+					break;
+			}
+		}
+	
 		return [
-			'tier' => $tier,
-			'rank' => $rank,
+			"tier" => $tier,
+			"rank" => $rank,
 		];
 	}
 
