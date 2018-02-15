@@ -843,6 +843,10 @@ class TeamController extends BaseController{
         switch( $type ){
             case UserTeamApply::TYPE_MEMBER:
                 // メンバー
+                if( $oTeam->getCurrentLadder( $oDb ) ){
+                    self::displayError();
+                    exit;
+                }
                 // 脱退申請した職種でなければエラー
                 if( empty( $ahsTeamMemberInfo["member"] ) ){
                     self::displayError();
