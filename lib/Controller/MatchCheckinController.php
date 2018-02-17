@@ -68,10 +68,22 @@ class MatchCheckinController extends BaseController{
                 $asAuthorizedTeamInfo["team_members"] = $enable_checkin_members;
                 
                 $team_staffs = TeamStaffs::getByTeamId( $iTeamId );
-                $asAuthorizedTeamInfo["team_staffs"] = $team_staffs;
+                $enable_checkin_staffs = [];
+                foreach( $team_staffs as $team_staff ){
+                    if( $team_staff["summoner_id"] != null ){
+                        $enable_checkin_staffs[] = $team_staff;
+                    }
+                }
+                $asAuthorizedTeamInfo["team_staffs"] = $enable_checkin_staffs;
                 
-                $team_contact = TeamContact::getByTeamId( $iTeamId );
-                $asAuthorizedTeamInfo["team_contact"] = $team_contact;
+                $team_contacts = TeamContact::getByTeamId( $iTeamId );
+                $enable_checkin_contacts = [];
+                foreach( $team_contacts as $team_contact ){
+                    if( $team_contact["summoner_id"] != null ){
+                        $enable_checkin_contacts[] = $team_contact;
+                    }
+                }
+                $asAuthorizedTeamInfo["team_contact"] = $enable_checkin_contacts;
                 
                 $ahsMatchTeam[] = $asAuthorizedTeamInfo;
             }
