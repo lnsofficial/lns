@@ -91,7 +91,7 @@
 .container-fluid {
 	width: 1200px;
 }
-.col-lg-5.news-left {
+.col-lg-4.news-left {
 	border-left: 3px solid #00CCCC;
 }
 
@@ -100,6 +100,7 @@
 
 }
 .footer-info {
+	margin-top: 15px;
 	background-color: #00CCCC;
 	padding-top: 15px;
 	padding-bottom: 10px;
