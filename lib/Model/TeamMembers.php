@@ -1,5 +1,6 @@
 <?php
 require_once( PATH_MODEL . "Base.php" );
+require_once( PATH_MODEL . "UserRank.php" );
 
 class TeamMembers extends Base{
 	const MAIN_TABLE			= "team_members";
