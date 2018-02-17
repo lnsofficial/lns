@@ -120,6 +120,7 @@ function updateTeamLadderNormal( $oDb, $oWinTeam, $oLoseTeam ){
 			}
 			
 			break;
+			/*
 		case 1:
 			// １つ上のブロック
 			writeLog("[updateTeamLadderNormal][TeamId:" . $oWinTeam->id . ",TeamName:" . $oWinTeam->team_name . "]+3 Point");
@@ -131,6 +132,7 @@ function updateTeamLadderNormal( $oDb, $oWinTeam, $oLoseTeam ){
 				$oLoseLadder->point -= 2;
 			}
 			break;
+			*/
 		case $iRankDiff < 0:
 			// 下位ブロック
 			writeLog("[updateTeamLadderNormal][TeamId:" . $oWinTeam->id . ",TeamName:" . $oWinTeam->team_name . "]+2 Point");
@@ -142,11 +144,10 @@ function updateTeamLadderNormal( $oDb, $oWinTeam, $oLoseTeam ){
 				$oLoseLadder->point -= 1;
 			}
 			break;
-		case $iRankDiff > 1:
-			// ２つ以上上のブロック
-			// 相手の一つ下のリーグ取得
-			$oWinLeague = $oLoseLeague->getUnderOneLeague( $oDb );
-			$oWinLadder->league_id = $oWinLeague->id;
+		case $iRankDiff > 0:
+			// １つ以上上のブロック
+			// 相手のリーグ取得
+			$oWinLadder->league_id = $oLoseLeague->id;
 			writeLog("[updateTeamLadderNormal][TeamId:" . $oWinTeam->id . ",TeamName:" . $oWinTeam->team_name . "]Up LeagueId:" . $oWinLadder->league_id);
 			writeLog("[updateTeamLadderNormal][TeamId:" . $oLoseTeam->id . ",TeamName:" . $oLoseTeam->team_name . "]-2 Point");
 			$oWinLadder->point = 0;
