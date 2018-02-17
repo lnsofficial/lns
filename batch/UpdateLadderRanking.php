@@ -51,6 +51,7 @@ function createNewLadder( $oDb ){
 		
 		$oNewLadder->team_id = $info["team_id"];
 		$oNewLadder->league_id = $info["league_id"];
+		$oNewLadder->season = SEASON_NOW;
 		$oNewLadder->point = $info["point"];
 		$oNewLadder->term = $iTerm + 1;
 		$oNewLadder->save();
