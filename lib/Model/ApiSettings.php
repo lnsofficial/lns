@@ -28,7 +28,7 @@ class ApiSettings extends Base{
         $oDb = new Db();
         $oUser = null;
         
-        $ahsResult = static::getList( $oDb, [ [ "column" => "setting_name",  "type" => "varchar", "value" => $setting_name ] ] );
+        $ahsResult = ApiSettings::getList( $oDb, [ [ "column" => "setting_name",  "type" => "varchar", "value" => $setting_name ] ] );
         
         if( $ahsResult ){
             $value = $ahsResult[0]["value"];

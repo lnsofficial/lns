@@ -21,6 +21,7 @@ class Match extends Base{
         "screen_shot_url"       => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
         "tournament_code"       => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
         "match_id"              => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false   ],
+        "match_info"            => [ "type" => "varchar"    , "min" => 1    ,"max" => 2147483647    , "required" => false   , "null" => true    ],
     ];
     
     const MATCH_TYPE_ANY                    = 1;
@@ -224,19 +225,23 @@ class Match extends Base{
     }
     
     /**
-     * チェックイン可能な日時か
+     * チェックイン可能か
      */
-    public function enableCheckin(){
-        $enableCheckin = false;
-        $start_date    = date( "Y-m-d h:i:s", strtotime( $this->match_date . "-1 hour" ) );
-        $end_date      = date( "Y-m-d h:i:s", strtotime( $this->match_date . "-10 minute" ) );
-        $current_date  = date( "Y-m-d h:i:s" );
+    public function enableCheckin( $iTeamId ){
+        $start_date    = date( "Y-m-d H:i:s", strtotime( $this->match_date . "-1 hour" ) );
+        $end_date      = date( "Y-m-d H:i:s", strtotime( $this->match_date . "-10 minute" ) );
+        $current_date  = date( "Y-m-d H:i:s" );
         
-        if( $current_date <= $end_date && $current_date >= $start_date ){
-            $enableCheckin = true;
+        if( $current_date >= $end_date || $current_date <= $start_date ){
+            return false;
         }
         
-        return $enableCheckin;
+        $ahsCheckin = $this->getCheckinByTeamId( $iTeamId );
+        if( isset( $ahsCheckin ) && !empty($ahsCheckin) ){
+            return false;
+        }
+        
+        return true;
     }
 
     public function checkRecruitMatchDate($match_date){
@@ -252,10 +257,13 @@ class Match extends Base{
         return true;
     }
     
-    public function getCheckinStatus(){
+    public function getCheckinStatus( $db = null ){
         $checkinStatus = false;
-        $host_team_checkins = $this->getCheckinByTeamId( $this->host_team_id );
-        $apply_team_checkins = $this->getCheckinByTeamId( $this->apply_team_id );
+        if( empty( $db ) ){
+            $db = new Db();
+        }
+        $host_team_checkins = $this->getCheckinByTeamId( $this->host_team_id, $db );
+        $apply_team_checkins = $this->getCheckinByTeamId( $this->apply_team_id, $db );
         
         if( $host_team_checkins && $apply_team_checkins ){
             $checkinStatus = true;
@@ -271,14 +279,16 @@ class Match extends Base{
      * @param  int                  $team_id                // teams.id
      * @return MatchCheckin[]
      */
-    public function getCheckinByTeamId( $team_id ){
+    public function getCheckinByTeamId( $team_id, $db = null ){
         if( empty( $team_id ) ){
             return null;
         }
         
-        $oDb = new Db();
+        if( empty( $db ) ){
+            $db = new Db();
+        }
         $ahsResult = MatchCheckin::getList(
-            $oDb,
+            $db,
             [
                 [ "column" => "match_id",  "type" => "int", "value" => $this->id ],
                 [ "column" => "team_id",   "type" => "int", "value" => $team_id ]
@@ -287,7 +297,7 @@ class Match extends Base{
         
         $ahsMatchCheckins = [];
         foreach( $ahsResult as $hsResult ){
-            $oUser                      = new User( $oDb, $hsResult["user_id"] );
+            $oUser                      = new User( $db, $hsResult["user_id"] );
             $hsResult["summoner_name"]  = $oUser->summoner_name;
             $hsResult["main_role"]      = $oUser->main_role;
             $ahsMatchCheckins[]         = $hsResult;
@@ -299,6 +309,7 @@ class Match extends Base{
     public function getCheckinMemberSummonerId( $db ){
         $asMatchCheckins = [];
         
+        // 両チームのメンバーをセット
         $ahsResult = MatchCheckin::getList(
             $db,
             [
@@ -310,7 +321,14 @@ class Match extends Base{
             $oUser              = new User( $db, $hsResult["user_id"] );
             $asMatchCheckins[]  = $oUser->summoner_id;
         }
-
+        
+        // 運営の観戦者をセット
+        $ahsMatchObserversResult = ManagementObservers::getAllObservers();
+        
+        foreach( $ahsMatchObserversResult as $hsResult ){
+            $asMatchCheckins[]  = $hsResult["summoner_id"];
+        }
+        
         return $asMatchCheckins;
     }
     

@@ -39,7 +39,7 @@
               </li>
               {foreach from=$teams item=team key=id}
                 {if $team.join}<li role="presentation" name="team_{$team.id}"><a href="" onClick="join(); return false;">試合を申し込む</a></li>{/if}
-                {if false}{if $team.checkin}<li role="presentation" name="team_{$team.id}"><a href="" onClick="checkin(); return false;">チェックイン(確定/修正)する</a></li>{/if}{/if}
+                {if $team.checkin}<li role="presentation" name="team_{$team.id}"><a href="" onClick="checkin(); return false;">チェックイン</a></li>{/if}
                 {if $team.cancel}<li role="presentation" name="team_{$team.id}"><a href="" onClick="cancel(); return false;">試合をキャンセル</a></li>{/if}
                 {if $team.penalty_cancel}<li role="presentation" name="team_{$team.id}"><a href="" onClick="cancelPenalty(); return false;">試合を当日キャンセル</a></li>{/if}
                 {if $team.result}<li role="presentation" name="team_{$team.id}"><a href="" onClick="registerResult(); return false;">試合結果を登録</a></li>{/if}
@@ -91,8 +91,14 @@
           <div class="form-group">
             ※試合結果は、試合日時後の朝6時までに登録してください
           </div>
-          {if false}
           {if $match_info->state == MATCH::MATCH_STATE_MATCHED}
+          <div class="form-group">
+             <label for="leader">トーナメントコード</label>
+             <input type="text" id="tournament_code" class="form-control" value="{$match_info->tournament_code}" readonly>
+          </div>
+          <div class="form-group">
+            ※トーナメントコードの使い方は<a href="#">こちら</a>
+          </div>
           <h2>チェックイン状況</h2>
           <div class="form-group">
             <label for="team_name">{$host_team_name}</label>
@@ -100,6 +106,7 @@
               <tr>
                 <th>サモナーネーム　</th>
                 <th>メインロール　</th>
+                <th>種類　</th>
               </tr>
               {foreach from=$host_checkin item=member key=member_id}
               <tr>
@@ -111,6 +118,7 @@
                 {if $member.main_role == 4}ADC{/if}
                 {if $member.main_role == 5}Support{/if}
                 </td>
+                <td>{if $member.type == 1}選手{else}観戦{/if}</td>
               </tr>
               {/foreach}
             </table>
@@ -121,6 +129,7 @@
               <tr>
                 <th>サモナーネーム　</th>
                 <th>メインロール　</th>
+                <th>種類　</th>
               </tr>
               {foreach from=$apply_checkin item=member key=member_id}
               <tr>
@@ -132,11 +141,16 @@
                 {if $member.main_role == 4}ADC{/if}
                 {if $member.main_role == 5}Support{/if}
                 </td>
+                <td>{if $member.type == 1}選手{else}観戦{/if}</td>
               </tr>
               {/foreach}
             </table>
           </div>
           {/if}
+          {if $match_info->state == MATCH::MATCH_STATE_FINISHED && $match_info->match_info != null}
+          <div class="form-group">
+             <a class="btn btn-primary btn-lg" href="/MatchResult/Detail/{$match_info->id}" role="button">試合情報詳細</a>
+          </div>
           {/if}
         </div>
       </div>
@@ -194,6 +208,11 @@
       document.form1.action = "/MatchResult/Form";
       document.form1.submit();
     }
+    $("#tournament_code").on("click",function(){
+        $(this).select();
+        document.execCommand('copy');
+        alert("クリップボードにコピーしました");
+    });
   </script>
   <!-- Include all compiled plugins (below), or include individual files as needed --> 
   <script src="/js/bootstrap.js"></script>

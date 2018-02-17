@@ -9,6 +9,8 @@ require_once( PATH_MODEL . 'League.php' );
 require_once( PATH_MODEL . 'MatchCheckin.php' );
 require_once( PATH_MODEL . 'Settings.php' );
 
+require_once( PATH_RIOTAPI . 'MatchesById.php' );
+
 class MatchController extends BaseController{
     const DISPLAY_DIR_PATH    = "Match";
     const DISPLAY_FILE_PATH    = "Match_common";
@@ -43,6 +45,9 @@ class MatchController extends BaseController{
         $ahsAuthorizedTeamInfo = $oLoginUser->getAuthorizedTeam();
         
         $ahsTeamInfo = [];
+            
+        $ahsHostCheckins  = null;
+        $ahsApplyCheckins = null;
         
         foreach( $ahsAuthorizedTeamInfo as $asAuthorizedTeamInfo ){
             $oTeam = new Teams( $oDb, $asAuthorizedTeamInfo["id"] );
@@ -80,7 +85,12 @@ class MatchController extends BaseController{
                             // 通常のキャンセルができない場合は、直前キャンセル
                             $asTeamInfo["penalty_cancel"] = true;
                         }
-                        $asTeamInfo["checkin"]  = $oMatch->enableCheckin();
+                        $ahsHostCheckins  = $oMatch->getCheckinByTeamId( $oHostTeam->id );
+                        if( $oApplyTeam ){
+                            $ahsApplyCheckins = $oMatch->getCheckinByTeamId( $oApplyTeam->id );
+                        }
+                        
+                        $asTeamInfo["checkin"]  = $oMatch->enableCheckin( $oTeam->id );
                         $asTeamInfo["result"]   = $oMatch->expirationRegistMatchResult();
                     }
                     break;
@@ -89,11 +99,6 @@ class MatchController extends BaseController{
             $ahsTeamInfo[] = $asTeamInfo;
         }
         
-        $ahsHostCheckins  = $oMatch->getCheckinByTeamId( $oHostTeam->id );
-        $ahsApplyCheckins = null;
-        if( $oApplyTeam ){
-            $ahsApplyCheckins = $oMatch->getCheckinByTeamId( $oApplyTeam->id );
-        }
 
         $smarty = new Smarty();
         
@@ -599,15 +604,22 @@ class MatchController extends BaseController{
         $match = Match::getMatchByTournamentCode( $db, $result->shortCode );
         
         if($match){
-            $winnerTeamSummonerId = $result->winningTeam[0]->summonerId;
-            $winner_team_id = $match->getMatchWinnerTeamBySummonerId( $winnerTeamSummonerId );
-            $match_id = $result->gameId;
+            $winnerTeamSummonerId   = $result->winningTeam[0]->summonerId;
+            $winner_team_id         = $match->getMatchWinnerTeamBySummonerId( $winnerTeamSummonerId );
+            $match_id               = $result->gameId;
             
             if($winner_team_id > 0){
-                $match->winner   = $winner_team_id;
-                $match->state    = Match::MATCH_STATE_FINISHED;
-                $match->match_id = $match_id;
+                $api = new MatchesById();
+                $api->setParams(["id" => $match_id]);
+                
+                $json = $api->execApi();
+                
+                $match->winner      = $winner_team_id;
+                $match->state       = Match::MATCH_STATE_FINISHED;
+                $match->match_id    = $match_id;
+                $match->match_info  = json_encode( $json );
                 $match->save();
+                var_dump($match);
             }else{
                 $match->state   = Match::MATCH_STATE_ERROR;
             }
