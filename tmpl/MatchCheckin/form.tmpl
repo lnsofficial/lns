@@ -32,7 +32,7 @@
       </div>
 
       <div class="col-lg-9">
-        <form name="form2" method="post" action="/MatchCheckin/commit" onSubmit="return chkCheckin()">
+        <form name="form2" method="post" action="/MatchCheckin/confirm">
         <input type="hidden" name="match_id" value="{$match->id}" />
         
         <h2>チーム</h2>
@@ -60,14 +60,47 @@
               {if $member.main_role == 4}ADC{/if}
               {if $member.main_role == 5}Support{/if}
               </td>
-              <td><input type="checkbox" name="user_{$member.user_id}" value="1" {if $member.is_checkin}checked{/if} ></td>
+              <td align="center"><input type="checkbox" name="member_{$member.user_id}" value="1"></td>
             </tr>
             {/foreach}
           {/foreach}
         </table>
         <p>試合に出る5名のメンバーにチェックを入れてください。</p>
 
-        <button type="submit" class="btn btn-default">このメンバーでチェックインする</button>
+        <h2>チームの観戦者</h2>
+        <table  class="table-bordered">
+          <tr>
+            <th>サモナーネーム　</th>
+            <th>メンバー種別　</th>
+            <th>チェックイン状況　</th>
+          </tr>
+          {foreach from=$teams item=team key=id}
+            {foreach from=$team.team_members item=member key=id}
+            <tr name="team_{$team.id}">
+              <td>{$member.summoner_name}</td>
+              <td>選手</td>
+              <td align="center"><input type="radio" name="observer" value="{$member.user_id}"></td>
+            </tr>
+            {/foreach}
+            {foreach from=$team.team_contact item=contact key=id}
+            <tr name="team_{$team.id}">
+              <td>{$contact.summoner_name}</td>
+              <td>連絡先</td>
+              <td align="center"><input type="radio" name="observer" value="{$contact.user_id}"></td>
+            </tr>
+            {/foreach}
+            {foreach from=$team.team_staffs item=staffs key=id}
+            <tr name="team_{$team.id}">
+              <td>{$staffs.summoner_name}</td>
+              <td>アナリスト</td>
+              <td align="center"><input type="radio" name="observer" value="{$staffs.user_id}"></td>
+            </tr>
+            {/foreach}
+          {/foreach}
+        </table>
+        <p>試合を観戦するメンバー１名にチェックを入れてください。</p>
+
+        <button type="submit" class="btn btn-default">確認</button>
         </form>
       </div>
 
@@ -97,15 +130,6 @@
             }else{
                 $('[name="team_' + team_id.eq(i).val() + '"]').hide();
             }
-        }
-    }
-    
-    function chkCheckin(){
-        ret = confirm("このメンバーで試合に出ます。よろしいですか？");
-        if ( ret == true ){
-            return true;
-        }else{
-            return false;
         }
     }
   // --></script>
