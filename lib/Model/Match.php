@@ -365,7 +365,7 @@ class Match extends Base{
     
     public function getMatchTeamBySummonerId( $member_list, $summoner_id ){
         foreach( $member_list as $member ){
-            if( $member = $summoner_id ){
+            if( $member["summoner_id"] == $summoner_id ){
                 return true;
             }
         }
