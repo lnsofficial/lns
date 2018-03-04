@@ -376,7 +376,7 @@ class MatchController extends BaseController{
             $ahsMatch["id"]                 = $row["id"];
             $ahsMatch["new"]                = $bNew;
             $ahsMatch["state"]              = $row["state"];
-            $ahsMatch["match_date"]         = date('n月j日 H:i', strtotime( $row["match_date"]) );
+            $ahsMatch["match_date"]         = UtilTime::timeToStrForMatchList($row["match_date"]);
             $ahsMatch["host_team_id"]       = $row["host_team_id"];
             $ahsMatch["host_team_name"]     = $oHostTeam->team_name;
             $ahsMatch["host_league_name"]   = $oHostLeague->league_name;
