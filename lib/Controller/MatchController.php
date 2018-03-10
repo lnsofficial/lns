@@ -108,8 +108,10 @@ class MatchController extends BaseController{
         $smarty->assign( "match_info"           , $oMatch );
         $smarty->assign( "teams"                , $ahsTeamInfo );
         $smarty->assign( "host_team_name"       , $oHostTeam->team_name );
+        $smarty->assign( "host_team_logo"       , Teams::getLogoFileName($oHostTeam->id) );
         if( $oApplyTeam ){
             $smarty->assign( "apply_team_name"  , $oApplyTeam->team_name );
+            $smarty->assign( "apply_team_logo"  , Teams::getLogoFileName($oApplyTeam->id) );
         }
         if( isset( $ahsHostCheckins ) ){
             $smarty->assign( "host_checkin"     , $ahsHostCheckins );

@@ -37,7 +37,13 @@ class Teams extends Base{
      */
     static function getLogoFileName( $team_id )
     {
-        return $team_id . '_logo.jpg';
+        $file_path = PATH_TEAM_LOGO . $team_id . "_logo.jpg";
+        $file_name = $team_id . "_logo.jpg";
+        if( !file_exists($file_path) )
+        {
+            $file_name = "0_general.jpg";
+        }
+        return $file_name;
     }
 
 

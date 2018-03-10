@@ -51,9 +51,17 @@
           <input type="hidden" name="match_id" value="{$match_info->id}">
           <div class="form-group">
           </div>
-          <h2>募集チーム</h2>
-          <div class="form-group">
-             <label for="leader">{$host_team_name}</label>
+          <div class="row">
+            <div class="col-lg-6">
+              <h2>募集チーム</h2>
+              <label for="leader"><img src="/img/logo/{$host_team_logo}" height="70px" width="70px" /><a href="/Team/Detail/{$match_info->host_team_id}">{$host_team_name}</a></label>
+            </div>
+            <div class="col-lg-6">
+            {if !empty({$match_info->apply_team_id})}
+              <h2>応募チーム</h2>
+             <label for="leader"><img src="/img/logo/{$apply_team_logo}" height="70px" width="70px" /><a href="/Team/Detail/{$match_info->apply_team_id}">{$apply_team_name}</a></label>
+            {/if}
+            </div>
           </div>
           <h2>募集条件</h2>
           <div class="form-group">
