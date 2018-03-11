@@ -119,6 +119,11 @@ class MatchController extends BaseController{
         if( isset( $ahsApplyCheckins ) ){
             $smarty->assign( "apply_checkin"    , $ahsApplyCheckins );
         }
+        // youtubeに配信動画アップされてるようなら表示
+        if( $oMatch->url_youtube )
+        {
+            $smarty->assign( "youtube_id"       , explode('=',$oMatch->url_youtube)[1] );
+        }
         
         $smarty->display('Match/MatchDetail.tmpl');
     }

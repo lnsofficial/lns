@@ -157,6 +157,11 @@
              <a class="btn btn-primary btn-lg" href="/MatchResult/Detail/{$match_info->id}" role="button">試合情報詳細</a>
           </div>
           {/if}
+          {* youtubeに配信動画アップされてるようなら表示 *}
+          {if !empty({$match_info->url_youtube})}
+          <h2>試合の配信動画</h2>
+          <a href="{$match_info->url_youtube}" target=”_blank”><img src="http://img.youtube.com/vi/{$youtube_id}/default.jpg" height="90px" width="120px" /></a>
+          {/if}
         </div>
       </div>
     </form>
