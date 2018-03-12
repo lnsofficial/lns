@@ -944,4 +944,25 @@ class TeamController extends BaseController{
         $smarty->assign( "logo_file" , $logo_file);
         $smarty->display('Team/LogoUploaded.tmpl');
     }
+    
+    public function Logo($team_id){
+        $smarty = new Smarty();
+        
+        $smarty->template_dir = PATH_TMPL;
+        $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
+        
+        $file_path = PATH_TEAM_LOGO . "stream/" .  $team_id . "_logo.jpg";
+        
+        $file_name = "";
+        if( file_exists($file_path) ){
+            $file_name = $team_id . "_logo";
+        } else {
+            $file_name = "0_general";
+        }
+        
+        $smarty->assign( "file_name" , $file_name);
+        $smarty->display('Team/Logo.tmpl');
+    }
+    
 }
