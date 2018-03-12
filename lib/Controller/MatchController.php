@@ -108,14 +108,21 @@ class MatchController extends BaseController{
         $smarty->assign( "match_info"           , $oMatch );
         $smarty->assign( "teams"                , $ahsTeamInfo );
         $smarty->assign( "host_team_name"       , $oHostTeam->team_name );
+        $smarty->assign( "host_team_logo"       , Teams::getLogoFileName($oHostTeam->id) );
         if( $oApplyTeam ){
             $smarty->assign( "apply_team_name"  , $oApplyTeam->team_name );
+            $smarty->assign( "apply_team_logo"  , Teams::getLogoFileName($oApplyTeam->id) );
         }
         if( isset( $ahsHostCheckins ) ){
             $smarty->assign( "host_checkin"     , $ahsHostCheckins );
         }
         if( isset( $ahsApplyCheckins ) ){
             $smarty->assign( "apply_checkin"    , $ahsApplyCheckins );
+        }
+        // youtubeに配信動画アップされてるようなら表示
+        if( $oMatch->url_youtube )
+        {
+            $smarty->assign( "youtube_id"       , explode('=',$oMatch->url_youtube)[1] );
         }
         
         $smarty->display('Match/MatchDetail.tmpl');
@@ -376,7 +383,7 @@ class MatchController extends BaseController{
             $ahsMatch["id"]                 = $row["id"];
             $ahsMatch["new"]                = $bNew;
             $ahsMatch["state"]              = $row["state"];
-            $ahsMatch["match_date"]         = date('n月j日 H:i', strtotime( $row["match_date"]) );
+            $ahsMatch["match_date"]         = UtilTime::timeToStrForMatchList($row["match_date"]);
             $ahsMatch["host_team_id"]       = $row["host_team_id"];
             $ahsMatch["host_team_name"]     = $oHostTeam->team_name;
             $ahsMatch["host_league_name"]   = $oHostLeague->league_name;

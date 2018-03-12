@@ -22,6 +22,7 @@ class Match extends Base{
         "tournament_code"       => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
         "match_id"              => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false   ],
         "match_info"            => [ "type" => "varchar"    , "min" => 1    ,"max" => 2147483647    , "required" => false   , "null" => true    ],
+        "url_youtube"           => [ "type" => "varchar"    , "min" => 1    ,"max" => 2147483647    , "required" => false   , "null" => true    ],
     ];
     
     const MATCH_TYPE_ANY                    = 1;

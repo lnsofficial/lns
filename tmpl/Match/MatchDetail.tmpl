@@ -51,9 +51,17 @@
           <input type="hidden" name="match_id" value="{$match_info->id}">
           <div class="form-group">
           </div>
-          <h2>募集チーム</h2>
-          <div class="form-group">
-             <label for="leader">{$host_team_name}</label>
+          <div class="row">
+            <div class="col-lg-6">
+              <h2>募集チーム</h2>
+              <label for="leader"><img src="/img/logo/{$host_team_logo}" height="70px" width="70px" /><a href="/Team/Detail/{$match_info->host_team_id}">{$host_team_name}</a></label>
+            </div>
+            <div class="col-lg-6">
+            {if !empty({$match_info->apply_team_id})}
+              <h2>応募チーム</h2>
+             <label for="leader"><img src="/img/logo/{$apply_team_logo}" height="70px" width="70px" /><a href="/Team/Detail/{$match_info->apply_team_id}">{$apply_team_name}</a></label>
+            {/if}
+            </div>
           </div>
           <h2>募集条件</h2>
           <div class="form-group">
@@ -148,6 +156,11 @@
           <div class="form-group">
              <a class="btn btn-primary btn-lg" href="/MatchResult/Detail/{$match_info->id}" role="button">試合情報詳細</a>
           </div>
+          {/if}
+          {* youtubeに配信動画アップされてるようなら表示 *}
+          {if !empty({$match_info->url_youtube})}
+          <h2>試合の配信動画</h2>
+          <a href="{$match_info->url_youtube}" target=”_blank”><img src="http://img.youtube.com/vi/{$youtube_id}/default.jpg" height="90px" width="120px" /></a>
           {/if}
         </div>
       </div>
