@@ -3,6 +3,7 @@
 	define( "PATH_LIB"			, PATH_BASE . "lib/" );
     define( "PATH_COMMON"       , PATH_LIB . "common/" );
     define( "PATH_RIOTAPI"      , PATH_COMMON . "RiotApi/" );
+	define( "PATH_DISCORDAPI"	, PATH_COMMON . "DiscordApi/" );
 	define( "PATH_CONTROLLER"	, PATH_LIB . "Controller/" );
 	define( "PATH_MODEL"		, PATH_LIB . "Model/" );
 	define( "PATH_TMP_IMAGE"	, PATH_BASE . "htdocs/tmp/image/" );
