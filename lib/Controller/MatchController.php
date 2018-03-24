@@ -10,6 +10,7 @@ require_once( PATH_MODEL . 'MatchCheckin.php' );
 require_once( PATH_MODEL . 'Settings.php' );
 
 require_once( PATH_RIOTAPI . 'MatchesById.php' );
+require_once( PATH_DISCORDAPI . 'DiscordPublisher.php' );
 
 class MatchController extends BaseController{
     const DISPLAY_DIR_PATH    = "Match";
@@ -457,6 +458,9 @@ class MatchController extends BaseController{
         $oMatch->save();
         
         $oDb->commit();
+        
+        // discordに通知飛ばす。
+        DiscordPublisher::noticeMatchCreated( $oMatch );
         
         self::displayCommonScreen( MSG_HEAD_MATCH_COMPLETE, MSG_MATCH_RECRUIT_COMPLETE );
     }
