@@ -10,7 +10,6 @@ require_once( PATH_MODEL . 'MatchCheckin.php' );
 require_once( PATH_MODEL . 'Settings.php' );
 
 require_once( PATH_RIOTAPI . 'MatchesById.php' );
-require_once( PATH_DISCORDAPI . 'DiscordPublisher.php' );
 
 class MatchController extends BaseController{
     const DISPLAY_DIR_PATH    = "Match";
@@ -458,9 +457,6 @@ class MatchController extends BaseController{
         $oMatch->save();
         
         $oDb->commit();
-
-        // discordに通知飛ばす。
-        DiscordPublisher::noticeMatchCreated( $oMatch );
         
         self::displayCommonScreen( MSG_HEAD_MATCH_COMPLETE, MSG_MATCH_RECRUIT_COMPLETE );
     }
@@ -542,6 +538,15 @@ class MatchController extends BaseController{
             // 試合日時がリーグの開催期間外の場合はエラー
             if( $match_date < $season_start_date || $match_date > $season_end_date ){
                 $bResult = false;
+            }
+            
+            // 試合日時が入れ替え期間の場合はエラー
+            // TODO メッセージを戻すとかそういうのでエラー処理、他もまとめて直す
+            $replacement_start_date  = Settings::getSettingValue( Settings::REPLACEMENT_START_DATE );
+            $replacement_end_date    = Settings::getSettingValue( Settings::REPLACEMENT_END_DATE );
+            if( $match_date > $replacement_start_date && $match_date < $replacement_end_date ){
+                self::displayCommonScreen( ERR_HEAD_COMMON, ERR_MATCH_REPLACEMENT );
+                exit;
             }
         }
         if( empty( $_REQUEST["deadline_date"] ) ){

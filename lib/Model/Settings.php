@@ -14,6 +14,8 @@ class Settings extends Base{
     
     const SEASON_START_DATE = "season_start";   // シーズン開始日
     const SEASON_END_DATE   = "season_end";     // シーズン終了日
+    const REPLACEMENT_START_DATE = "replacement_start";   // 入れ替え可能期間開始日
+    const REPLACEMENT_END_DATE   = "replacement_end";     // 入れ替え可能期間終了日
     
     
     public function getSettingValue( $setting_name ){
