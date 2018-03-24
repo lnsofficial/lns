@@ -1,3 +1,4 @@
 tmpl_c
 htdocs/.htaccess
+lib/common/env.ini
 !.gitkeep
