@@ -25,7 +25,7 @@
         <ul class="nav side">
           {if isset($user)}
           <li role="presentation">チームへ参加</li>
-          {if ($isThisTeamMember && $user.id != $team_owner->id && $isThisTeamJoinedLadder == false) || ($isThisTeamMemberLeave && $team_owner->id)}
+          {if ($isThisTeamMember && $user.id != $team_owner->id && $isThisTeamJoinedLadder == false) || ($isThisTeamMemberLeave && $user.id != $team_owner->id)}
           <li role="presentation"><a href="/Team/leave/?team_id={$team->id}&type=1" onclick="return chkLeave(1)">選手脱退</a></li>
           {elseif !$user['team_member'] && !$isTeamMemberApply && count($team_members) < Teams::COUNT_MAX_MEMBER}
           <li role="presentation"><a href="/Team/apply/?team_id={$team->id}&type=1">選手申請</a></li>
