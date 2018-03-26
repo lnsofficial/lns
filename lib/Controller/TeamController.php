@@ -8,6 +8,7 @@ require_once( PATH_MODEL . 'UserTeamApply.php' );
 require_once( PATH_MODEL . 'User.php' );
 require_once( PATH_LIB . '/common/UtilTime.php');
 require_once( PATH_MODEL . 'UserRank.php' );
+require_once( PATH_MODEL . 'Settings.php' );
 // TODO 最低限の共通化、全コントローラーで共通部分はBaseControllerにまとめる
 // 特別に処理を入れる場合のみ、各Controllerに追記する形で開発する
 class TeamController extends BaseController{
@@ -391,16 +392,17 @@ class TeamController extends BaseController{
         $smarty->assign( "logo_file"        , $logo_file );
         if( isset( $user ) ){
             $smarty->assign( "user"         , $user );
-            
             $ahsTeamMemberInfo = $oTeam->getTeamMemberInfoById( $user_id );
             
-            $isThisTeamMember       = !empty( $ahsTeamMemberInfo["member"] );
+            $isThisTeamMember       = !empty( $ahsTeamMemberInfo );
+            $isThisTeamMemberLeave  = $oTeam->enableTeamLeave( $user_id );
             $isThisTeamContact      = count( array_filter($user['team_contacts'],function($item)use($team_id){ return $item['team_id']==$team_id; }) );
             $isThisTeamStaff        = count( array_filter($user['team_staffs'],  function($item)use($team_id){ return $item['team_id']==$team_id; }) );
             $isTeamMemberApply      = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_MEMBER; }) );
             $isThisTeamContactApply = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_CONTACT && $item['team_id']==$team_id; }) );
             $isThisTeamStaffApply   = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_STAFF   && $item['team_id']==$team_id; }) );
             
+            $smarty->assign( "isThisTeamMemberLeave"        , $isThisTeamMemberLeave );
             $smarty->assign( "isThisTeamMember"             , $isThisTeamMember );
             $smarty->assign( "isThisTeamContact"            , $isThisTeamContact );
             $smarty->assign( "isThisTeamStaff"              , $isThisTeamStaff );
@@ -844,8 +846,10 @@ class TeamController extends BaseController{
             case UserTeamApply::TYPE_MEMBER:
                 // メンバー
                 if( $oTeam->getCurrentLadder( $oDb ) ){
-                    self::displayError();
-                    exit;
+                    if( !$oTeam->enableTeamLeave( $user_id ) ){
+                        self::displayError();
+                        exit;
+                    }
                 }
                 // 脱退申請した職種でなければエラー
                 if( empty( $ahsTeamMemberInfo["member"] ) ){
