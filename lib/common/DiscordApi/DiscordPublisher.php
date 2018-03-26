@@ -18,7 +18,6 @@ class DiscordPublisher
     static $ini;
     const WEBHOOK_URLS     = [
         'LIVE'  => 'https://discordapp.com/api/webhooks/425659894159638538/hlUULvWG48DGmUlleJaDv0nRL6Twe_LcIyiA36o0geYSXhbhdbIEYq2ceyq8_zo8_0cq', // ←ここあとで本番用に変えること。
-        'PRE'   => 'https://discordapp.com/api/webhooks/425659894159638538/hlUULvWG48DGmUlleJaDv0nRL6Twe_LcIyiA36o0geYSXhbhdbIEYq2ceyq8_zo8_0cq',
         'DEV'   => 'https://discordapp.com/api/webhooks/425659894159638538/hlUULvWG48DGmUlleJaDv0nRL6Twe_LcIyiA36o0geYSXhbhdbIEYq2ceyq8_zo8_0cq',
         'LOCAL' => 'https://discordapp.com/api/webhooks/425688670671077396/BWQDNG8S644CjptXAwR2zlE_D10yFmdqHCYCxTYVDJ0GFOV3jWzPGgJ4FuuZJJVedIta',
     ];
@@ -58,28 +57,13 @@ class DiscordPublisher
 ////////////////////////////////////////// ここからprivate関数 //////////////////////////////////////////
 
     /**
-     * 環境設定を返す。
-     * 
-     * @return array
-     */
-    private static function getIni()
-    {
-        if( empty(self::$ini) )
-        {
-            self::$ini = parse_ini_file(PATH_COMMON . 'env.ini', true);
-        }
-        return self::$ini;
-    }
-
-
-    /**
      * 環境別のWebhookUrlを返す。
      * 
      * @return string
      */
     private static function getWebhookUrl()
     {
-        return self::WEBHOOK_URLS[self::getIni()['env']];
+        return self::WEBHOOK_URLS[ENV];
     }
 
 

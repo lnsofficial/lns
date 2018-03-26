@@ -24,8 +24,10 @@
 	define( "INTERVAL_BATCH_TIME"	, "1 DAY" );
 	define( "SEASON_NOW",             "S4" );
 	define( "SEASON_BEFORE",          "S3" );
-	
-	
+
+	// 環境別
+	define( "ENV"			, getenv('ENV') );
+
 	// 見出し
 	define( "MSG_HEAD_MATCH_COMPLETE"	, "登録が完了しました" );
 	define( "MSG_HEAD_MATCH_CANCEL"		, "キャンセルしました" );
