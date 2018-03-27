@@ -3,6 +3,7 @@
 	define( "PATH_LIB"			, PATH_BASE . "lib/" );
     define( "PATH_COMMON"       , PATH_LIB . "common/" );
     define( "PATH_RIOTAPI"      , PATH_COMMON . "RiotApi/" );
+	define( "PATH_DISCORDAPI"	, PATH_COMMON . "DiscordApi/" );
 	define( "PATH_CONTROLLER"	, PATH_LIB . "Controller/" );
 	define( "PATH_MODEL"		, PATH_LIB . "Model/" );
 	define( "PATH_TMP_IMAGE"	, PATH_BASE . "htdocs/tmp/image/" );
@@ -23,8 +24,10 @@
 	define( "INTERVAL_BATCH_TIME"	, "1 DAY" );
 	define( "SEASON_NOW",             "S4" );
 	define( "SEASON_BEFORE",          "S3" );
-	
-	
+
+	// 環境別
+	define( "ENV"			, getenv('ENV') );
+
 	// 見出し
 	define( "MSG_HEAD_MATCH_COMPLETE"	, "登録が完了しました" );
 	define( "MSG_HEAD_MATCH_CANCEL"		, "キャンセルしました" );
@@ -42,6 +45,7 @@
 	define( "ERR_MATCH_HOST_DONT_APPLY"		, "募集条件に合致しないため、登録できません" );
 	define( "ERR_MATCH_REGIST_INTERVAL"		, "試合を申し込んでから５日間が経過していないため、試合を申し込めません。<br />※ゲスト側で試合申し込みを行った場合、そこから５日間は新たな試合を申し込めません。ただし、募集開始から１日以上経過した試合には申し込むことが可能です。" );
 	define( "ERR_MATCH_COMPLETE"			, "試合の登録が失敗しました" );
+	define( "ERR_MATCH_REPLACEMENT"			, "試合日時が入れ替え期間内のため、登録できません" );
 	define( "ERR_MATCH_PERMISSION"			, "権限がありません" );
 	define( "ERR_MATCH_OVER_REGIST"			, "既に該当月での試合の募集回数が上限に達しているため、応募できません。<br />１ヶ月に間に募集できる回数は５回までとなります。" );
 	define( "ERR_MATCH_OVER_RESULT_REGIST"	, "試合結果の登録可能時間を過ぎているため、登録できません" );

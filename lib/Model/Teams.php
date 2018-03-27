@@ -295,4 +295,30 @@ class Teams extends Base{
         
         return $ahsMemberInfo;
     }
+    
+    public function enableTeamLeave( $user_id ){
+        $ahsTeamMemberInfo = $this->getTeamMemberInfoById( $user_id );
+        if( empty( $ahsTeamMemberInfo["member"] ) ){
+            // チームに未所属
+            return false;
+        }
+        
+        $season_start_date  = Settings::getSettingValue( Settings::SEASON_START_DATE );
+        $season_end_date    = Settings::getSettingValue( Settings::SEASON_END_DATE );
+        
+        $replacement_start_date  = Settings::getSettingValue( Settings::REPLACEMENT_START_DATE );
+        $replacement_end_date    = Settings::getSettingValue( Settings::REPLACEMENT_END_DATE );
+        
+        $current_date  = date( "Y-m-d H:i:s" );
+        
+        if( $current_date >= $season_start_date && $current_date <= $season_end_date ){
+            // シーズン期間内
+            if( $current_date >= $replacement_end_date || $current_date <= $replacement_start_date ){
+                // 入れ替え期間外
+                return false;
+            }
+        }
+        
+        return true;
+    }
 }
