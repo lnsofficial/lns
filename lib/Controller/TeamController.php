@@ -394,7 +394,7 @@ class TeamController extends BaseController{
             $smarty->assign( "user"         , $user );
             $ahsTeamMemberInfo = $oTeam->getTeamMemberInfoById( $user_id );
             
-            $isThisTeamMember       = !empty( $ahsTeamMemberInfo );
+            $isThisTeamMember       = !empty( $ahsTeamMemberInfo["member"] );
             $isThisTeamMemberLeave  = $oTeam->enableTeamLeave( $user_id );
             $isThisTeamContact      = count( array_filter($user['team_contacts'],function($item)use($team_id){ return $item['team_id']==$team_id; }) );
             $isThisTeamStaff        = count( array_filter($user['team_staffs'],  function($item)use($team_id){ return $item['team_id']==$team_id; }) );

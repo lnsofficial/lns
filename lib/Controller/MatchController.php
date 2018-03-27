@@ -639,7 +639,6 @@ class MatchController extends BaseController{
                 $match->match_id    = $match_id;
                 $match->match_info  = json_encode( $json );
                 $match->save();
-                var_dump($match);
             }else{
                 $match->state   = Match::MATCH_STATE_ERROR;
             }
