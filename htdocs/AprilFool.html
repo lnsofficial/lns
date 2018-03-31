@@ -294,7 +294,6 @@ LNSが活動を開始したのは2016年12月。<br>
       url       : "/AprilEnquete/getCount",
       dataType  : "json"
     }).done(function(data){
-      console.log(data);
       var myBarChart = new Chart($("#chart"), {
         //データの設定
         "data": {
@@ -324,7 +323,12 @@ LNSが活動を開始したのは2016年12月。<br>
                 "xAxes": [
                     {
                         "ticks": {
-                            "beginAtZero": true
+                            "beginAtZero": true,
+                            "userCallback": function(label, index, labels) {
+                              if (Math.floor(label) === label) {
+                                return label;
+                              }
+                            }
                         }
                     }
                 ]
