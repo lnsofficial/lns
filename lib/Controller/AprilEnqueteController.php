@@ -1,6 +1,7 @@
 <?php
 require_once( PATH_CONTROLLER . 'BaseController.php' );
 require_once( PATH_MODEL . 'AprilEnquete.php' );
+require_once( PATH_COMMON . 'UtilTime.php' );
 
 class AprilEnqueteController extends BaseController{
 
@@ -29,10 +30,20 @@ class AprilEnqueteController extends BaseController{
         
         $AprilEnquete = new AprilEnquete( $db, 1 );
         
-        if( $size == 2 ){
-            $AprilEnquete->cinderella = $AprilEnquete->cinderella + 1;
-        } else {
+        if( strtotime('2018-04-01 21:00:00') < UtilTime::nowTime() )
+        {
+            if( $size == 2 ){
+                $AprilEnquete->cinderella = $AprilEnquete->cinderella + 1;
+            } else {
+                $AprilEnquete->boin = $AprilEnquete->boin + 1;
+            }
+        }
+        else
+        {
             $AprilEnquete->boin = $AprilEnquete->boin + 1;
+            if( $size == 2 ){
+                $AprilEnquete->cinderella = $AprilEnquete->cinderella + 1;
+            }
         }
         
         $AprilEnquete->save();
