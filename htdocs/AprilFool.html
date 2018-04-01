@@ -259,7 +259,7 @@ LNSが活動を開始したのは2016年12月。<br>
 <script src="/js/Chart.js"></script>
 <script type="text/javascript">
   $(function(){
-    if( $.cookie("voted") ){
+    if( voteCheck() ){
       $("#vote").hide();
       $("#result").show();
       showChart();
@@ -278,7 +278,7 @@ LNSが活動を開始したのは2016年12月。<br>
         size: $size
       }
     }).done(function(){
-      $.cookie("voted", "true", { expires: 1 })
+      setCookieVote();
       $("#vote").hide();
       $("#result").show();
       
@@ -337,7 +337,7 @@ LNSが活動を開始したのは2016年12月。<br>
         //グラフの種類
         type: 'horizontalBar'
       });
-      $.cookie("voted", "true", { expires: 1 })
+      setCookieVote();
       $("#vote").hide();
       $("#result").show();
       
@@ -346,9 +346,84 @@ LNSが活動を開始したのは2016年12月。<br>
   }
   
   function moveNormalPage(){
-    if( !$.cookie("april_access") ){
-      $.cookie("april_access", "true", { expires: 1 });
+    if( !aprilAccessCheck() ){
+      setCookieAprilAccess();
     }
     window.location.href = '/';
   }
+
+
+
+	// 切り変わり日づけ以降かどうかを返す
+	function isTurnDate()
+	{
+		var turnDate = new Date("2018/04/01 21:00:00");
+		var nowDate  = new Date();
+
+		if( turnDate.getTime() < nowDate.getTime() )
+		{
+			return true;
+		}
+		return false;
+	}
+	// 投票したかどうかの判定をcookieから行なう
+	function voteCheck()
+	{
+		// 投票したかどうかのcookie判定のkey
+		var vote_key = "voted";
+		if( isTurnDate() )
+		{
+			// 切り変わり日づけ以降ならkeyを変える
+			vote_key = "voted_revenge";
+		}
+
+		if( $.cookie(vote_key) )
+		{
+			return true;
+		}
+		return false;
+	}
+	// 投票した、と、cookieに設定する
+	function setCookieVote()
+	{
+		// 投票したかどうかのcookie判定のkey
+		var vote_key = "voted";
+		if( isTurnDate() )
+		{
+			// 切り変わり日づけ以降ならkeyを変える
+			vote_key = "voted_revenge";
+		}
+		$.cookie(vote_key, "true", { expires: 1 })
+	}
+
+
+	// AprilFoolページを見たかどうかの判定をcookieから行なう
+	function aprilAccessCheck()
+	{
+		// AprilFoolページを見たかどうかのcookie判定のkey
+		var april_access_key = "april_access";
+		if( isTurnDate() )
+		{
+			// 切り変わり日づけ以降ならkeyを変える
+			april_access_key = "april_access_revenge";
+		}
+
+		if( $.cookie(april_access_key) )
+		{
+			return true;
+		}
+		return false;
+	}
+	// AprilFoolページを見た、と、cookieに設定する
+	function setCookieAprilAccess()
+	{
+		// 見たかどうかのcookie判定のkey
+		var april_access_key = "april_access";
+		if( isTurnDate() )
+		{
+			// 切り変わり日づけ以降ならkeyを変える
+			april_access_key = "april_access_revenge";
+		}
+		$.cookie(april_access_key, "true", { expires: 1 })
+	}
 </script>

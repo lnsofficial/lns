@@ -29,10 +29,10 @@ class AprilEnqueteController extends BaseController{
         
         $AprilEnquete = new AprilEnquete( $db, 1 );
         
-        $AprilEnquete->boin = $AprilEnquete->boin + 1;
-        
         if( $size == 2 ){
             $AprilEnquete->cinderella = $AprilEnquete->cinderella + 1;
+        } else {
+            $AprilEnquete->boin = $AprilEnquete->boin + 1;
         }
         
         $AprilEnquete->save();
