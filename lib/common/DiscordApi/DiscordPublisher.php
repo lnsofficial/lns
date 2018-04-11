@@ -17,7 +17,7 @@ class DiscordPublisher
 {
     static $ini;
     const WEBHOOK_URLS     = [
-        'LIVE'  => 'https://discordapp.com/api/webhooks/425659894159638538/hlUULvWG48DGmUlleJaDv0nRL6Twe_LcIyiA36o0geYSXhbhdbIEYq2ceyq8_zo8_0cq', // ←ここあとで本番用に変えること。
+        'LIVE'  => 'https://discordapp.com/api/webhooks/433283524003364864/LlCYwp3R2cH7K2iH4yuCeGZUmLtfDfJgDjhVYK0Qw3sSHb4yekxluSuMj2Zlvg7FsRN-',
         'DEV'   => 'https://discordapp.com/api/webhooks/425659894159638538/hlUULvWG48DGmUlleJaDv0nRL6Twe_LcIyiA36o0geYSXhbhdbIEYq2ceyq8_zo8_0cq',
         'LOCAL' => 'https://discordapp.com/api/webhooks/425688670671077396/BWQDNG8S644CjptXAwR2zlE_D10yFmdqHCYCxTYVDJ0GFOV3jWzPGgJ4FuuZJJVedIta',
     ];
@@ -36,6 +36,9 @@ class DiscordPublisher
         "*Now, you are off to your next big challenge！*",
         "*You miss 100% of the shots you dont take.*",
         "*The only one who can beat me is me.*",
+        "*Your will, my hands.*",
+        "*Master yourself, master the enemy.*",
+        "*Be Cool!!!!!*",
     ];
 
 
@@ -83,7 +86,8 @@ class DiscordPublisher
 
 
         $message  = "@here" . "\n";
-        $message .= "新しい試合募集があります！". "\n\n";
+        $message .= "さぁ、新しい試合募集だ・・・". "\n\n";
+
 
         $message .= self::TIPS[ mt_rand(0, count(self::TIPS)-1) ] . "\n\n";
 
