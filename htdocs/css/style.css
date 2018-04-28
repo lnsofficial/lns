@@ -1,5 +1,5 @@
 ﻿@charset "utf-8";
-.header-image {
+.header-image-ahri {
 	background-image: url(../img/AhriSuits.jpg);
 	background-repeat: no-repeat;
 	background-size: 45
@@ -55,7 +55,7 @@
 	box-shadow: 0px 0px;
 	border-bottom: 4px solid #00CCCC;
 }
-.header-image {
+.header-image-alistar {
 	background-image: url(../img/UsiSuits.jpg);
 	background-repeat: no-repeat;
 	background-size: 45

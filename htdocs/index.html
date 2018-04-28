@@ -22,7 +22,7 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-lg-12">
-        <div class="header-image">
+        <div class="header-image-ahri">
           <div>
             <?php if( !$bLogin ){ ?><a href="/User/form" class="touroku">ユーザ登録</a><?php } ?>
           </div>
@@ -68,11 +68,12 @@
 	<script src="/js/jquery-1.11.3.min.js"></script>
 	<script type="text/javascript">
 $(function(){
-	mainImageCLassNameAhri  = "header-image";
+	mainImageCLassNameAhri  = "header-image-ahri";
 	mainImageCLassNameJinx  = "header-image-jinx";
 	mainImageCLassNameTeemo = "header-image-teemo";
 	mainImageCLassNameAnie = "header-image-anie";
-	idx = Math.ceil( Math.random()*4 ) % 4;
+	mainImageCLassNameAlistar = "header-image-alistar";
+	idx = Math.ceil( Math.random()*5 ) % 5;
 	if( idx == 0)
 	{
 		$('.' + mainImageCLassNameAhri).removeClass(mainImageCLassNameAhri).addClass(mainImageCLassNameJinx);
@@ -87,7 +88,11 @@ $(function(){
 	}
 	else if( idx == 3)
 	{
-		// そのまま。
+		$('.' + mainImageCLassNameAhri).removeClass(mainImageCLassNameAhri).addClass(mainImageCLassNameAlistar);
+	}
+	else if( idx == 4)
+	{
+		// そのまま
 	}
 });
 	</script>
