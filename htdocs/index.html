@@ -72,9 +72,10 @@
         mainImageCLassNameJinx      = "background-image-jinx";
         mainImageCLassNameTeemo     = "background-image-teemo";
         mainImageCLassNameAnie      = "background-image-anie";
+        mainImageCLassNameAnietibber= "background-image-anietibber";
         mainImageCLassNameAlistar   = "background-image-alistar";
         
-        idx = Math.ceil( Math.random()*5 ) % 5;
+        idx = Math.ceil( Math.random()*6 ) % 6;
         
         if( idx == 0)
         {
@@ -93,6 +94,10 @@
             $('.' + mainImageCLassNameAhri).removeClass(mainImageCLassNameAhri).addClass(mainImageCLassNameAlistar);
         }
         else if( idx == 4)
+        {
+            $('.' + mainImageCLassNameAhri).removeClass(mainImageCLassNameAhri).addClass(mainImageCLassNameAnietibber);
+        }
+        else if( idx == 5)
         {
             // そのまま
         }
