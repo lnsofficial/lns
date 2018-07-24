@@ -30,6 +30,9 @@
 .background-image-alistar {
 	background-image: url(../img/UsiSuits.jpg);
 }
+.background-image-taliyah_akali {
+	background-image: url(../img/summer_taliyah_akali.png);
+}
 .navbar.navbar-default.navbar-static-top {
 	background-color: #00CCCC;		
 }
