@@ -15,7 +15,7 @@ class LadderMovePoint extends Base{
 		"lose_point"=> [ "type" => "int"	, "min" => -256	,"max" => 0			    , "required" => true	, "null" => false	],
 	];
 
-    var $point_table = array(
+    const POINT_TABLE = array(
         League::LEAGUE_HIRA => [
             League::LEAGUE_HIRA         => [ "win_point"  => 23, "lose_point" => -17, ],
             League::LEAGUE_SHITSUCHO    => [ "win_point"  => 29, "lose_point" => -14, ],
@@ -82,7 +82,10 @@ class LadderMovePoint extends Base{
     );
 	
 	public function getLeagueMovePoint( $win_team_rank,  $lose_team_rank ){
+        if (isset(self::POINT_TABLE[$win_team_rank][$lose_team_rank])) {
+            return self::POINT_TABLE[$win_team_rank][$lose_team_rank];
+        }
         
-		return $oResult;
+		return false;
 	}
 }

@@ -3,10 +3,16 @@ ini_set('display_errors', 1);
 
 //require_once('../lib/common/Define.php');
 require_once('/var/www/html/lib/common/Define.php');
-require_once( PATH_MODEL . "Match.php" );
-require_once( PATH_MODEL . "Teams.php" );
-require_once( PATH_MODEL . "League.php" );
-require_once( PATH_MODEL . "Ladder.php" );
+require_once( "/var/www/html/lib/Model/Match.php" );
+require_once( "/var/www/html/lib/Model/Teams.php" );
+require_once( "/var/www/html/lib/Model/League.php" );
+require_once( "/var/www/html/lib/Model/Ladder.php" );
+require_once( "/var/www/html/lib/Model/LadderMovePoint.php" );
+#require_once( PATH_MODEL . "Match.php" );
+#require_once( PATH_MODEL . "Teams.php" );
+#require_once( PATH_MODEL . "League.php" );
+#require_once( PATH_MODEL . "Ladder.php" );
+require_once( PATH_MODEL . "LadderMovePoint.php" );
 // ポイントを反映
 writeLog("-----------------【処理開始】-----------------");
 // マッチ一覧取得
@@ -105,75 +111,47 @@ function updateTeamLadderNormal( $oDb, $oWinTeam, $oLoseTeam ){
 	// リーグ取得
 	$oWinLeague = new League( $oDb, $oWinLadder->league_id );
 	$oLoseLeague = new League( $oDb, $oLoseLadder->league_id );
-	
-	$iRankDiff = $oWinLeague->rank - $oLoseLeague->rank;
-	
-	switch( $iRankDiff ){
-		case 0:
-			// 同ブロック
-			writeLog("[updateTeamLadderNormal][TeamId:" . $oWinTeam->id . ",TeamName:" . $oWinTeam->team_name . "]+2 Point");
-			writeLog("[updateTeamLadderNormal][TeamId:" . $oLoseTeam->id . ",TeamName:" . $oLoseTeam->team_name . "]-2 Point");
-			$oWinLadder->point += 2;
-			if( $oLoseLeague->rank == League::LEAGUE_HIRA && $oLoseLadder->point < 2 ){
-				$oLoseLadder->point = 0;
-			} else {
-				$oLoseLadder->point -= 2;
-			}
-			
-			break;
-			/*
-		case 1:
-			// １つ上のブロック
-			writeLog("[updateTeamLadderNormal][TeamId:" . $oWinTeam->id . ",TeamName:" . $oWinTeam->team_name . "]+3 Point");
-			writeLog("[updateTeamLadderNormal][TeamId:" . $oLoseTeam->id . ",TeamName:" . $oLoseTeam->team_name . "]-2 Point");
-			$oWinLadder->point += 3;
-			if( $oLoseLeague->rank == League::LEAGUE_HIRA && $oLoseLadder->point < 2 ){
-				$oLoseLadder->point = 0;
-			} else {
-				$oLoseLadder->point -= 2;
-			}
-			break;
-			*/
-		case $iRankDiff < 0:
-			// 下位ブロック
-			writeLog("[updateTeamLadderNormal][TeamId:" . $oWinTeam->id . ",TeamName:" . $oWinTeam->team_name . "]+2 Point");
-			writeLog("[updateTeamLadderNormal][TeamId:" . $oLoseTeam->id . ",TeamName:" . $oLoseTeam->team_name . "]-1 Point");
-			$oWinLadder->point += 2;
-			if( $oLoseLeague->rank == League::LEAGUE_HIRA && $oLoseLadder->point < 1 ){
-				$oLoseLadder->point = 0;
-			} else {
-				$oLoseLadder->point -= 1;
-			}
-			break;
-		case $iRankDiff > 0:
-			// １つ以上上のブロック
-			// 相手のリーグ取得
-			$oWinLadder->league_id = $oLoseLeague->id;
-			writeLog("[updateTeamLadderNormal][TeamId:" . $oWinTeam->id . ",TeamName:" . $oWinTeam->team_name . "]Up LeagueId:" . $oWinLadder->league_id);
-			writeLog("[updateTeamLadderNormal][TeamId:" . $oLoseTeam->id . ",TeamName:" . $oLoseTeam->team_name . "]-2 Point");
-			$oWinLadder->point = 0;
-			if( $oLoseLeague->rank == League::LEAGUE_HIRA && $oLoseLadder->point < 2 ){
-				$oLoseLadder->point = 0;
-			} else {
-				$oLoseLadder->point -= 2;
-			}
-			break;
-	}
-	
-	if( $oWinLadder->point >= 5 ){
-		$oWinLeague = $oWinLeague->getUpperOneLeague( $oDb );
-		writeLog("[updateTeamLadder][TeamId:" . $oWinTeam->id . ",TeamName:" . $oWinTeam->team_name . "]Up");
-		writeLog("[updateTeamLadder][TeamId:" . $oWinTeam->id . ",TeamName:" . $oWinTeam->team_name . "]LeagueId:" . $oWinLeague->id);
-		$oWinLadder->league_id = $oWinLeague->id;
-		$oWinLadder->point = 0;
-	}
-	if( $oLoseLadder->point <= -5 ){
-		$oLoseLeague = $oLoseLeague->getUnderOneLeague( $oDb );
-		writeLog("[updateTeamLadder][TeamId:" . $oWinTeam->id . ",TeamName:" . $oLoseTeam->team_name . "]Down");
-		writeLog("[updateTeamLadder][TeamId:" . $oWinTeam->id . ",TeamName:" . $oLoseTeam->team_name . "]LeagueId:" . $oLoseLeague->id);
-		$oLoseLadder->league_id = $oLoseLeague->id;
-		$oLoseLadder->point = 2;
-	}
+
+    $move_point = LadderMovePoint::getLeagueMovePoint($oWinLeague->rank, $oLoseLeague->rank);
+    if (!$move_point) {
+        return false;
+    }
+    writeLog("[updateTeamLadderNormal][TeamId:" . $oWinTeam->id . ",TeamName:" . $oWinTeam->team_name . "]+" . $move_point['win_point'] . "Point");
+    writeLog("[updateTeamLadderNormal][TeamId:" . $oLoseTeam->id . ",TeamName:" . $oLoseTeam->team_name . "]+" . $move_point['lose_point'] . "Point");
+    $moved_win_point = $oWinLadder->point + $move_point['win_point'];
+    $moved_lose_point = $oLoseLadder->point + $move_point['lose_point'];
+
+	switch( $moved_win_point ){
+        case $moved_win_point > 100:
+            if ($oWinLeague->rank == League::LEAGUE_SENMU) {
+                $oWinLadder->point = $moved_win_point;
+            } else {
+                $oWinLadder->point = 0;
+                $oWinLeague = $oWinLeague->getUpperOneLeague( $oDb );
+                $oWinLadder->league_id = $oWinLeague->id;
+            }
+            break;
+        default:
+            $oWinLadder->point = $moved_win_point;
+            break;
+    }
+
+	switch( $moved_lose_point ){
+        case $moved_lose_point < 0:
+            if ($oLoseLeague->rank == League::LEAGUE_HIRA) {
+                $oLoseLadder->point = 0;
+            } elseif ($moved_lose_point <= -10) {
+                $oLoseLadder->point = 0;
+                $oLoseLeague = $oLoseLeague->getUnderOneLeague( $oDb );
+                $oLoseLadder->league_id = $oLoseLeague->id;
+            } else {
+                $oLoseLadder->point = $moved_lose_point;
+            }
+            break;
+        default:
+            $oLoseLadder->point = $moved_lose_point;
+            break;
+    }
 	
 	$oWinLadder->save();
 	$oLoseLadder->save();
