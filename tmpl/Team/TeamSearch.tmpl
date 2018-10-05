@@ -53,7 +53,7 @@
             </tr>
             {foreach from=$team_list item=team key=id}
             <tr>
-              <th><img src="/img/logo/{$team.id}_logo.jpg" width="40px"></th>
+              <th><img src="/img/logo/{$team.logo_file_name}" width="40px"></th>
               <th><a href="/Team/Detail/{$team.id}">{$team.team_name}</a></th>
             </tr>
             {/foreach}
