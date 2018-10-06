@@ -93,38 +93,24 @@ class LadderController extends BaseController{
             exit;
         }
         
-
-        // このチームが既存チームなのか新規チームなのかチェック
-        $beforeseason_ladder = $oTeam->getBeforeSeasonLadder();
-
-        // 既存チーム(S3でリーグに参加済み)の場合
-        if( !empty($beforeseason_ladder) )
+        // 各メンバーのtier/rankからチーム力を算出する
+        $oUserRank = new UserRank($oDb);
+        $iCalcCount = 0;
+        $iTotalTeamPower = 0;
+        foreach( $ahsTeamMembers as $asMember )
         {
-            // 前期最終ブロックを取ってくる
-            $oLeague = new League( $oDb, $beforeseason_ladder->league_id );
-        }
-        // 新規参画チーム(今回S4からリーグに参加)の場合
-        else
-        {
-            // 各メンバーのtier/rankからチーム力を算出する
-            $oUserRank = new UserRank($oDb);
-            $iCalcCount = 0;
-            $iTotalTeamPower = 0;
-            foreach( $ahsTeamMembers as $asMember )
+            $user_rank = $oUserRank->findHigherByUserId( $asMember['user_id'] );
+            if( $user_rank['tier'] == 'UNRANK' )
             {
-                $user_rank = $oUserRank->findHigherByUserId( $asMember['user_id'] );
-                if( $user_rank['tier'] == 'UNRANK' )
-                {
-                    continue;
-                }
-                $iCalcCount++;
-                $iTotalTeamPower += User::RANK_LIST[$user_rank['tier']][$user_rank['rank']];
+                continue;
             }
-            
-            $iTeamPower = $iTotalTeamPower / $iCalcCount;
-            // 適切なリーグを取ってくる
-            $oLeague = League::getAssignLeague( $oDb, $iTeamPower );
+            $iCalcCount++;
+            $iTotalTeamPower += User::RANK_LIST[$user_rank['tier']][$user_rank['rank']];
         }
+        
+        $iTeamPower = $iTotalTeamPower / $iCalcCount;
+        // 適切なリーグを取ってくる
+        $oLeague = League::getAssignLeague( $oDb, $iTeamPower );
 
 
         $oDb->beginTransaction();
