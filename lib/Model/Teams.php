@@ -20,6 +20,8 @@ class Teams extends Base{
         "team_tag_kana"     => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
         "comment"           => [ "type" => "varchar"    , "min" => 1    ,"max" => 256           , "required" => false   , "null" => true    ],
         "status"            => [ "type" => "int"        , "min" => 0    ,"max" => 127           , "required" => false   , "null" => false   ],
+        "logo_status"       => [ "type" => "int"        , "min" => 0    ,"max" => 127           , "required" => false   , "null" => false   ],
+        "logo_updated_at"   => [ "type" => "varchar"    , "min" => 0    ,"max" => 256           , "required" => false   , "null" => true    ],
     ];
 
 
@@ -28,6 +30,13 @@ class Teams extends Base{
     const COUNT_MAX_STAFF       =  1;        // チームに所属できるアナリストの最大数
     const COUNT_MIN_JOIN_LADDER =  5;        // 大会に参加可能な最低選手人数
 
+    const LOGO_MAX_WIDTH        =512;        // チームロゴアップロード可能な最大横
+    const LOGO_MAX_HEIGHT       =512;        // チームロゴアップロード可能な最大縦
+
+    const LOGO_STATUS_UNREGISTERED      = 0; // 未登録
+    const LOGO_STATUS_UNAUTHENTICATED   = 1; // アップロードしたけどまだ運営で未認証
+    const LOGO_STATUS_AUTHENTICATED     = 2; // 運営にて認証済み
+    const LOGO_STATUS_AUTHENTICATEERROR = 3; // 運営にて認証NG
 
     /**
      * // ロゴファイル名はここから取る感じで。
@@ -37,13 +46,62 @@ class Teams extends Base{
      */
     static function getLogoFileName( $team_id )
     {
-        $file_path = PATH_TEAM_LOGO . $team_id . "_logo.jpg";
-        $file_name = $team_id . "_logo.jpg";
+        $file_name = $team_id . "_logo.png";
+        $file_path = PATH_TEAM_LOGO . $file_name;
         if( !file_exists($file_path) )
         {
-            $file_name = "0_general.jpg";
+            $file_name = "0_general.png";
         }
+
         return $file_name;
+    }
+
+
+    /**
+     * // 配信用ロゴファイル名はここから取る感じで。
+     * 
+     * team.logo_status での判定
+     * /img/logo/modified/*_logo.png有無の判定
+     * /img/logo/*_logo.png有無の判定
+     * で出し分ける
+     * 
+     * @return string
+     */
+    function getStreamingLogoFileName()
+    {
+        $logo_img_path = "/img/logo/";
+        $file_name = self::getLogoFileName( $this->id );
+
+        switch( $this->logo_status )
+        {
+            // 運営にて認証済みの場合
+            case self::LOGO_STATUS_AUTHENTICATED:
+                // 修正版がある場合はそちらから。
+                if( file_exists( PATH_TEAM_LOGO . "modified/" . $file_name ) )
+                {
+                    $logo_img_path .= "modified/";
+                }
+
+                $logo_file = $logo_img_path . $file_name;
+                break;
+
+            // 運営にて認証NGの場合
+            case self::LOGO_STATUS_AUTHENTICATEERROR:
+                $file_name = "0_ban.png";
+                $logo_file = $logo_img_path . $file_name;
+                break;
+
+            // アップロードしたけどまだ運営で未認証の場合
+            case self::LOGO_STATUS_UNAUTHENTICATED:
+            // 未登録の場合
+            case self::LOGO_STATUS_UNREGISTERED:
+            default:
+                $file_name = "0_general.png";
+                $logo_file = $logo_img_path . $file_name;
+                break;
+        }
+
+        return $logo_file;
     }
 
 
@@ -128,7 +186,13 @@ class Teams extends Base{
         $oDb = new Db();
         
         $ahsTeams = Teams::getList( $oDb, [ [ "column" => "status",  "type" => "int", "value" => 0 ] ] );
-        
+
+        // チームロゴ未登録のとこもある
+        foreach( $ahsTeams as &$team )
+        {
+            $team['logo_file_name'] = self::getLogoFileName( $team['id'] );
+        }
+
         return $ahsTeams;
     }
     

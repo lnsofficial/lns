@@ -9,6 +9,7 @@ require_once( PATH_MODEL . 'User.php' );
 require_once( PATH_LIB . '/common/UtilTime.php');
 require_once( PATH_MODEL . 'UserRank.php' );
 require_once( PATH_MODEL . 'Settings.php' );
+require_once( PATH_DISCORDAPI . 'DiscordPublisher.php' );
 // TODO 最低限の共通化、全コントローラーで共通部分はBaseControllerにまとめる
 // 特別に処理を入れる場合のみ、各Controllerに追記する形で開発する
 class TeamController extends BaseController{
@@ -331,11 +332,7 @@ class TeamController extends BaseController{
         $applys_for_team = UserTeamApply::getByTeamId( $oTeam->id );
         // team logo
         $logo_file = Teams::getLogoFileName( $oTeam->id );
-        $logo_path = PATH_TEAM_LOGO . $logo_file;
-        if (!file_exists($logo_path)) {
-            $logo_path = false;
-        }
-        
+
         // team_staffs
         $team_staffs = TeamStaffs::getByTeamId( $oTeam->id );
         // users
@@ -930,11 +927,50 @@ class TeamController extends BaseController{
             self::displayError();
             exit;
         }
-        
-        $logo_file = $team_id . "_logo.jpg";
+
+        // 縦横サイズチェック
+        $imgData = getimagesize( $_FILES['inputTeamLogo']['tmp_name'] );
+        if( $imgData[0] > Teams::LOGO_MAX_WIDTH || $imgData[1] > Teams::LOGO_MAX_HEIGHT )
+        {
+            self::displayCommonError([
+                'message' => "チームロゴ縦横サイズがオーバーです。",
+                'button'   => [
+                    'href'      => "/Team/detail/" . $team_id,
+                    'name'      => "チーム詳細へ戻る",
+                ],
+            ]);
+            exit;
+        }
+
+        // あっぷろ～ど！
+        $logo_file = $team_id . "_logo.png";
         $logo_path = PATH_TEAM_LOGO . $logo_file;
         move_uploaded_file($_FILES['inputTeamLogo']['tmp_name'], $logo_path);
+
+        // あげる前の画像の運営修正版がある場合は削除しておく
+        if( file_exists( PATH_TEAM_LOGO . "modified/" . $logo_file ) )
+        {
+            unlink( PATH_TEAM_LOGO . "modified/" . $logo_file );
+        }
+
+        // 時間とステータスを更新
+        $oDb = new Db();
+        $oDb->beginTransaction();
         
+        $oTeam = new Teams( $oDb, $team_id );
+        if( $oTeam->id == null ){
+            self::displayError();
+            exit();
+        }
+        $oTeam->logo_status     = Teams::LOGO_STATUS_UNAUTHENTICATED;
+        $oTeam->logo_updated_at = UtilTime::now();
+        $oTeam->save();
+        $oDb->commit();
+
+        // Discordへ通知
+        DiscordPublisher::noticeTeamLogoUpdated( $oTeam );
+
+
         $this->_displayUploaded($logo_file);
     }
 
@@ -948,24 +984,30 @@ class TeamController extends BaseController{
         $smarty->assign( "logo_file" , $logo_file);
         $smarty->display('Team/LogoUploaded.tmpl');
     }
-    
-    public function Logo($team_id){
+
+
+    /**
+     * 配信表示用のチームロゴ
+     * 
+     */
+    public function Logo($team_id)
+    {
+        $db = new Db();
+        $team = new Teams( $db, $team_id );
+        if( $team->id == null )
+        {
+            self::displayError();
+            exit();
+        }
+
+        $logo_file = $team->getStreamingLogoFileName();
+
         $smarty = new Smarty();
-        
         $smarty->template_dir = PATH_TMPL;
         $smarty->compile_dir  = PATH_TMPL_C;
         $smarty->default_modifiers[] = 'escape:html';
-        
-        $file_path = PATH_TEAM_LOGO . "stream/" .  $team_id . "_logo.jpg";
-        
-        $file_name = "";
-        if( file_exists($file_path) ){
-            $file_name = $team_id . "_logo";
-        } else {
-            $file_name = "0_general";
-        }
-        
-        $smarty->assign( "file_name" , $file_name);
+
+        $smarty->assign( "logo_file" , $logo_file);
         $smarty->display('Team/Logo.tmpl');
     }
     
