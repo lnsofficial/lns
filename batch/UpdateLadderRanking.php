@@ -3,15 +3,10 @@ ini_set('display_errors', 1);
 
 //require_once('../lib/common/Define.php');
 require_once('/var/www/html/lib/common/Define.php');
-require_once( "/var/www/html/lib/Model/Match.php" );
-require_once( "/var/www/html/lib/Model/Teams.php" );
-require_once( "/var/www/html/lib/Model/League.php" );
-require_once( "/var/www/html/lib/Model/Ladder.php" );
-require_once( "/var/www/html/lib/Model/LadderMovePoint.php" );
-#require_once( PATH_MODEL . "Match.php" );
-#require_once( PATH_MODEL . "Teams.php" );
-#require_once( PATH_MODEL . "League.php" );
-#require_once( PATH_MODEL . "Ladder.php" );
+require_once( PATH_MODEL . "Match.php" );
+require_once( PATH_MODEL . "Teams.php" );
+require_once( PATH_MODEL . "League.php" );
+require_once( PATH_MODEL . "Ladder.php" );
 require_once( PATH_MODEL . "LadderMovePoint.php" );
 // ポイントを反映
 writeLog("-----------------【処理開始】-----------------");
@@ -31,6 +26,9 @@ if ($ret === false) {
 
 // ラダー反映
 updateLadderRanking( $oDb );
+
+// 社長選定
+updateTopTeam( $oDb );
 
 $oDb->commit();
 
@@ -129,6 +127,7 @@ function updateTeamLadderNormal( $oDb, $oWinTeam, $oLoseTeam ){
                 $oWinLadder->point = 30;
                 $oWinLeague = $oWinLeague->getUpperOneLeague( $oDb );
                 $oWinLadder->league_id = $oWinLeague->id;
+                writeLog("[updateTeamLadderNormal][TeamId:" . $oWinTeam->id . ",LeagueId:" . $oWinLeague->id . "]");
             }
             break;
         default:
@@ -144,6 +143,7 @@ function updateTeamLadderNormal( $oDb, $oWinTeam, $oLoseTeam ){
                 $oLoseLadder->point = 70;
                 $oLoseLeague = $oLoseLeague->getUnderOneLeague( $oDb );
                 $oLoseLadder->league_id = $oLoseLeague->id;
+                writeLog("[updateTeamLadderNormal][TeamId:" . $oLoseTeam->id . ",LeagueId:" . $oLoseLeague->id . "]");
             } else {
                 $oLoseLadder->point = $moved_lose_point;
             }
@@ -189,6 +189,7 @@ function updateTeamLadderCancel( $oDb, $oWinTeam, $oLoseTeam ){
                 $oWinLadder->point = 30;
                 $oWinLeague = $oWinLeague->getUpperOneLeague( $oDb );
                 $oWinLadder->league_id = $oWinLeague->id;
+                writeLog("[updateTeamLadderCancel][TeamId:" . $oWinTeam->id . ",LeagueId:" . $oWinLeague->id . "]");
             }
             break;
         default:
@@ -204,6 +205,7 @@ function updateTeamLadderCancel( $oDb, $oWinTeam, $oLoseTeam ){
                 $oLoseLadder->point = 70;
                 $oLoseLeague = $oLoseLeague->getUnderOneLeague( $oDb );
                 $oLoseLadder->league_id = $oLoseLeague->id;
+                writeLog("[updateTeamLadderCancel][TeamId:" . $oLoseTeam->id . ",LeagueId:" . $oLoseLeague->id . "]");
             } else {
                 $oLoseLadder->point = $moved_lose_point;
             }
@@ -217,6 +219,53 @@ function updateTeamLadderCancel( $oDb, $oWinTeam, $oLoseTeam ){
 	$oLoseLadder->save();
 	
 	writeLog("[updateTeamLadderCancel][End]");
+}
+
+
+function updateTopTeam( $oDb ){
+	writeLog("[UpdateTopTeam][Start]");
+    $term = Ladder::getCurrentTerm( $oDb );
+	
+	if( $term == 0 ){
+		return false;
+	}
+
+    $top_teams = Ladder::getTopRankTeams($oDb, $term);
+
+	if(empty($top_teams)){
+		return false;
+	}
+
+    $update_teams = [];
+    $top_point = 0;
+    $shacho_teams = [];
+    foreach ($top_teams as $team) {
+        if ($team['point'] > $top_point) {
+            $top_point = $team['point'];
+            $update_teams = [$team['team_id']]; 
+        } elseif ($team['point'] == $top_point) {
+            $update_teams[] = $team['team_id']; 
+        } 
+
+        if ($team['league_id'] == League::LEAGUE_SHACHO) {
+            $shacho_teams[] = $team['team_id'];
+        }
+    }
+    
+    foreach ($update_teams as $team_id) {
+        Ladder::updateTeamLeagueId($oDb, $term, $team_id, League::LEAGUE_SHACHO);
+        writeLog("[UpdateTopTeam][TeamId:" . $team_id . ",LeagueId:" . League::LEAGUE_SHACHO . "]");
+    }
+
+    foreach ($shacho_teams as $team_id) {
+        if (!in_array($team_id, $update_teams)) {
+            Ladder::updateTeamLeagueId($oDb, $term, $team_id, League::LEAGUE_SENMU);
+            writeLog("[UpdateTopTeam][TeamId:" . $team_id . ",LeagueId:" . League::LEAGUE_SENMU . "]");
+        }
+    }
+	writeLog("[UpdateTopTeam][End]");
+
+	return true;
 }
 
 function writeLog( $sMessage ){
