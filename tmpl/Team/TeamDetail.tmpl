@@ -249,8 +249,8 @@
     }
     function isImageFile(fileName) {
         var Extension = getExtension(fileName);
-        if (Extension.toLowerCase() != "png" && Extension.toLowerCase() != "jpg" && Extension.toLowerCase() != "jpeg" && Extension.toLowerCase() != "gif") {
-            alert("適切な形式ではありません。png, jpeg, jpg, gifでアップロードしてください。");
+        if (Extension.toLowerCase() != "png") {
+            alert("チームロゴ画像ファイルはpng形式のものをアップロードする形でお願い致します。");
             return false;
         }
     }

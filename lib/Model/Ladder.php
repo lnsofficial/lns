@@ -57,4 +57,24 @@ WHERE season = '" . SEASON_NOW . "' AND term = (SELECT MAX(term) FROM " . self::
         }
         return $ret;
 	}
+
+	public function getTopRankTeams( $oDb, $team ){
+	    $sSelectLadderSql = "SELECT * FROM " . self::MAIN_TABLE . " WHERE season = '" . SEASON_NOW . "' AND term = ? AND league_id IN (" . League::LEAGUE_SHACHO . "," . League::LEAGUE_SENMU . ")";
+	    $ahsParameter = [ $team ];
+	    
+	    $oLadderRanking = $oDb->executePrepare( $sSelectLadderSql, "i", $ahsParameter );
+	    
+        $ret = array();
+	    while( $row = $oLadderRanking->fetch_assoc() ) {
+            $ret[] = $row;
+        }
+        return $ret;
+	}
+
+	public function updateTeamLeagueId( $oDb, $term, $team_id, $league_id ){
+	    $sSelectLadderSql = "UPDATE " . self::MAIN_TABLE . " SET league_id = ? WHERE season = '" . SEASON_NOW . "' AND term = ? AND team_id = ?";
+	    $ahsParameter = [$league_id, $term, $team_id];
+	    
+	    $result = $oDb->executePrepare( $sSelectLadderSql, "iii", $ahsParameter );
+	}
 }
