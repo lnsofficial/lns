@@ -22,8 +22,8 @@
 	
 	// バッチ関連
 	define( "INTERVAL_BATCH_TIME"	, "1 DAY" );
-	define( "SEASON_NOW",             "S4" );
-	define( "SEASON_BEFORE",          "S3" );
+	define( "SEASON_NOW",             "S5" );
+	define( "SEASON_BEFORE",          "S4" );
 
 	// 環境別
 	define( "ENV"			, getenv('ENV') );

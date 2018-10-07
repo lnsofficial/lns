@@ -40,12 +40,37 @@ class DiscordPublisher
         "*Master yourself, master the enemy.*",
         "*Be Cool!!!!!*",
     ];
+    const ORIANNA_TIPS = [
+        "*We will kill your enemies. That will be fun*",
+        "*I have sharp things.*",
+        "*We are as one.*",
+        "*Yes, I am a weapon.*",
+        "*The Ball is angry.*",
+        "*So strange, they scream.*",
+        "*Why do they keep breaking?*",
+        "*Winding.*",
+        "*I hear soft things.*",
+        "*Motivating.*",
+        "*We go.*",
+        "*This is very exciting.*",
+        "*This is a fun game.*",
+        "*The Ball is impatient.*",
+        "*Time tick-ticks away.*",
+        "*Why are they running?*",
+        "*Ravage.*",
+        "*Pulse.*",
+        "*Protect.*",
+        "*Throw*",
+        "*I know what makes them tick. I know how to make the ticking stop.*",
+        "*They come apart so easily. How do I put them back together again?*",
+        "*When you fall, you get right back up.*",
+    ];
 
 
 
 
     /**
-     * 試合募集があるよ～、をDiscordに通知する
+     * 試合募集があるよ～、を参加者用Discordに通知する
      * 
      * @param  Match                   $match  // Matchインスタンス
      * @return void
@@ -54,6 +79,24 @@ class DiscordPublisher
     {
         $message    = self::getMessageNoticeMatchCreated( $match );
         self::publish( $message );
+    }
+
+
+    /**
+     * チームロゴ更新があったときに、運営Discordに通知する
+     * 
+     * @param  Teams                   $team  // Teamsインスタンス
+     * @return void
+     */
+    public static function noticeTeamLogoUpdated( Teams $team )
+    {
+        $message    = self::getMessageNoticeTeamLogoUpdated( $team );
+
+        // local
+        //$url = "https://discordapp.com/api/webhooks/425688670671077396/BWQDNG8S644CjptXAwR2zlE_D10yFmdqHCYCxTYVDJ0GFOV3jWzPGgJ4FuuZJJVedIta";
+        // live
+        $url = "https://discordapp.com/api/webhooks/497828016211361812/DEDpmFMERciF7_sPmC3BfPWzMI1uEuRvK54MQscGGDn0CwXC5OpMpJ8Dk9ikYlwdk4Z1";
+        self::publish( $message, $url );
     }
 
 
@@ -140,16 +183,38 @@ class DiscordPublisher
 
 
     /**
+     * Discordに飛ばすメッセージの作成 [チームロゴ更新されたよ～]
+     * 
+     * @param  Teams                   $team  // Teamsインスタンス
+     * @return string
+     */
+    private static function getMessageNoticeTeamLogoUpdated( Teams $team )
+    {
+        $message  = "@here" . "\n";
+        $message .= "チームロゴが更新されました。". "\n\n";
+
+        $message .= self::ORIANNA_TIPS[ mt_rand(0, count(self::ORIANNA_TIPS)-1) ] . "\n\n";
+
+        $message .= "チームID：**" . $team->id        . "**\n"; // **で囲むと太字
+        $message .= "チーム名：**" . $team->team_name . "**\n"; // **で囲むと太字
+        $message .= "タグ名  ：**" . $team->team_tag  . "**\n"; // **で囲むと太字
+
+        return $message;
+    }
+
+
+    /**
      * 飛ばす処理
      * 
      * @param  string                  $message  // Discordに流すメッセージ
+     * @param  string                  $url      // 通知先URL指定する場合
      * @return void
      */
-    private static function publish( $message = "" )
+    private static function publish( $message = "", $url = "" )
     {
         // 環境で通知先切り替えるかんじ
         $params = [
-            'url'  => self::getWebhookUrl(),
+            'url'  => empty($url) ? self::getWebhookUrl() : $url,
             'data' => [
                 'content' => $message,
             ],
