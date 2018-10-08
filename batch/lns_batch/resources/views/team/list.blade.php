@@ -3,34 +3,128 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-default">
-                <div class="panel-heading">チーム一覧(ロゴ更新日順)</div>
 
-                <div class="panel-body">
-                    @foreach($teams as $team)
-                        <div class="row alert">
-                            <div class="col-md-9">
-                                <a href="{{ url('/team/detail/' . $team->id) }}">
-                                    {{ $team->team_name }}
-                                </a>
-                            </div>
-                            <div class="col-md-3">
-                            @if ($team->logo_status == App\Models\Team::LOGO_STATUS_UNREGISTERED)
-                                <span class="label label-default">ロゴ未登録</span>
-                            @elseif ($team->logo_status == App\Models\Team::LOGO_STATUS_UNAUTHENTICATED)
-                                <span class="label label-warning">ロゴ未検閲</span>
-                            @elseif ($team->logo_status == App\Models\Team::LOGO_STATUS_AUTHENTICATED)
-                                <span class="label label-success">ロゴ検閲済み</span>
-                            @elseif ($team->logo_status == App\Models\Team::LOGO_STATUS_AUTHENTICATEERROR)
-                                <span class="label label-danger">ロゴ検閲NG</span>
-                            @endif
-                            </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">チーム一覧</div>
+
+            <div class="panel-body">
+
+                <form class="form-horizontal" method="GET" action="{{ url('/team/list') }}">
+                    {{ csrf_field() }}
+
+                    {{-- フィルタリング：team_name --}}
+                    <div class="form-group">
+                        <label class="control-label col-md-2">team_name</label>
+                        <div class="col-md-6">
+                            <input name="team_name" type="text" class="form-control" value="{{ $team_name }}" />
                         </div>
-                    @endforeach
-                </div>
+                    </div>
+
+                    {{-- フィルタリング：team_tag --}}
+                    <div class="form-group">
+                        <label class="control-label col-md-2">team_tag</label>
+                        <div class="col-md-6">
+                            <input name="team_tag" type="text" class="form-control" value="{{ $team_tag }}" />
+                        </div>
+                    </div>
+
+                    {{-- フィルタリング：logo_status --}}
+                    <div class="form-group">
+                        <label class="control-label col-md-2">logo_status</label>
+                        <div class="col-md-6">
+                            <select class="form-control" name="logo_status">
+                                <option value="">指定なし</option>
+                                @foreach(App\Models\Team::LOGO_STATUS_MESSAGES as $key=>$ls_val)
+                                <option value={{ $key }} @if ($logo_status===$key) selected @endif>{{ $ls_val }}</option>
+                                @endforeach
+
+                            </select>
+                        </div>
+                    </div>
+
+                    {{-- ソート --}}
+                    <div class="form-group">
+                        <label class="control-label col-md-2">並び順</label>
+                        <div class="col-md-3">
+                            <select class="form-control" name="sort">
+                                <option value="id"              @if ("id"             ==$sort) selected @endif>id</option>
+                                <option value="logo_status"     @if ("logo_status"    ==$sort) selected @endif>logo_status</option>
+                                <option value="logo_updated_at" @if ("logo_updated_at"==$sort) selected @endif>logo_updated_at</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" name="order">
+                                <option value="asc"  @if ("asc"  ==$order) selected @endif>昇順</option>
+                                <option value="desc" @if ("desc" ==$order) selected @endif>降順</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {{-- submitボタン --}}
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <button type="submit" class="btn btn-default">検索</button>
+                        </div>
+                    </div>
+
+                </form>
+
             </div>
         </div>
+
+    </div>
+
+
+
+    <div class="row">
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+
+                <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>team_name</th>
+                        <th>team_tag</th>
+                        <th>logo_status</th>
+                        <th>logo_updated_at</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                @foreach($teams as $team)
+                    <tr>
+                        <td>{{ $team->id }}</td>
+                        <td>
+                            <a href="{{ url('/team/detail/' . $team->id) }}">
+                                {{ str_limit($team->team_name, 30) }}
+                            </a>
+                        </td>
+                        <td>{{ str_limit($team->team_tag, 30) }}</td>
+                        <td class="{{ App\Models\Team::LOGO_STATUS_COLOR_CLASS['table'][$team->logo_status] }}">
+                            {{ App\Models\Team::LOGO_STATUS_MESSAGES[$team->logo_status] }}
+                        </td>
+                        <td>{{ $team->logo_updated_at }}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <td colspan=5>
+                            <div class="center-block text-center">
+                                {{ $teams->appends(['team_name'=>$team_name,'team_tag'=>$team_name,'logo_status'=>$logo_status,'sort'=>$sort,'order'=>$order,])->render() }}
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+                </table>
+
+            </div>
+        </div>
+
     </div>
 </div>
 @endsection

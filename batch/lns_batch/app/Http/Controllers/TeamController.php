@@ -27,14 +27,51 @@ class TeamController extends Controller
      * 
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index( Request $request )
     {
-        $teams = Team::orderBy('logo_updated_at', 'desc')
-                     ->orderBy('created_at',      'asc')
-                     ->get();
+        $team_name   = $request->input('team_name');
+        $team_tag    = $request->input('team_tag');
+        $logo_status = '';
+        $sort        = 'id';
+        $order       = 'asc';
+
+        $query = Team::query();
+
+        if( $request->has('team_name') )
+        {
+            $team_name   = $request->input('team_name');
+            $query->where('team_name', 'like', '%'.$team_name.'%');
+        }
+        if( $request->has('team_tag') )
+        {
+            $team_tag    = $request->input('team_tag');
+            $query->where('team_tag', 'like', '%'.$team_tag.'%');
+        }
+        if( $request->has('logo_status') )
+        {
+            $logo_status = intval($request->input('logo_status'));
+            $query->where('logo_status', $logo_status);
+        }
+
+        if( $request->has('sort') )
+        {
+            $sort = $request->input('sort');
+        }
+        if( $request->has('order') )
+        {
+            $order = $request->input('order');
+        }
+        $query->orderBy($sort, $order);
+
+        $teams = $query->paginate(50);
 
         return view('team.list')->with([
-            'teams' => $teams,
+            'teams'       => $teams,
+            'team_name'   => $team_name,
+            'team_tag'    => $team_tag,
+            'logo_status' => $logo_status,
+            'sort'        => $sort,
+            'order'       => $order,
         ]);
     }
 

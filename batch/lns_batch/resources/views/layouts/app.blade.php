@@ -15,6 +15,7 @@
 </head>
 <body>
     <div id="app">
+        {{-- 上部メニュー --}}
         <nav class="navbar navbar-default navbar-static-top">
             <div class="container">
                 <div class="navbar-header">
@@ -29,7 +30,16 @@
 
                     <!-- Branding Image -->
                     <a class="navbar-brand" href="{{ url('/') }}">
-                        {{ config('app.name', 'Laravel') }}
+                        {{ config('app.name', 'Laravel') }}&nbsp;(
+                        @if (config('app.env')=="production")
+                        <font color="red">
+                        @elseif (config('app.env')=="staging")
+                        <font color="blue">
+                        @else
+                        <font>
+                        @endif
+                            {{ config('app.env') }}
+                        </font>)
                     </a>
                 </div>
 
@@ -75,9 +85,21 @@
             </div>
         </nav>
 
-        @yield('content')
-    </div>
+        <div class="container-fluid">
+            <div class="row">
+                {{-- 左サイドメニュー --}}
+                <div class="col-md-2">
+                    @include('layouts.left-nav')
+                </div>
 
+                {{-- メインコンテンツ --}}
+                <div class="col-md-10">
+                    @yield('content')
+                </div>
+            </div>
+        </div>
+
+    </div>
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
 </body>

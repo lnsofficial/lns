@@ -3,9 +3,13 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-default">
-                <div class="panel-heading">Functions</div>
+        <div class="col-md-12">
+            @if (!Auth::user()->activate)
+            <div class="panel panel-danger">
+            @else
+            <div class="panel panel-info">
+            @endif
+                <div class="panel-heading">Notice</div>
 
                 <div class="panel-body">
                     @if (session('status'))
@@ -16,14 +20,22 @@
 
                     @if (!Auth::user()->activate)
                         <div>
-                            Not activated.
+                            「{{Auth::user()->name}}さん、どこかで会ったかしら？」
+                        </div>
+                        <div>
+                            <img src="{{ asset('img/20180422_lulu.png') }}" />
+                        </div>
+                        <div>
+                            ※アカウントがactivateされていないので、Slackにて<br />
+                            @スミス さん @ラクラク / webエンジニア さん<br />
+                            に依頼してください～。
                         </div>
                     @else
                         <div>
-                            <!-- Branding Image -->
-                            <a href="{{ url('/team/list') }}">
-                                チーム一覧
-                            </a>
+                            「データはね、壊すためにあるのよ。codeもdbもみんな……ね！」
+                        </div>
+                        <div>
+                            <img src="{{ asset('img/20180819_jinx.png') }}" />
                         </div>
                     @endif
                 </div>
