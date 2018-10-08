@@ -22,7 +22,7 @@ class MatchController extends Controller
     }
 
     /**
-     * ユーザー一覧
+     * マッチ一覧
      * 
      * @return \Illuminate\Http\Response
      */
@@ -39,7 +39,7 @@ class MatchController extends Controller
 
 
     /**
-     * ユーザー詳細
+     * マッチ詳細
      * 
      * @return \Illuminate\Http\Response
      */

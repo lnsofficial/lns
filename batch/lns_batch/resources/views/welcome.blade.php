@@ -13,18 +13,16 @@
         <!-- Styles -->
         <style>
             html, body {
-/*
                 background-image: url("{{ asset('img/otukaree.png') }}");
                 background-size:contain;
                 background-position: center;
                 background-repeat: no-repeat;
-*/
                 background-color: #fff;
-                color: #636b6f;
-/*                color: #0012ff; */
+/*                color: #636b6f; */
+                color: #0012ff;
                 font-family: 'Raleway', sans-serif;
-                font-weight: 100;
-/*                font-weight: 900; */
+/*                font-weight: 100; */
+                font-weight: 900;
                 height: 100vh;
                 margin: 0;
             }

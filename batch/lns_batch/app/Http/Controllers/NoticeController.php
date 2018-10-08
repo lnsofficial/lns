@@ -22,7 +22,7 @@ class NoticeController extends Controller
     }
 
     /**
-     * ユーザー一覧
+     * お知らせ一覧
      * 
      * @return \Illuminate\Http\Response
      */
@@ -42,7 +42,7 @@ class NoticeController extends Controller
 
 
     /**
-     * ユーザー詳細
+     * お知らせ詳細
      * 
      * @return \Illuminate\Http\Response
      */

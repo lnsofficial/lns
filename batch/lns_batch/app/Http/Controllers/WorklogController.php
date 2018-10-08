@@ -21,7 +21,7 @@ class WorklogController extends Controller
     }
 
     /**
-     * ユーザー一覧
+     * 作業ログ一覧
      * 
      * @return \Illuminate\Http\Response
      */
@@ -32,7 +32,7 @@ class WorklogController extends Controller
 
 
     /**
-     * ユーザー詳細
+     * 作業ログ詳細
      * 
      * @return \Illuminate\Http\Response
      */

@@ -22,7 +22,7 @@ class OperatorController extends Controller
     }
 
     /**
-     * ユーザー一覧
+     * 管理ユーザー一覧
      * 
      * @return \Illuminate\Http\Response
      */
@@ -39,7 +39,7 @@ class OperatorController extends Controller
 
 
     /**
-     * ユーザー詳細
+     * 管理ユーザー詳細
      * 
      * @return \Illuminate\Http\Response
      */
