@@ -12,4 +12,20 @@ class Team extends BaseModel
     const LOGO_STATUS_AUTHENTICATED     = 2; // 運営にて認証済み
     const LOGO_STATUS_AUTHENTICATEERROR = 3; // 運営にて認証NG
 
+    const LOGO_STATUS_MESSAGES = [
+        self::LOGO_STATUS_UNREGISTERED      => '未登録',
+        self::LOGO_STATUS_UNAUTHENTICATED   => '未認証',
+        self::LOGO_STATUS_AUTHENTICATED     => '認証済み',
+        self::LOGO_STATUS_AUTHENTICATEERROR => '認証NG',
+    ];
+
+    const LOGO_STATUS_COLOR_CLASS = [
+        'table' => [
+            self::LOGO_STATUS_UNREGISTERED      => '',
+            self::LOGO_STATUS_UNAUTHENTICATED   => 'warning',
+            self::LOGO_STATUS_AUTHENTICATED     => 'success',
+            self::LOGO_STATUS_AUTHENTICATEERROR => 'danger',
+        ],
+    ];
+
 }
