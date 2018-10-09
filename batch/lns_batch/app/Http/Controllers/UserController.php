@@ -43,13 +43,11 @@ class UserController extends Controller
      * 
      * @return \Illuminate\Http\Response
      */
-/*
     public function detail( User $user )
     {
         return view('user.detail')->with([
             'user' => $user,
         ]);
     }
-*/
 
 }

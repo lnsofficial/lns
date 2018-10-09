@@ -91,10 +91,9 @@
                         </div>
                         <div class="col-md-4">
                             <select name="logo_status" class="form-control">
-                                <option value="{{ App\Models\Team::LOGO_STATUS_UNREGISTERED      }}" @if($team->logo_status == App\Models\Team::LOGO_STATUS_UNREGISTERED)      selected @endif>未登録</option>
-                                <option value="{{ App\Models\Team::LOGO_STATUS_UNAUTHENTICATED   }}" @if($team->logo_status == App\Models\Team::LOGO_STATUS_UNAUTHENTICATED)   selected @endif>未検閲</option>
-                                <option value="{{ App\Models\Team::LOGO_STATUS_AUTHENTICATED     }}" @if($team->logo_status == App\Models\Team::LOGO_STATUS_AUTHENTICATED)     selected @endif>検閲済み</option>
-                                <option value="{{ App\Models\Team::LOGO_STATUS_AUTHENTICATEERROR }}" @if($team->logo_status == App\Models\Team::LOGO_STATUS_AUTHENTICATEERROR) selected @endif>検閲NG</option>
+                                @foreach(App\Models\Team::LOGO_STATUS_MESSAGES as $key=>$ls_val)
+                                    <option value={{ $key }} @if ($team->logo_status==$key) selected @endif>{{ $ls_val }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -164,5 +163,62 @@
 
 
     </div>
-</div>
+
+
+
+    <div class="row">
+        <div class="panel panel-default">
+
+            {{-- パネルヘッダ --}}
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-2">
+                        チームメンバー一覧
+                    </div>
+                </div>
+            </div>
+
+            {{-- パネルボディ --}}
+            <div class="panel-body">
+                <table class="table table-hover">
+
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>summoner_id</th>
+                        <th>summoner_name</th>
+                        <th>main_role</th>
+                        <th>updated_at</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                @foreach($team->members as $user)
+                    <tr>
+                        <td>{{ $user->id }}</td>
+                        <td>{{ $user->summoner_id }}</td>
+                        <td>
+                            <a href="{{ url('/user/detail/' . $user->id) }}">
+                                {{ str_limit($user->summoner_name, 30) }}
+                            </a>
+                        </td>
+                        <td>{{ $user->main_role }}</td>
+                        <td>{{ $user->updated_at }}</td>
+                        <td>
+                            <a class="btn" href="#" role="button">Leave</a>
+                        </td>
+                    </tr>
+                @endforeach
+                </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>{{-- row --}}
+
+
+
+</div>{{-- container --}}
 @endsection
