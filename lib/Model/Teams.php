@@ -367,6 +367,8 @@ class Teams extends Base{
             return false;
         }
         
+        return true;
+        /*
         $season_start_date  = Settings::getSettingValue( Settings::SEASON_START_DATE );
         $season_end_date    = Settings::getSettingValue( Settings::SEASON_END_DATE );
         
@@ -384,5 +386,6 @@ class Teams extends Base{
         }
         
         return true;
+        */
     }
 }
