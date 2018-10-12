@@ -6,40 +6,42 @@
 
 
         <div class="panel panel-default">
-            <div class="panel-heading">チーム一覧</div>
+            <div class="panel-heading">ユーザー一覧</div>
 
             <div class="panel-body">
 
-                <form class="form-horizontal" method="GET" action="{{ url('/team/list') }}">
+                <form class="form-horizontal" method="GET" action="{{ url('/user/list') }}">
                     {{ csrf_field() }}
 
-                    {{-- フィルタリング：team_name --}}
+                    {{-- フィルタリング：login_id --}}
                     <div class="form-group">
-                        <label class="control-label col-md-2">team_name</label>
+                        <label class="control-label col-md-2">login_id</label>
                         <div class="col-md-6">
-                            <input name="team_name" type="text" class="form-control" value="{{ $team_name }}" />
+                            <input name="login_id" type="text" class="form-control" value="{{ $login_id }}" />
                         </div>
                     </div>
 
-                    {{-- フィルタリング：team_tag --}}
+                    {{-- フィルタリング：summoner_id --}}
                     <div class="form-group">
-                        <label class="control-label col-md-2">team_tag</label>
+                        <label class="control-label col-md-2">summoner_id</label>
                         <div class="col-md-6">
-                            <input name="team_tag" type="text" class="form-control" value="{{ $team_tag }}" />
+                            <input name="summoner_id" type="text" class="form-control" value="{{ $summoner_id }}" />
                         </div>
                     </div>
 
-                    {{-- フィルタリング：logo_status --}}
+                    {{-- フィルタリング：account_id --}}
                     <div class="form-group">
-                        <label class="control-label col-md-2">logo_status</label>
+                        <label class="control-label col-md-2">account_id</label>
                         <div class="col-md-6">
-                            <select class="form-control" name="logo_status">
-                                <option value="">指定なし</option>
-                                @foreach(App\Models\Team::LOGO_STATUS_MESSAGES as $key=>$ls_val)
-                                <option value={{ $key }} @if ($logo_status===$key) selected @endif>{{ $ls_val }}</option>
-                                @endforeach
+                            <input name="account_id" type="text" class="form-control" value="{{ $account_id }}" />
+                        </div>
+                    </div>
 
-                            </select>
+                    {{-- フィルタリング：summoner_name --}}
+                    <div class="form-group">
+                        <label class="control-label col-md-2">summoner_name</label>
+                        <div class="col-md-6">
+                            <input name="summoner_name" type="text" class="form-control" value="{{ $summoner_name }}" />
                         </div>
                     </div>
 
@@ -49,8 +51,8 @@
                         <div class="col-md-3">
                             <select class="form-control" name="sort">
                                 <option value="id"              @if ("id"             ==$sort) selected @endif>id</option>
-                                <option value="logo_status"     @if ("logo_status"    ==$sort) selected @endif>logo_status</option>
-                                <option value="logo_updated_at" @if ("logo_updated_at"==$sort) selected @endif>logo_updated_at</option>
+                                <option value="created_at"      @if ("created_at"     ==$sort) selected @endif>created_at</option>
+                                <option value="updated_at"      @if ("updated_at"     ==$sort) selected @endif>updated_at</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -86,27 +88,31 @@
                 <thead>
                     <tr>
                         <th>id</th>
-                        <th>team_name</th>
-                        <th>team_tag</th>
-                        <th>logo_status</th>
-                        <th>logo_updated_at</th>
+                        <th>login_id</th>
+                        <th>summoner_id</th>
+                        <th>account_id</th>
+                        <th>summoner_name</th>
+                        <th>discord_id</th>
+                        <th>created_at</th>
+                        <th>updated_at</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                @foreach($teams as $team)
+                @foreach($users as $user)
                     <tr>
-                        <td>{{ $team->id }}</td>
+                        <td>{{ $user->id }}</td>
+                        <td>{{ $user->login_id }}</td>
+                        <td>{{ $user->summoner_id }}</td>
+                        <td>{{ $user->account_id }}</td>
                         <td>
-                            <a href="{{ url('/team/detail/' . $team->id) }}">
-                                {{ str_limit($team->team_name, 30) }}
+                            <a href="{{ url('/user/detail/' . $user->id) }}">
+                                {{ str_limit($user->summoner_name, 30) }}
                             </a>
                         </td>
-                        <td>{{ str_limit($team->team_tag, 30) }}</td>
-                        <td class="{{ App\Models\Team::LOGO_STATUS_COLOR_CLASS['table'][$team->logo_status] }}">
-                            {{ App\Models\Team::LOGO_STATUS_MESSAGES[$team->logo_status] }}
-                        </td>
-                        <td>{{ $team->logo_updated_at }}</td>
+                        <td>{{ $user->discord_id }}</td>
+                        <td>{{ $user->created_at }}</td>
+                        <td>{{ $user->updated_at }}</td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -115,7 +121,7 @@
                     <tr>
                         <td colspan=5>
                             <div class="center-block text-center">
-                                {{ $teams->appends(['team_name'=>$team_name,'team_tag'=>$team_name,'logo_status'=>$logo_status,'sort'=>$sort,'order'=>$order,])->render() }}
+                                {{ $users->appends(['login_id'=>$login_id,'summoner_id'=>$summoner_id,'account_id'=>$account_id,'summoner_name'=>$summoner_name,'sort'=>$sort,'order'=>$order,])->render() }}
                             </div>
                         </td>
                     </tr>
@@ -126,5 +132,10 @@
         </div>
 
     </div>
+
+
+
+
+
 </div>
 @endsection

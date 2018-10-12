@@ -40,7 +40,7 @@ class AuthenticateAdmin
     {
         $this->authenticate($guards);
 
-        // activate�ς݂Ȃ�OK
+        // activate済みならOK
         if( !$this->auth->user()->activate )
         {
             \Log::debug("not activated. name:". $this->auth->user()->name);
