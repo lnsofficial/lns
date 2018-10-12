@@ -28,4 +28,15 @@ class Team extends BaseModel
         ],
     ];
 
+
+    /**
+     * リレーション周り
+     */
+    public function members()
+    {
+        return $this->hasManyThrough('App\Models\User', 'App\Models\TeamMember', 'team_id', 'id');
+    }
+
+
+
 }

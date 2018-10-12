@@ -24,6 +24,7 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 // ユーザー関連
 Route::get ('/user/list',              'UserController@index')     ->name('user.list');
+Route::get ('/user/detail/{user}',     'UserController@detail')    ->name('user.detail')    ->where('user', '[0-9]+');
 
 // チーム関連
 Route::get ('/team/list',              'TeamController@index')     ->name('team.list');
