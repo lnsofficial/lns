@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 use App\Libs\UtilTime;
+use App\Libs\WorkLog;
 
 class WorklogController extends Controller
 {
@@ -27,7 +28,11 @@ class WorklogController extends Controller
      */
     public function index()
     {
-        return view('worklog.list');
+        $worklogs = WorkLog::getList();
+//dd($worklogs);
+        return view('worklog.list')->with([
+            'worklogs'    => $worklogs,
+        ]);
     }
 
 
