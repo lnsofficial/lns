@@ -194,17 +194,17 @@
                 </thead>
 
                 <tbody>
-                @foreach($team->members as $user)
+                @foreach($team->members as $member)
                     <tr>
-                        <td>{{ $user->id }}</td>
-                        <td>{{ $user->summoner_id }}</td>
+                        <td>{{ $member->user->id }}</td>
+                        <td>{{ $member->user->summoner_id }}</td>
                         <td>
-                            <a href="{{ url('/user/detail/' . $user->id) }}">
-                                {{ str_limit($user->summoner_name, 30) }}
+                            <a href="{{ url('/user/detail/' . $member->user->id) }}">
+                                {{ str_limit($member->user->summoner_name, 30) }}
                             </a>
                         </td>
-                        <td>{{ $user->main_role }}</td>
-                        <td>{{ $user->updated_at }}</td>
+                        <td>{{ $member->user->main_role }}</td>
+                        <td>{{ $member->user->updated_at }}</td>
                         <td>
                             <a class="btn" href="#" role="button">Leave</a>
                         </td>

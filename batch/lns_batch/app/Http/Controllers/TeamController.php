@@ -83,6 +83,7 @@ class TeamController extends Controller
      */
     public function detail( Team $team )
     {
+        $team->load('members.user');
         return view('team.detail')->with([
             'team' => $team,
         ]);
