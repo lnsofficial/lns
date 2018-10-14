@@ -13,7 +13,11 @@ class TeamMember extends BaseModel
      */
     public function team()
     {
-        return $this->belongsTo('Team', 'team_id', 'id');
+        return $this->belongsTo( 'App\Models\Team', 'team_id', 'id' );
+    }
+    public function user()
+    {
+        return $this->belongsTo( 'App\Models\User', 'user_id', 'id' );
     }
 
 }

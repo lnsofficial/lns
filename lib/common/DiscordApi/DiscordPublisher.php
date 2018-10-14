@@ -18,8 +18,8 @@ class DiscordPublisher
     static $ini;
     const WEBHOOK_URLS     = [
         'LIVE'  => 'https://discordapp.com/api/webhooks/433283524003364864/LlCYwp3R2cH7K2iH4yuCeGZUmLtfDfJgDjhVYK0Qw3sSHb4yekxluSuMj2Zlvg7FsRN-',
-        'DEV'   => 'https://discordapp.com/api/webhooks/425659894159638538/hlUULvWG48DGmUlleJaDv0nRL6Twe_LcIyiA36o0geYSXhbhdbIEYq2ceyq8_zo8_0cq',
-        'LOCAL' => 'https://discordapp.com/api/webhooks/425688670671077396/BWQDNG8S644CjptXAwR2zlE_D10yFmdqHCYCxTYVDJ0GFOV3jWzPGgJ4FuuZJJVedIta',
+        'DEV'   => 'https://discordapp.com/api/webhooks/500472420130357268/97KyqsSkxuCWppRfHuNYGMvS-_hmNGJsrE6W5uVkV-rNNdoTolleAdADpC1dyfr_HbBC',
+        'LOCAL' => 'https://discordapp.com/api/webhooks/500473506216280064/gHezUYKBZbyMDr8zqMsZpRFUQ4gzyPrthsbIM8bQOBgv2k08sI2kxODjjvgxU266HwpK',
     ];
     const TIPS = [
         "*Here comes a new Challenger !*",
