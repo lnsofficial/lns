@@ -34,7 +34,7 @@ class Team extends BaseModel
      */
     public function members()
     {
-        return $this->hasManyThrough('App\Models\User', 'App\Models\TeamMember', 'team_id', 'id');
+        return $this->hasMany( 'App\Models\TeamMember', 'team_id', 'id' );
     }
 
 

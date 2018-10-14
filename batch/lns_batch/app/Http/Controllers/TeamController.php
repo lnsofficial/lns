@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
 use App\Libs\UtilTime;
+use App\Libs\WorkLog;
 use App\Models\Team;
 
 class TeamController extends Controller
@@ -83,6 +84,7 @@ class TeamController extends Controller
      */
     public function detail( Team $team )
     {
+        $team->load('members.user');
         return view('team.detail')->with([
             'team' => $team,
         ]);
@@ -115,7 +117,7 @@ class TeamController extends Controller
         $team->save();
 
         // ログに記録
-        \Log::notice( "[".Auth::user()->id.":".Auth::user()->name."] チームロゴ検閲状況を更新 ", $team->toArray() );
+        WorkLog::log( Auth::user(), "チームロゴ検閲状況を更新", $team->toArray() );
 
         return redirect()
             ->route('team.detail', ['team'=>$team->id])
@@ -143,7 +145,7 @@ class TeamController extends Controller
             $team->save();
 
             // ログに記録
-            \Log::notice( "[".Auth::user()->id.":".Auth::user()->name."] 修正版チームロゴを更新 ", $team->toArray() );
+            WorkLog::log( Auth::user(), "修正版チームロゴを更新", $team->toArray() );
 
             return redirect()
                 ->route('team.detail', ['team'=>$team->id])
