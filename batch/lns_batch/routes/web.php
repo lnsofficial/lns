@@ -44,4 +44,5 @@ Route::get ('/worklog/list',           'WorklogController@index')  ->name('workl
 // 管理ユーザー関連
 Route::get ('/operator/list',                  'OperatorController@index') ->name('operator.list');
 Route::get ('/operator/detail/{operator}',     'OperatorController@detail')->name('operator.detail')    ->where('operator', '[0-9]+');
+Route::post('/operator/detail/{operator}',     'OperatorController@update')->name('operator.update')    ->where('operator', '[0-9]+');
 

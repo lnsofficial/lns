@@ -24,7 +24,7 @@
             {{-- パネルヘッダ --}}
             <div class="panel-heading">
                 <div class="row">
-                    <div class="col-md-2">
+                    <div class="col-md-12">
                         管理ユーザー情報(・・調整中・・)
                     </div>
                 </div>
@@ -56,6 +56,28 @@
                         {{ $operator->email }}
                     </div>
                 </div>
+
+                <form class="form-horizontal" method="POST" action="{{ url('/operator/detail/' . $operator->id) }}">
+                {{ csrf_field() }}
+                <div class="row">
+                    <div class="col-md-2">
+                        activate
+                    </div>
+                    <div class="col-md-4">
+                        <select name="activate" class="form-control">
+                            @foreach(App\Models\Operator::ACTIVATE_STATUS_MESSAGES as $key=>$ac_val)
+                                <option value={{ $key }} @if ($operator->activate==$key) selected @endif>{{ $ac_val }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                            <button type="submit" class="btn btn-primary">
+                                Update
+                            </button>
+                    </div>
+                </div>
+                </form>
+
                 <div class="row">
                     <div class="col-md-2">
                         created_at
