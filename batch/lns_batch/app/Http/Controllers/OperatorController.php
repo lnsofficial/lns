@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 use App\Libs\UtilTime;
+use App\Libs\WorkLog;
 use App\Models\Operator;
 
 class OperatorController extends Controller
@@ -85,6 +86,40 @@ class OperatorController extends Controller
         return view('operator.detail')->with([
             'operator' => $operator,
         ]);
+    }
+
+
+    /**
+     * 管理ユーザー更新(今のところactivate変更)
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function update( Request $request, Operator $operator )
+    {
+        // 今のところ activate しか、受け取ってvalidationしてないけど他も受け取れば更新可
+        $input = $request->all();
+        $validator = Validator::make($input, [
+            'activate' => 'required|numeric|min:'.Operator::ACTIVATE_STATUS_UNAUTHENTICATED.'|max:'.Operator::ACTIVATE_STATUS_AUTHENTICATED
+        ]);
+        if ($validator->fails())
+        {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors( $validator );
+        }
+
+        // 更新
+        $operator->activate     = $input['activate'];
+        $operator->save();
+
+        // ログに記録
+        WorkLog::log( Auth::user(), "管理ユーザーのactivateを更新", $operator->toArray() );
+
+        return redirect()
+            ->route('operator.update', ['operator'=>$operator->id])
+            ->with('success', 'activateを更新しました。');
+
     }
 
 }
