@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Libs\UtilTime;
 use App\Libs\WorkLog;
 use App\Models\Team;
+use App\Models\Ladder;
 
 class TeamController extends Controller
 {
@@ -84,7 +85,15 @@ class TeamController extends Controller
      */
     public function detail( Team $team )
     {
-        $team->load('members.user');
+        // チームメンバーレコードもランクまで含めて読み込んでおく
+        $team->load('members.user.ranks');
+        // ランキング情報も読み込んでおく
+        $team->load(['ladders'=> function($query) {
+            $query->with('league');
+            $query->where('season', Ladder::SEASON_NOW);
+            $query->orderBy('term', 'desc');
+        }]);
+
         return view('team.detail')->with([
             'team' => $team,
         ]);

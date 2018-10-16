@@ -29,14 +29,6 @@
                         </div>
                     </div>
 
-                    {{-- フィルタリング：account_id --}}
-                    <div class="form-group">
-                        <label class="control-label col-md-2">account_id</label>
-                        <div class="col-md-6">
-                            <input name="account_id" type="text" class="form-control" value="{{ $account_id }}" />
-                        </div>
-                    </div>
-
                     {{-- フィルタリング：summoner_name --}}
                     <div class="form-group">
                         <label class="control-label col-md-2">summoner_name</label>
@@ -90,9 +82,9 @@
                         <th>id</th>
                         <th>login_id</th>
                         <th>summoner_id</th>
-                        <th>account_id</th>
                         <th>summoner_name</th>
-                        <th>discord_id</th>
+                        <th>rank</th>
+                        <th>team_tag</th>
                         <th>created_at</th>
                         <th>updated_at</th>
                     </tr>
@@ -104,13 +96,21 @@
                         <td>{{ $user->id }}</td>
                         <td>{{ $user->login_id }}</td>
                         <td>{{ $user->summoner_id }}</td>
-                        <td>{{ $user->account_id }}</td>
                         <td>
                             <a href="{{ url('/user/detail/' . $user->id) }}">
-                                {{ str_limit($user->summoner_name, 30) }}
+                                {{ $user->viewSummonerName() }}
                             </a>
                         </td>
-                        <td>{{ $user->discord_id }}</td>
+                        <td style="background-color: {{ App\Models\UserRank::RANK_COLOR_CLASS['background-color'][$user->rank()->tier] }}">
+                            {{ $user->rank()->viewTierRank() }}
+                        </td>
+                        <td>
+                            @if( !empty($user->member->team) )
+                            <a href="{{ url('/team/detail/' . $user->member->team->id) }}">
+                                {{ $user->member->team->team_tag }}
+                            </a>
+                            @endif
+                        </td>
                         <td>{{ $user->created_at }}</td>
                         <td>{{ $user->updated_at }}</td>
                     </tr>
@@ -121,7 +121,7 @@
                     <tr>
                         <td colspan=5>
                             <div class="center-block text-center">
-                                {{ $users->appends(['login_id'=>$login_id,'summoner_id'=>$summoner_id,'account_id'=>$account_id,'summoner_name'=>$summoner_name,'sort'=>$sort,'order'=>$order,])->render() }}
+                                {{ $users->appends(['login_id'=>$login_id,'summoner_id'=>$summoner_id,'summoner_name'=>$summoner_name,'sort'=>$sort,'order'=>$order,])->render() }}
                             </div>
                         </td>
                     </tr>
