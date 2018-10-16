@@ -158,7 +158,8 @@ class DiscordPublisher
                 break;
         }
         $message .= "ブロック指定：" . $msg_tmp . "\n";
-        $message .= "配信可否：配信を希望" . ($match->stream ? "する" : "しない") . "\n\n";
+        $message .= "配信可否：配信を希望" . ($match->stream ? "する" : "しない") . "\n";
+        $message .= "決着形式：BO1\n\n";
 
         // ランダムなチームメンバーからの一言を付け加えたい。
         $team_members = TeamMembers::getByTeamId( $team->id );

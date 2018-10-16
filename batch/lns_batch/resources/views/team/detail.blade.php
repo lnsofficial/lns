@@ -56,6 +56,30 @@
                             {{ $team->team_tag }}
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            所属ブロック
+                        </div>
+                        <div class="col-md-10">
+                            @if( !empty($team->ladders->first()) )
+                                {{ $team->ladders->first()->league->league_name }}
+                                ({{ $team->ladders->first()->create_date }}時点)
+                            @else
+                                リーグ未参加
+                            @endif
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            メンバーレート平均
+                        </div>
+                        <div class="col-md-10">
+                            {{ App\Models\UserRank::point2rank( $team->memberRankPointAvr() )['tier'] }}
+                            {{ App\Models\UserRank::point2rank( $team->memberRankPointAvr() )['rank'] }}
+                            ({{ $team->memberRankPointAvr() }})
+                            ({{ $team->league()->league_name }} 配属が妥当)
+                        </div>
+                    </div>
 
                 </div>
             </div>
@@ -187,8 +211,9 @@
                         <th>id</th>
                         <th>summoner_id</th>
                         <th>summoner_name</th>
+                        <th>rank</th>
+                        <th>(rank_point)</th>
                         <th>main_role</th>
-                        <th>updated_at</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -200,13 +225,16 @@
                         <td>{{ $member->user->summoner_id }}</td>
                         <td>
                             <a href="{{ url('/user/detail/' . $member->user->id) }}">
-                                {{ str_limit($member->user->summoner_name, 30) }}
+                                {{ $member->user->viewSummonerName() }}
                             </a>
                         </td>
-                        <td>{{ $member->user->main_role }}</td>
-                        <td>{{ $member->user->updated_at }}</td>
+                        <td style="background-color: {{ App\Models\UserRank::RANK_COLOR_CLASS['background-color'][$member->user->rank()->tier] }}">
+                            {{ $member->user->rank()->viewTierRank() }}
+                        </td>
+                        <td>{{ App\Models\UserRank::RANK_LIST[$member->user->rank()->tier][$member->user->rank()->rank] }}</td>
+                        <td>{{ App\Models\Team::ROLE_LABELS[$member->user->main_role] }}</td>
                         <td>
-                            <a class="btn" href="#" role="button">Leave</a>
+                            <a href="#" role="button">Leave</a>
                         </td>
                     </tr>
                 @endforeach

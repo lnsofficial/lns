@@ -99,10 +99,10 @@
                         <td>{{ $team->id }}</td>
                         <td>
                             <a href="{{ url('/team/detail/' . $team->id) }}">
-                                {{ str_limit($team->team_name, 30) }}
+                                {{ $team->viewTeamName() }}
                             </a>
                         </td>
-                        <td>{{ str_limit($team->team_tag, 30) }}</td>
+                        <td>{{ $team->team_tag }}</td>
                         <td class="{{ App\Models\Team::LOGO_STATUS_COLOR_CLASS['table'][$team->logo_status] }}">
                             {{ App\Models\Team::LOGO_STATUS_MESSAGES[$team->logo_status] }}
                         </td>
