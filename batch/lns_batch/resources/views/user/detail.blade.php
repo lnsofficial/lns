@@ -24,7 +24,7 @@
             {{-- パネルヘッダ --}}
             <div class="panel-heading">
                 <div class="row">
-                    <div class="col-md-2">
+                    <div class="col-md-12">
                         ユーザー情報(・・調整中・・)
                     </div>
                 </div>
@@ -90,10 +90,18 @@
                 </div>
                 <div class="row">
                     <div class="col-md-2">
+                        ランク
+                    </div>
+                    <div class="col-md-10">
+                        {{ $user->rank()->tier }} {{ $user->rank()->rank }}&nbsp;(ポイント：{{ App\Models\UserRank::RANK_LIST[$user->rank()->tier][$user->rank()->rank] }})
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
                         メインロール
                     </div>
                     <div class="col-md-10">
-                        {{ $user->main_role }}
+                        {{ App\Models\Team::ROLE_LABELS[$user->main_role] }}
                     </div>
                 </div>
                 <div class="row">

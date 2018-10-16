@@ -30,7 +30,6 @@ class UserController extends Controller
     {
         $login_id        = '';
         $summoner_id     = '';
-        $account_id      = '';
         $summoner_name   = '';
         $sort            = 'id';
         $order           = 'asc';
@@ -46,11 +45,6 @@ class UserController extends Controller
         {
             $summoner_id     = $request->input('summoner_id');
             $query->where('summoner_id', $summoner_id);
-        }
-        if( $request->has('account_id') )
-        {
-            $account_id      = $request->input('account_id');
-            $query->where('account_id', $account_id);
         }
         if( $request->has('summoner_name') )
         {
@@ -68,13 +62,13 @@ class UserController extends Controller
         }
         $query->orderBy($sort, $order);
 
-        $users = $query->paginate(50);
+        // ランク情報、所属チーム情報も読み込んでおく
+        $users = $query->with('ranks','member.team')->paginate(50);
 
         return view('user.list')->with([
             'users'         => $users,
             'login_id'      => $login_id,
             'summoner_id'   => $summoner_id,
-            'account_id'    => $account_id,
             'summoner_name' => $summoner_name,
             'sort'          => $sort,
             'order'         => $order,

@@ -9,6 +9,9 @@ class LolSeason extends BaseModel
     protected $table      = 'lol_seasons';  // テーブル名
     protected $guarded    = [];
 
+    protected static $season_now    = '';
+    protected static $season_before = '';
+
 
 
 	/**
@@ -18,10 +21,18 @@ class LolSeason extends BaseModel
 	 */
 	public static function findSeason()
 	{
+		if( !empty(self::$season_now) )
+		{
+			return self::$season_now;
+		}
+
 		$now = UtilTime::now();
-		return self::where('start_at', '<=', $now)
-				   ->where('end_at',   '>=', $now)
-				   ->first();
+		$record = self::where('start_at', '<=', $now)
+					  ->where('end_at',   '>=', $now)
+					  ->first();
+		self::$season_now = $record;
+
+		return $record;
 	}
 
 	/**
@@ -31,11 +42,19 @@ class LolSeason extends BaseModel
 	 */
 	public static function findBeforeSeason()
 	{
+		if( !empty(self::$season_before) )
+		{
+			return self::$season_before;
+		}
+
 		$season = self::findSeason();
 		if( $season->id > 1 )
 		{
 			$before_season_id = $season->id - 1;
-			return self::find($before_season_id);
+			$record = self::find($before_season_id);
+			self::$season_before = $record;
+
+			return $record;
 		}
 		else
 		{
