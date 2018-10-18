@@ -11,6 +11,15 @@ use App\Libs\UtilTime;
 use App\Libs\WorkLog;
 use App\Models\Team;
 use App\Models\Ladder;
+use App\Models\LnsDB;
+use App\Models\Match;
+use App\Models\TeamOwner
+use App\Models\TeamMember
+use App\Models\TeamStaff
+use App\Models\TeamContact
+use App\Models\UserTeamApply
+use App\Models\TeamJoin
+use App\Models\MatchCheckin
 
 class TeamController extends Controller
 {
@@ -167,6 +176,74 @@ class TeamController extends Controller
                 ->withInput()
                 ->withErrors(['logo' => '画像がアップロードされていないか不正なデータです。']);
         }
+    }
+
+
+    /**
+     * チーム解散させる
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function breakup( Request $request, Team $team )
+    {
+/*
+teams			// チーム
+team_owner		// オーナー
+team_members	// メンバー
+team_staffs		// アナリスト
+teams_contact	// 連絡先
+user_team_applys	// 申請系
+team_joins		// マッチへの参加時。
+matches			// 対戦一覧
+match_checkins	// チェックイン
+ladders			// ランキング
+*/
+
+        // MATCH_STATE_MATCHED のマッチが無ければOKかな？
+        $matched_matches = Match::where('state', Match::MATCH_STATE_MATCHED)
+                                ->hostOrApply( $team->id )
+                                ->get();
+        if( !empty($matched_matches) )
+//        if( true )
+        {
+            // 結果待ちのマッチングがあるので解散だめ。
+            $request->session()->flash('error', '結果待ちのマッチングがあるので解散させられない。');
+            return redirect()->back();
+        }
+dd('test breakup');
+
+        try
+        {
+            LnsDB::beginTransaction();
+
+            Team         ::where('id',      $team->id)->delete();
+            TeamOwner    ::where('team_id', $team->id)->delete();
+            TeamMember   ::where('team_id', $team->id)->delete();
+            TeamStaff    ::where('team_id', $team->id)->delete();
+            TeamContact  ::where('team_id', $team->id)->delete();
+            UserTeamApply::where('team_id', $team->id)->delete();
+            TeamJoin     ::where('team_id', $team->id)->delete();
+            Match        ::hostOrApply($team->id)     ->delete();
+            MatchCheckin ::where('team_id', $team->id)->delete();
+            Ladder       ::where('team_id', $team->id)->delete();
+
+            LnsDB::commit();
+        }
+        catch( Exception $e )
+        {
+            // DB更新で失敗したならしょうがない・・・
+            LnsDB::rollBack();
+
+            $request->session()->flash('error', $e->getMessage());
+            return redirect()->back();
+        }
+
+
+        // ログに記録
+        WorkLog::log( Auth::user(), "チームを解散", $team->toArray() );
+        $request->session()->flash('success', 'チーム['.$team->team_name.']['.$team->team_tag.']を解散しました');
+
+        return redirect('team.list');
     }
 
 }
