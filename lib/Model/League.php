@@ -5,15 +5,13 @@ class League extends Base{
 	const MAIN_TABLE	= "leagues";
 	const COL_ID		= "id";
 
-	const LEAGUE_KAICHO    = 1;
-	const LEAGUE_SHACHO    = 2;
-	const LEAGUE_SENMU     = 3;
-	const LEAGUE_HONBUCHO  = 4;
-	const LEAGUE_BUCHO     = 5;
-	const LEAGUE_KACHO     = 6;
-	const LEAGUE_KAKARICHO = 7;
-	const LEAGUE_SHITSUCHO = 8;
-	const LEAGUE_HIRA      = 9;
+	const LEAGUE_SHACHO    = 1;
+	const LEAGUE_SENMU     = 2;
+	const LEAGUE_BUCHO     = 3;
+	const LEAGUE_KACHO     = 4;
+	const LEAGUE_KAKARICHO = 5;
+	const LEAGUE_SHITSUCHO = 6;
+	const LEAGUE_HIRA      = 7;
 	
 	// カラム
 	const DATA	= [
