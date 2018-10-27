@@ -21,7 +21,8 @@ class CreateSessionsTable extends Migration
             Schema::create($this->tablename, function (Blueprint $table) {
                 $table->string('id');
                 $table->string('session');
-                $table->timestamps();
+                $table->timestamp('create_date')->default(DB::raw('CURRENT_TIMESTAMP'));
+                $table->timestamp('update_date')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
                 $table->primary('id');
             });
         }
