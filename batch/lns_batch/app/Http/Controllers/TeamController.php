@@ -13,13 +13,13 @@ use App\Models\Team;
 use App\Models\Ladder;
 use App\Models\LnsDB;
 use App\Models\Match;
-use App\Models\TeamOwner
-use App\Models\TeamMember
-use App\Models\TeamStaff
-use App\Models\TeamContact
-use App\Models\UserTeamApply
-use App\Models\TeamJoin
-use App\Models\MatchCheckin
+use App\Models\TeamOwner;
+use App\Models\TeamMember;
+use App\Models\TeamStaff;
+use App\Models\TeamContact;
+use App\Models\UserTeamApply;
+use App\Models\TeamJoin;
+use App\Models\MatchCheckin;
 
 class TeamController extends Controller
 {
