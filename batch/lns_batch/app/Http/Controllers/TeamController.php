@@ -147,7 +147,7 @@ class TeamController extends Controller
         ]);
         if( $request->file('logo')->isValid() )
         {
-            $request->file('logo')->storeAs('public/logo/modified', $team->id.'_logo.png');
+            $request->file('logo')->storeAs('public/logo/modified', $team->logoFileName());
 
             // レコードのロゴ更新日時も更新
             $team->logo_updated_at = UtilTime::now();

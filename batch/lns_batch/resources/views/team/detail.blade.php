@@ -133,8 +133,8 @@
                             チームロゴ(オリジナル)
                         </div>
                         <div class="col-md-10">
-                            @if ( Storage::exists('public/logo/' . $team->id . '_logo.png') )
-                                <img width="200px" height="200px" src="{{ asset('/storage/logo/' . $team->id . '_logo.png') }}" />
+                            @if ( Storage::exists('public/logo/' . $team->logoFileName()) )
+                                <img width="200px" height="200px" src="{{ asset('/storage/logo/' . $team->logoFileName()) }}" />
                             @else
                                 なし
                             @endif
@@ -146,8 +146,8 @@
                             チームロゴ(運営修正版)
                         </div>
                         <div class="col-md-10">
-                            @if ( Storage::exists('public/logo/modified/' . $team->id . '_logo.png') )
-                                <img width="200px" height="200px" src="{{ asset('/storage/logo/modified/' . $team->id . '_logo.png') }}" />
+                            @if ( Storage::exists('public/logo/modified/' . $team->logoFileName()) )
+                                <img width="200px" height="200px" src="{{ asset('/storage/logo/modified/' . $team->logoFileName()) }}" />
                             @else
                                 なし
                             @endif

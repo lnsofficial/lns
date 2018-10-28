@@ -41,12 +41,11 @@ class Teams extends Base{
     /**
      * // ロゴファイル名はここから取る感じで。
      * 
-     * @param  int                  $team_id                // teams.id
      * @return string
      */
-    static function getLogoFileName( $team_id )
+    function getLogoFileName()
     {
-        $file_name = $team_id . "_logo.png";
+        $file_name = self::makeLogoFileName( $this->id, $this->team_tag );
         $file_path = PATH_TEAM_LOGO . $file_name;
         if( !file_exists($file_path) )
         {
@@ -54,6 +53,10 @@ class Teams extends Base{
         }
 
         return $file_name;
+    }
+    static function makeLogoFileName( $team_id, $team_tag )
+    {
+        return $team_id . "_" . $team_tag . ".png";
     }
 
 
@@ -70,7 +73,7 @@ class Teams extends Base{
     function getStreamingLogoFileName()
     {
         $logo_img_path = "/img/logo/";
-        $file_name = self::getLogoFileName( $this->id );
+        $file_name = $this->getLogoFileName();
 
         switch( $this->logo_status )
         {
@@ -190,7 +193,8 @@ class Teams extends Base{
         // チームロゴ未登録のとこもある
         foreach( $ahsTeams as &$team )
         {
-            $team['logo_file_name'] = self::getLogoFileName( $team['id'] );
+            $tmp_team = new Teams( $oDb, $team['id'] );
+            $team['logo_file_name'] = $tmp_team->getLogoFileName();
         }
 
         return $ahsTeams;
