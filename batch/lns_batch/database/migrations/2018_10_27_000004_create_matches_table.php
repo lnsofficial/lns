@@ -31,6 +31,9 @@ class CreateMatchesTable extends Migration
                 $table->integer('winner')->unsigned()->nullable()->default(null);
                 $table->string('screen_shot_url')->nullable()->default(null);
                 $table->string('tournament_code')->nullable()->default(null);
+                $table->integer('match_id')->unsigned()->nullable()->default(null);
+                $table->string('match_info')->nullable()->default(null);
+                $table->string('url_youtube')->nullable()->default(null);
                 $table->timestamps();
                 $table->index(['host_team_id','apply_team_id','winner'], 'hti');
             });
