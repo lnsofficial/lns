@@ -1,0 +1,4 @@
+<Files ~ "\.(jpe?g|gif|png)$">
+Header add Pragma "no-cache"
+Header set Cache-Control private
+</Files>
