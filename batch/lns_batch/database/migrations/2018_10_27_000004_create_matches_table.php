@@ -30,6 +30,7 @@ class CreateMatchesTable extends Migration
                 $table->tinyInteger('state')->unsigned();
                 $table->integer('winner')->unsigned()->nullable()->default(null);
                 $table->string('screen_shot_url')->nullable()->default(null);
+                $table->string('tournament_code')->nullable()->default(null);
                 $table->timestamps();
                 $table->index(['host_team_id','apply_team_id','winner'], 'hti');
             });
