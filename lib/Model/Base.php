@@ -18,7 +18,7 @@ class Base{
         if( $id ){
             // ID指定があれば取得
             foreach( static::DATA as $key => $value ){
-                $sSelectColumn[] = $key;
+                $sSelectColumn[] = "`$key`";
             }
             $sSelectSql = "SELECT " . implode( ",", $sSelectColumn ) . " FROM " . static::MAIN_TABLE . " WHERE " . static::COL_ID . " = ?";
             $ahsParameter = [ $id ];

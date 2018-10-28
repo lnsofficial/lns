@@ -33,7 +33,7 @@
                         <div class="col-md-8">
                         </div>
                         <div class="col-md-2">
-                            <form class="form-horizontal" method="POST" action="{{ url('/team/breakup/' . $team->id) }}">
+                            <form class="form-horizontal" method="POST" action="{{ url('/team/breakup/' . $team->id) }}" onsubmit="return confirm('チーム本当に解散させます？')">
                             {{ csrf_field() }}
                                 <button type="submit" class="btn btn-primary">
                                     倒産させる？

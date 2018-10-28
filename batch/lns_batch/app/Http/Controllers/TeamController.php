@@ -186,31 +186,16 @@ class TeamController extends Controller
      */
     public function breakup( Request $request, Team $team )
     {
-/*
-teams			// チーム
-team_owner		// オーナー
-team_members	// メンバー
-team_staffs		// アナリスト
-teams_contact	// 連絡先
-user_team_applys	// 申請系
-team_joins		// マッチへの参加時。
-matches			// 対戦一覧
-match_checkins	// チェックイン
-ladders			// ランキング
-*/
-
         // MATCH_STATE_MATCHED のマッチが無ければOKかな？
         $matched_matches = Match::where('state', Match::MATCH_STATE_MATCHED)
                                 ->hostOrApply( $team->id )
                                 ->get();
-        if( !empty($matched_matches) )
-//        if( true )
+        if( ! $matched_matches->isEmpty() )
         {
             // 結果待ちのマッチングがあるので解散だめ。
             $request->session()->flash('error', '結果待ちのマッチングがあるので解散させられない。');
             return redirect()->back();
         }
-dd('test breakup');
 
         try
         {
@@ -221,11 +206,14 @@ dd('test breakup');
             TeamMember   ::where('team_id', $team->id)->delete();
             TeamStaff    ::where('team_id', $team->id)->delete();
             TeamContact  ::where('team_id', $team->id)->delete();
-            UserTeamApply::where('team_id', $team->id)->delete();
             TeamJoin     ::where('team_id', $team->id)->delete();
             Match        ::hostOrApply($team->id)     ->delete();
             MatchCheckin ::where('team_id', $team->id)->delete();
             Ladder       ::where('team_id', $team->id)->delete();
+
+            UserTeamApply::where('team_id', $team->id)
+                         ->whereNull('deleted_at')
+                         ->update(['deleted_at'=>UtilTime::now()]);
 
             LnsDB::commit();
         }
@@ -243,7 +231,7 @@ dd('test breakup');
         WorkLog::log( Auth::user(), "チームを解散", $team->toArray() );
         $request->session()->flash('success', 'チーム['.$team->team_name.']['.$team->team_tag.']を解散しました');
 
-        return redirect('team.list');
+        return redirect()->route('team.list');
     }
 
 }
