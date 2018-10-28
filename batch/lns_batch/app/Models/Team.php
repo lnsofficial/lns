@@ -104,5 +104,15 @@ class Team extends BaseModel
     }
 
 
+    /**
+     * ロゴファイル名はここから取る感じで。
+     * 
+     */
+    function logoFileName()
+    {
+        return $this->id . "_" . $this->team_tag . ".png";
+    }
+
+
 
 }
