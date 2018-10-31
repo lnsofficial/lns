@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Auth;
 
 use App\Libs\UtilTime;
@@ -197,10 +198,32 @@ class TeamController extends Controller
             return redirect()->back();
         }
 
+        // 作業ファイル名 team_breakup_[YmdHis]_[teams.id]_[tablename].log
+        $backup_filename_format = storage_path('backup/db') . '/' . 'team_breakup_' . date("YmdHis") . '_%d_%s.log';
+
+        // 該当レコードを一応保存しておく、基本ユニークファイル名になるはずだから存在チェックはスルー！
+        File::put(sprintf($backup_filename_format, $team->id, (new Team)         ->getTable()), Team         ::where('id',      $team->id)->get()->toJson());
+        File::put(sprintf($backup_filename_format, $team->id, (new TeamOwner)    ->getTable()), TeamOwner    ::where('team_id', $team->id)->get()->toJson());
+        File::put(sprintf($backup_filename_format, $team->id, (new TeamMember)   ->getTable()), TeamMember   ::where('team_id', $team->id)->get()->toJson());
+        File::put(sprintf($backup_filename_format, $team->id, (new TeamStaff)    ->getTable()), TeamStaff    ::where('team_id', $team->id)->get()->toJson());
+        File::put(sprintf($backup_filename_format, $team->id, (new TeamContact)  ->getTable()), TeamContact  ::where('team_id', $team->id)->get()->toJson());
+        File::put(sprintf($backup_filename_format, $team->id, (new TeamJoin)     ->getTable()), TeamJoin     ::where('team_id', $team->id)->get()->toJson());
+        File::put(sprintf($backup_filename_format, $team->id, (new Match)        ->getTable()), Match        ::hostOrApply($team->id)     ->get()->toJson());
+        File::put(sprintf($backup_filename_format, $team->id, (new MatchCheckin) ->getTable()), MatchCheckin ::where('team_id', $team->id)->get()->toJson());
+        File::put(sprintf($backup_filename_format, $team->id, (new Ladder)       ->getTable()), Ladder       ::where('id',      $team->id)->get()->toJson());
+        File::put(sprintf($backup_filename_format, $team->id, (new UserTeamApply)->getTable()), UserTeamApply::where('team_id', $team->id)->whereNull('deleted_at')->get()->toJson());
+
+        // 懸念点：
+        // このあとのトランザクションでrollbackかかった場合、↑のファイルだけ残る(頻度は多くないと思う)
+        // 保存したレコードから復元するのも作っておいたほうがいい？と思ったけど、解散後userが他チームに既に所属済みだったりした場合、復元できない。
+        // そもそも復元自体稀なのとこのバックアップ自体も念のため程度なのでその時は手動対応で。
+        // 参考：TeamMember::insert( json_decode(File::get("filename"), true) );
+
         try
         {
             LnsDB::beginTransaction();
 
+            // ここから削除
             Team         ::where('id',      $team->id)->delete();
             TeamOwner    ::where('team_id', $team->id)->delete();
             TeamMember   ::where('team_id', $team->id)->delete();
