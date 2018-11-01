@@ -17,6 +17,9 @@
             </ul>
             </div>
         @endif
+        @if (session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
 
 
             <div class="panel panel-default">
@@ -26,6 +29,16 @@
                     <div class="row">
                         <div class="col-md-2">
                             チーム基本情報
+                        </div>
+                        <div class="col-md-8">
+                        </div>
+                        <div class="col-md-2">
+                            <form class="form-horizontal" method="POST" action="{{ url('/team/breakup/' . $team->id) }}" onsubmit="return confirm('チーム本当に解散させます？')">
+                            {{ csrf_field() }}
+                                <button type="submit" class="btn btn-primary">
+                                    倒産させる？
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
