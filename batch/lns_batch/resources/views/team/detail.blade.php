@@ -17,6 +17,9 @@
             </ul>
             </div>
         @endif
+        @if (session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
 
 
             <div class="panel panel-default">
@@ -26,6 +29,16 @@
                     <div class="row">
                         <div class="col-md-2">
                             チーム基本情報
+                        </div>
+                        <div class="col-md-8">
+                        </div>
+                        <div class="col-md-2">
+                            <form class="form-horizontal" method="POST" action="{{ url('/team/breakup/' . $team->id) }}" onsubmit="return confirm('チーム本当に解散させます？')">
+                            {{ csrf_field() }}
+                                <button type="submit" class="btn btn-primary">
+                                    倒産させる？
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -133,8 +146,8 @@
                             チームロゴ(オリジナル)
                         </div>
                         <div class="col-md-10">
-                            @if ( Storage::exists('public/logo/' . $team->id . '_logo.png') )
-                                <img width="200px" height="200px" src="{{ asset('/storage/logo/' . $team->id . '_logo.png') }}" />
+                            @if ( Storage::exists('public/logo/' . $team->logoFileName()) )
+                                <img width="200px" height="200px" src="{{ asset('/storage/logo/' . $team->logoFileName()) }}" />
                             @else
                                 なし
                             @endif
@@ -146,8 +159,8 @@
                             チームロゴ(運営修正版)
                         </div>
                         <div class="col-md-10">
-                            @if ( Storage::exists('public/logo/modified/' . $team->id . '_logo.png') )
-                                <img width="200px" height="200px" src="{{ asset('/storage/logo/modified/' . $team->id . '_logo.png') }}" />
+                            @if ( Storage::exists('public/logo/modified/' . $team->logoFileName()) )
+                                <img width="200px" height="200px" src="{{ asset('/storage/logo/modified/' . $team->logoFileName()) }}" />
                             @else
                                 なし
                             @endif

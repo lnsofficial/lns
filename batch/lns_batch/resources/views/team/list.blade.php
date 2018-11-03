@@ -4,6 +4,13 @@
 <div class="container">
     <div class="row">
 
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-danger">{{ session('danger') }}</div>
+        @endif
+
 
         <div class="panel panel-default">
             <div class="panel-heading">チーム一覧</div>

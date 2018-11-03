@@ -31,6 +31,7 @@ Route::get ('/team/list',              'TeamController@index')     ->name('team.
 Route::get ('/team/detail/{team}',     'TeamController@detail')    ->name('team.detail')    ->where('team', '[0-9]+');
 Route::post('/team/detail/{team}',     'TeamController@update')    ->name('team.update')    ->where('team', '[0-9]+');
 Route::post('/team/logo/{team}',       'TeamController@logoUpdate')->name('team.logoUpdate')->where('team', '[0-9]+');
+Route::post('/team/breakup/{team}',    'TeamController@breakup')   ->name('team.breakup')   ->where('team', '[0-9]+');
 
 // マッチ関連
 Route::get ('/match/list',             'MatchController@index')    ->name('match.list');

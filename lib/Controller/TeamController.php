@@ -331,7 +331,7 @@ class TeamController extends BaseController{
         // このチームへ届いている申請一覧
         $applys_for_team = UserTeamApply::getByTeamId( $oTeam->id );
         // team logo
-        $logo_file = Teams::getLogoFileName( $oTeam->id );
+        $logo_file = $oTeam->getLogoFileName();
 
         // team_staffs
         $team_staffs = TeamStaffs::getByTeamId( $oTeam->id );
@@ -942,8 +942,17 @@ class TeamController extends BaseController{
             exit;
         }
 
+        $oDb = new Db();
+        $oDb->beginTransaction();
+        
+        $oTeam = new Teams( $oDb, $team_id );
+        if( $oTeam->id == null ){
+            self::displayError();
+            exit();
+        }
+
         // あっぷろ～ど！
-        $logo_file = $team_id . "_logo.png";
+        $logo_file = $team_id . "_".$oTeam->team_tag.".png";
         $logo_path = PATH_TEAM_LOGO . $logo_file;
         move_uploaded_file($_FILES['inputTeamLogo']['tmp_name'], $logo_path);
 
@@ -954,14 +963,6 @@ class TeamController extends BaseController{
         }
 
         // 時間とステータスを更新
-        $oDb = new Db();
-        $oDb->beginTransaction();
-        
-        $oTeam = new Teams( $oDb, $team_id );
-        if( $oTeam->id == null ){
-            self::displayError();
-            exit();
-        }
         $oTeam->logo_status     = Teams::LOGO_STATUS_UNAUTHENTICATED;
         $oTeam->logo_updated_at = UtilTime::now();
         $oTeam->save();
