@@ -44,9 +44,13 @@ if( !empty($match_recruits) )
 	// 表示用の情報を作っていく。
 	foreach( $match_recruits as $match_recruit )
 	{
+		$blue_team_id = $match_recruit['host_team_id'];
+		$red_team_id  = $match_recruit['apply_team_id'];
+                $blue_team  = new Teams($db,$blue_team_id);
+                $red_team   = new Teams($db,$red_team_id);
 		$default_logo_file = "../NLSrogo.jpg";
-		$blue_logo_file    = Teams::getLogoFileName($match_recruit['host_team_id']);
-		$red_logo_file     = Teams::getLogoFileName($match_recruit['apply_team_id']);
+		$blue_logo_file    = $blue_team->getLogoFileName($match_recruit['host_team_id']);
+		$red_logo_file     = $red_team->getLogoFileName($match_recruit['apply_team_id']);
 		if( !file_exists(PATH_TEAM_LOGO . $blue_logo_file) )
 		{
 			$blue_logo_file = $default_logo_file;
