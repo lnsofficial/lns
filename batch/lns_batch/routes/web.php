@@ -47,3 +47,7 @@ Route::get ('/operator/list',                  'OperatorController@index') ->nam
 Route::get ('/operator/detail/{operator}',     'OperatorController@detail')->name('operator.detail')    ->where('operator', '[0-9]+');
 Route::post('/operator/detail/{operator}',     'OperatorController@update')->name('operator.update')    ->where('operator', '[0-9]+');
 
+// APIキュー関連
+Route::get ('/queue/list',             'QueueController@index')    ->name('queue.list');
+Route::get ('/queue/detail/{queue}',   'QueueController@detail')   ->name('queue.detail')    ->where('queue', '[0-9]+');
+Route::post('/queue/detail/{queue}',   'QueueController@update')   ->name('queue.update')    ->where('queue', '[0-9]+');
