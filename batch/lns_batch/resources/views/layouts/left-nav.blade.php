@@ -13,6 +13,9 @@
             <a class="nav-link" href="{{ url('/match/list') }}">マッチ</a>
         </li>
         <li class="nav-item {{ Auth::user()->activate ? '' : 'disabled' }}">
+            <a class="nav-link" href="{{ url('/queue/list') }}">APIキュー</a>
+        </li>
+        <li class="nav-item {{ Auth::user()->activate ? '' : 'disabled' }}">
             <a class="nav-link" href="{{ url('/notice/list') }}">お知らせ</a>
         </li>
         <li class="nav-item {{ Auth::user()->activate ? '' : 'disabled' }}">
