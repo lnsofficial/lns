@@ -42,11 +42,11 @@ class ApiQueue extends BaseModel
      */
     public function viewAction()
     {
-        return self::ACTION_MESSAGES[$this->action];
+        return array_key_exists($this->action, self::ACTION_MESSAGES) ? self::ACTION_MESSAGES[$this->action] : '';
     }
     public function viewState()
     {
-        return self::STATE_MESSAGES[$this->state];
+        return array_key_exists($this->state, self::STATE_MESSAGES) ? self::STATE_MESSAGES[$this->state] : '';
     }
     public function viewPayloadLink()
     {
