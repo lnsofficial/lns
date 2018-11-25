@@ -325,6 +325,7 @@ class Teams extends Base{
         $ahsMemberParameter = [
             [ "column" => "team_id",  "type" => "int", "value" => $this->id ],
             [ "column" => "user_id",  "type" => "int", "value" => $user_id ],
+            [ "column" => "deleted_at", "type" => "null", "value" => true ],
         ];
         $memberResult = TeamMembers::getList( $this->db, $ahsMemberParameter );
         
@@ -337,10 +338,11 @@ class Teams extends Base{
         $ahsStaffParameter = [
             [ "column" => "team_id",  "type" => "int", "value" => $this->id ],
             [ "column" => "user_id",  "type" => "int", "value" => $user_id ],
+            [ "column" => "deleted_at", "type" => "null", "value" => true ],
         ];
         $staffResult = TeamStaffs::getList( $this->db, $ahsStaffParameter );
         
-        if( $staffResult ){
+        if( !empty($staffResult) ){
             $teamStaff = new TeamStaffs( $this->db, $staffResult[0]["id"] );
             $ahsMemberInfo["staff"] = $teamStaff;
         }
@@ -349,10 +351,11 @@ class Teams extends Base{
         $ahsContactParameter = [
             [ "column" => "team_id",  "type" => "int", "value" => $this->id ],
             [ "column" => "user_id",  "type" => "int", "value" => $user_id ],
+            [ "column" => "deleted_at", "type" => "null", "value" => true ],
         ];
         $contactResult = TeamContact::getList( $this->db, $ahsContactParameter );
         
-        if( $contactResult ){
+        if( !empty($contactResult) ){
             $teamContact = new TeamContact( $this->db, $contactResult[0]["id"] );
             $ahsMemberInfo["contact"] = $teamContact;
         }

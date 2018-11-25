@@ -388,9 +388,11 @@ class TeamController extends BaseController{
         $smarty->assign( "team"             , $oTeam );
         $smarty->assign( "logo_file"        , $logo_file );
         if( isset( $user ) ){
+            $oUser  = new User($oDb, $user_id);
             $smarty->assign( "user"         , $user );
             $ahsTeamMemberInfo = $oTeam->getTeamMemberInfoById( $user_id );
             
+            $enableTeamJoin         = $oUser->enableTeamJoin();
             $isThisTeamMember       = !empty( $ahsTeamMemberInfo["member"] );
             $isThisTeamMemberLeave  = $oTeam->enableTeamLeave( $user_id );
             $isThisTeamContact      = count( array_filter($user['team_contacts'],function($item)use($team_id){ return $item['team_id']==$team_id; }) );
@@ -399,6 +401,7 @@ class TeamController extends BaseController{
             $isThisTeamContactApply = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_CONTACT && $item['team_id']==$team_id; }) );
             $isThisTeamStaffApply   = count( array_filter($user['user_team_applys'],function($item)use($team_id){ return $item['type']==UserTeamApply::TYPE_STAFF   && $item['team_id']==$team_id; }) );
             
+            $smarty->assign( "enableTeamJoin"               , $enableTeamJoin );
             $smarty->assign( "isThisTeamMemberLeave"        , $isThisTeamMemberLeave );
             $smarty->assign( "isThisTeamMember"             , $isThisTeamMember );
             $smarty->assign( "isThisTeamContact"            , $isThisTeamContact );

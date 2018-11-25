@@ -66,6 +66,9 @@ class Base{
                     $asParameter[] = $value["value"];
                     $sType .= "s";
                     break;
+                case "null":
+                    $asWhereSql[] = $value["column"] . " IS " . ($value["value"] ? "" : "NOT ") . "NULL";
+                    break;
             }
         }
         
@@ -192,7 +195,7 @@ class Base{
     
     public function delete(){
         $id = static::COL_ID;
-        $sDeleteSql = "DELETE FROM " . static::MAIN_TABLE . " WHERE " . $id . " = ?";
+        $sDeleteSql = "UPDATE " . static::MAIN_TABLE . " SET deleted_at = NOW() WHERE " . $id . " = ?";
         
         $asValue[]  = $this->$id;
         $asType[]   = "i";
