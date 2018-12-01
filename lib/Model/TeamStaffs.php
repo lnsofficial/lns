@@ -25,7 +25,7 @@ class TeamStaffs extends Base{
     {
         $db = new Db();
 
-        $prepareSql = "SELECT ts.id AS id,ts.team_id AS team_id,ts.user_id AS user_id,u.summoner_id AS summoner_id,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role FROM team_staffs AS ts LEFT JOIN users AS u ON ts.user_id=u.id WHERE team_id = ?";
+        $prepareSql = "SELECT ts.id AS id,ts.team_id AS team_id,ts.user_id AS user_id,u.summoner_id AS summoner_id,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role FROM team_staffs AS ts LEFT JOIN users AS u ON ts.user_id=u.id WHERE team_id = ? AND ts.deleted_at IS NULL";
         $bindParam  = [ $team_id ];
 
         $result = $db->executePrepare( $prepareSql, "i", $bindParam );
@@ -50,7 +50,7 @@ class TeamStaffs extends Base{
     function findByUserIdTeamId( $user_id, $team_id )
     {
         $db = new Db();
-        $prepareSql = "SELECT * FROM team_staffs WHERE user_id = ? AND team_id = ?";
+        $prepareSql = "SELECT * FROM team_staffs WHERE user_id = ? AND team_id = ? AND deleted_at IS NULL";
         $bindParam  = [
             $user_id,
             $team_id,

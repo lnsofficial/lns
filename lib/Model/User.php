@@ -74,7 +74,7 @@ class User extends Base{
         $oDb = new Db();
         $oTeam = null;
         
-        $ahsResult = TeamMembers::getList( $oDb, [ [ "column" => "user_id",  "type" => "int", "value" => $this->id ] ] );
+        $ahsResult = TeamMembers::getList( $oDb, [ [ "column" => "user_id",  "type" => "int", "value" => $this->id ],["column" => "deleted_at",  "type" => "null", "value" => true] ] );
         
         if( $ahsResult ){
             $oTeam = new Teams( $oDb, $ahsResult[0]["team_id"] );
@@ -132,6 +132,22 @@ class User extends Base{
         return $asTeamInfo;
     }
     
+    public function enableTeamJoin(){
+        $oDb = new Db();
+        
+        // 2週間以内に脱退した記録あり
+        $limit_disable_date = date("Y-m-d H:i:s",strtotime("-2 week"));
+        $ahsTeamMembers = TeamMembers::getList( $oDb, [
+            [ "column" => "user_id",  "type" => "int", "value" => $this->id ],
+            [ "column" => "deleted_at", "type" => "date", "operator" => ">", "value" => $limit_disable_date ],
+        ]);
+        
+        // 2週間以内に脱退がなければ参加可能
+        $result = empty($ahsTeamMembers);
+        
+        return $result;
+    }
+    
     function getLastApiQueue(){
         $oDb = new Db();
         $oApiQueue = null;
@@ -168,7 +184,7 @@ class User extends Base{
         }
 
         // TeamMember
-        $prepareSql  = "SELECT * FROM team_members WHERE user_id = ?";
+        $prepareSql  = "SELECT * FROM team_members WHERE user_id = ? AND deleted_at IS NULL";
         $bindParam   = [ $user_id ];
         $team_member = $db->executePrepare( $prepareSql, "i", $bindParam )->fetch_assoc();
 
@@ -183,7 +199,7 @@ class User extends Base{
         }
 
         // TeamStaff
-        $prepareSql  = "SELECT * FROM team_staffs WHERE user_id = ?";
+        $prepareSql  = "SELECT * FROM team_staffs WHERE user_id = ? AND deleted_at IS NULL";
         $bindParam   = [ $user_id ];
         $result      = $db->executePrepare( $prepareSql, "i", $bindParam );
         $team_staffs = [];
@@ -193,7 +209,7 @@ class User extends Base{
         }
 
         // TeamContact
-        $prepareSql  = "SELECT * FROM teams_contact WHERE user_id = ?";
+        $prepareSql  = "SELECT * FROM teams_contact WHERE user_id = ? AND deleted_at IS NULL";
         $bindParam   = [ $user_id ];
         $result      = $db->executePrepare( $prepareSql, "i", $bindParam );
         $team_contacts = [];
