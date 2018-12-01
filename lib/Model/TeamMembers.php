@@ -14,7 +14,6 @@ class TeamMembers extends Base{
 	];
 
 
-
     /**
      * // team_idで検索。
      * 
@@ -25,7 +24,7 @@ class TeamMembers extends Base{
     {
         $db = new Db();
 
-        $prepareSql = "SELECT tm.id AS id,tm.team_id AS team_id,tm.user_id AS user_id,u.summoner_id AS summoner_id,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role FROM team_members AS tm LEFT JOIN users AS u ON tm.user_id=u.id WHERE team_id = ?";
+        $prepareSql = "SELECT tm.id AS id,tm.team_id AS team_id,tm.user_id AS user_id,u.summoner_id AS summoner_id,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role FROM team_members AS tm LEFT JOIN users AS u ON tm.user_id=u.id WHERE team_id = ? AND deleted_at IS NULL";
         $bindParam  = [ $team_id ];
 
         $result = $db->executePrepare( $prepareSql, "i", $bindParam );
@@ -59,7 +58,7 @@ class TeamMembers extends Base{
     {
         $db = new Db();
 
-        $prepareSql = "SELECT tm.id AS id,tm.team_id AS team_id,tm.user_id AS user_id,u.summoner_id AS summoner_id,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role FROM team_members AS tm LEFT JOIN users AS u ON tm.user_id=u.id WHERE user_id = ?";
+        $prepareSql = "SELECT tm.id AS id,tm.team_id AS team_id,tm.user_id AS user_id,u.summoner_id AS summoner_id,u.summoner_name AS summoner_name,u.discord_id AS discord_id,u.main_role AS main_role FROM team_members AS tm LEFT JOIN users AS u ON tm.user_id=u.id WHERE user_id = ? AND deleted_at IS NULL";
         $bindParam  = [ $user_id ];
 
         $result = $db->executePrepare( $prepareSql, "i", $bindParam );
