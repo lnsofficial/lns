@@ -137,6 +137,7 @@ class RegisterUser extends QueueBase
 			$user->summoner_name = $sm_json['name'];
 			$user->summoner_id   = $sm_json['id'];
 			$user->account_id    = $sm_json['accountId'];
+			$user->puuid         = $sm_json['puuid'];
 			$user->save();
 			$dest = $user->toArray();
 
