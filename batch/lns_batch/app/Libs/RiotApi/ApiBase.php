@@ -202,6 +202,7 @@ abstract class ApiBase
 				'header'       => $header,
 				'body'         => $body,
 			];
+		    \Log::info('$param = ' . json_encode($this->params));
 		}
 
 		return $data;

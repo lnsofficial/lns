@@ -8,14 +8,15 @@ namespace App\Libs\RiotApi;
  */
 class Summoners extends ApiBase
 {
-	protected static $path = 'summoner/v3/summoners/%d';
+	protected static $path = 'summoner/v4/summoners/%d';
 	protected static $dto  = [
 		'profileIconId' => 0,
 		'name'          => "",
+		'puuid'         => 0,
 		'summonerLevel' => 0,
+		'accountId'     => "",
+		'id'            => "",
 		'revisionDate'  => 0,
-		'id'            => 0,
-		'accountId'     => 0,
 	];
 	protected function makeUrl()
 	{

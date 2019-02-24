@@ -8,21 +8,23 @@ namespace App\Libs\RiotApi;
  */
 class PositionsBySummoner extends ApiBase
 {
-	protected static $path = 'league/v3/positions/by-summoner/%d';
+	protected static $path = 'league/v4/positions/by-summoner/%s';
 	protected static $dto  = [
-		'rank'              => "",
 		'tier'              => "",
-		'leagueName'        => "",
-		'queueType'         => "",
-		'playerOrTeamId'    => 0,
-		'playerOrTeamName'  => "",
-		'leaguePoints'      => 0,
+		'summonerName'      => "",
+		'hotStreak'         => false,
 		'wins'              => 0,
-		'losses'            => 0,
 		'veteran'           => false,
+		'losses'            => 0,
+		'rank'              => "",
+		'leagueName'        => "",
 		'inactive'          => false,
 		'freshBlood'        => false,
-		'hotStreak'         => false,
+		'position'          => false,
+		'leagueId'          => false,
+		'queueType'         => "",
+		'summonerId'        => "",
+		'leaguePoints'      => 0,
 	];
 	protected function makeUrl()
 	{
