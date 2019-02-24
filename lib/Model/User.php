@@ -11,12 +11,14 @@ class User extends Base{
     
     const RANK_LIST = [
         "CHALLENGER" => [ "I" => 100 ],
-        "MASTER"     => [ "I" => 94  ],
-        "DIAMOND"    => [ "I" => 88, "II" => 83, "III" => 78, "IV" => 73, "V" => 68],
-        "PLATINUM"   => [ "I" => 63, "II" => 60, "III" => 57, "IV" => 54, "V" => 51],
-        "GOLD"       => [ "I" => 48, "II" => 45, "III" => 42, "IV" => 39, "V" => 36],
-        "SILVER"     => [ "I" => 33, "II" => 31, "III" => 29, "IV" => 27, "V" => 25],
+        "GRANDMASTER"=> [ "I" => 92  ],
+        "MASTER"     => [ "I" => 85  ],
+        "DIAMOND"    => [ "I" => 79, "II" => 74, "III" => 69, "IV" => 64, "V" => 68],
+        "PLATINUM"   => [ "I" => 59, "II" => 55, "III" => 51, "IV" => 47, "V" => 51],
+        "GOLD"       => [ "I" => 43, "II" => 40, "III" => 37, "IV" => 34, "V" => 36],
+        "SILVER"     => [ "I" => 31, "II" => 29, "III" => 27, "IV" => 25, "V" => 25],
         "BRONZE"     => [ "I" => 23, "II" => 22, "III" => 21, "IV" => 20, "V" => 10],
+        "IRON"       => [ "I" => 19, "II" => 18, "III" => 17, "IV" => 10],
     ];
     
     // カラム
