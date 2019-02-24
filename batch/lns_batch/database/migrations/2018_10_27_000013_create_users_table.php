@@ -22,8 +22,9 @@ class CreateUsersTable extends Migration
                 $table->increments('id');
                 $table->string('login_id')->nullable()->default(null);
                 $table->string('password');
-                $table->bigInteger('summoner_id')->unsigned()->nullable()->default(null);
-                $table->bigInteger('account_id')->unsigned()->nullable()->default(null);
+                $table->string('summoner_id')->nullable()->default(null);
+                $table->string('account_id')->nullable()->default(null);
+                $table->string('puuid')->nullable()->default(null);
                 $table->string('summoner_name');
                 $table->string('summoner_name_kana')->nullable()->default(null);
                 $table->string('discord_id');
