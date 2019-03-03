@@ -131,6 +131,9 @@ abstract class ApiBase{
         $header      = substr($response, 0, $header_size);      // headerだけ切り出し
         $body        = substr($response, $header_size);         // bodyだけ切り出し
         curl_close($ch);
+        var_dump($code);
+        var_dump($header);
+        var_dump($body);
         
         $data = null;
 
