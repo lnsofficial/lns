@@ -14,7 +14,7 @@ class MatchCheckin extends Base
         "team_id"       => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false ],
         "user_id"       => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false ],
         "type"          => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false ],
-        "summoner_id"   => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false ],
+        "summoner_id"   => [ "type" => "varchar"    , "min" => 1    ,"max" => 65535         , "required" => true    , "null" => false ],
         "champion_id"   => [ "type" => "int"        , "min" => 1    ,"max" => 2147483647    , "required" => true    , "null" => false ],
         "created_at"    => [ "type" => "varchar"    , "min" => 0    ,"max" => 65535         , "required" => true    , "null" => false ],
         "updated_at"    => [ "type" => "varchar"    , "min" => 0    ,"max" => 65535         , "required" => true    , "null" => false ],
