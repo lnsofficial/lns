@@ -9,7 +9,7 @@ require_once( PATH_MODEL    . 'ApiSettings.php' );
  */
 class MatchesById extends ApiBase{
     protected static $api_base      = "https://jp1.api.riotgames.com/";
-    protected static $path          = "lol/match/v3/matches/%s";
+    protected static $path          = "lol/match/v4/matches/%s";
     protected static $method        = "GET";
     protected        $rate_limit    = true;
     protected static $dto           = [""];
