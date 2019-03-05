@@ -9,7 +9,7 @@ require_once( PATH_MODEL    . 'ApiSettings.php' );
  */
 class PublishTournamentCode extends ApiBase{
     protected static $api_base      = "https://americas.api.riotgames.com/";
-    protected static $path          = "lol/tournament/v3/codes?tournamentId=%d";
+    protected static $path          = "lol/tournament/v4/codes?tournamentId=%d";
     protected static $method        = "POST";
     protected        $rate_limit    = false;
     protected static $dto           = [""];

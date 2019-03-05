@@ -404,9 +404,7 @@ class MatchCheckinController extends BaseController{
             
             $api = new PublishTournamentCode();
             $api->setParams([
-                    "allowedSummonerIds" => [
-                        "participants" => $asCheckinMember
-                    ],
+                    "allowedSummonerIds" => $asCheckinMember,
                     "mapType"       => "SUMMONERS_RIFT",
                     "metadata"      => "",
                     "pickType"      => "TOURNAMENT_DRAFT",

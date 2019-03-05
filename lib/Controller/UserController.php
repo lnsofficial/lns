@@ -166,7 +166,7 @@ class UserController extends BaseController{
             if( $oLoginUser->summoner_name !== $_REQUEST["summoner_name"] ){
                 $oApiQueues = new ApiQueues( $oDb );
                 
-                $oApiQueues->action  = $oLoginUser->summoner_id > 0 ? ApiQueues::ACTION_UPDATE_SUMMONER : ApiQueues::ACTION_REGISTER_SUMMONER;
+                $oApiQueues->action  = empty($oLoginUser->summoner_id) ? ApiQueues::ACTION_REGISTER_SUMMONER : ApiQueues::ACTION_UPDATE_SUMMONER;
                 $oApiQueues->state   = ApiQueues::STATE_UNTREATED;
                 $oApiQueues->payload = json_encode( [ "user_id" => $oLoginUser->id ] );
                 $oApiQueues->save();
