@@ -75,12 +75,30 @@ class DiscordPublisher
      * @param  Match                   $match  // Matchインスタンス
      * @return void
      */
-    public static function noticeMatchCreated( Match $match )
-    {
-        $message    = self::getMessageNoticeMatchCreated( $match );
-        self::publish( $message );
-    }
+     public static function noticeMatchCreated( Match $match )
+     {
+         $message    = self::getMessageNoticeMatchCreated( $match );
+         self::publish( $message );
+     }
 
+
+
+
+	/**
+     * チームマッチ完了があったときに、運営Discordに通知する
+     * 
+     * @param  Teams                   $team  // Teamsインスタンス
+     * @return void
+     */
+	
+	public static function noticeMatchCompleted($match)
+	{
+		$massage = self::getMessageNoticeMatchCompleted( $match );
+		
+		$url = "https://discordapp.com/api/webhooks/579569750989078528/7VTUqTAIkoCUgL96CfoAb7-EwZQF3nvigJ-nM-f5D9Fwv_Vs2gCfoXBKTs9UzjwIu0QP";
+		self::publish( $massage, $url );
+	
+	}
 
     /**
      * チームロゴ更新があったときに、運営Discordに通知する
@@ -111,6 +129,48 @@ class DiscordPublisher
     {
         return self::WEBHOOK_URLS[ENV];
     }
+
+
+
+	/**
+     * Discordに飛ばすメッセージの作成 [試合マッチしたよ～]
+     * 
+     * @param  Match                   $match  // Matchインスタンス
+     * @return string
+     */
+    private static function getMessageNoticeMatchCompleted( Match $match )
+    {
+        // チーム名を取得
+        $db = new Db();
+        $team = new Teams( $db, $match->host_team_id );
+        $apteam = new Teams( $db, $match->apply_team_id);
+        $hostname = $team->team_name . " (" . $team->team_tag . ")";
+        $apname = $apteam->team_name . " (" . $apteam->team_tag . ")";
+        $league = $team->getLeague($db);
+
+
+        $message  = "@here" . "\n";
+        $message .= "モリアゲドン！". "\n\n";
+
+
+        $message .= self::TIPS[ mt_rand(0, count(self::TIPS)-1) ] . "\n\n";
+
+        $message .= "ホストチーム：**" . $hostname . "**\n"; // **で囲むと太字
+        $message .= "挑戦チーム：**" . $apname . "**\n"; // **で囲むと太字
+        $message .= "所属ブロック：" . $league->league_name . "\n\n";
+
+        $message .= "試合日時：" . $match->match_date . "\n";
+
+
+        $message .= "配信可否：配信を希望" . ($match->stream ? "する" : "しない") . "\n\n";
+
+
+        return $message;
+    }
+
+
+
+
 
 
     /**
