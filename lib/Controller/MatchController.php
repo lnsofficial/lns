@@ -217,6 +217,10 @@ class MatchController extends BaseController{
         
         $oDb->commit();
         
+        //マッチ完了通知処理	二つあるから修正したい。	2019/5/20追加
+        DiscordPublisher::noticeMatchCompleted( $oMatch );
+        DiscordPublisher::noticeMatchCompletedLNS( $oMatch );
+        
         self::displayCommonScreen( MSG_HEAD_MATCH_COMPLETE, MSG_MATCH_COMPLETE );
     }
     
