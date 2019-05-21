@@ -9,7 +9,7 @@ require_once( PATH_MODEL    . 'ApiSettings.php' );
  */
 class SummonersByName extends ApiBase{
     protected static $api_base      = "https://jp1.api.riotgames.com/";
-    protected static $path          = "lol/summoner/v3/summoners/by-name/%s";
+    protected static $path          = "lol/summoner/v4/summoners/by-name/%s";
     protected static $method        = "GET";
     protected        $rate_limit    = true;
     protected static $dto           = [""];
