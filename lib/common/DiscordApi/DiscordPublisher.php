@@ -144,6 +144,23 @@ class DiscordPublisher
 
 
 
+
+	/**
+     * チームマッチ完了があったときに、運営Discordに通知する
+     * 
+     * @param  Teams                   $team  // Teamsインスタンス
+     * @return void
+     */
+	
+	public static function noticeMatchCompleted($match)
+	{
+		$massage = self::getMessageNoticeMatchCompleted( $match );
+		
+		$url = "https://discordapp.com/api/webhooks/579569750989078528/7VTUqTAIkoCUgL96CfoAb7-EwZQF3nvigJ-nM-f5D9Fwv_Vs2gCfoXBKTs9UzjwIu0QP";
+		self::publish( $massage, $url );
+	
+	}
+
     /**
      * チームロゴ更新があったときに、運営Discordに通知する
      * 
