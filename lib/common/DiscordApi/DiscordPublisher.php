@@ -40,6 +40,25 @@ class DiscordPublisher
         "*Master yourself, master the enemy.*",
         "*Be Cool!!!!!*",
     ];
+    const YASUO_TIPS = [
+        "*Death is like the wind; always by my side.*",
+        "*A sword's poor company for a long road.*",
+        "*My honor left a long time ago.*",
+        "*No-one is promised tomorrow.*",
+        "*Follow the wind, but watch your back.*",
+        "*This blade never gets any lighter.*",
+        "*Virtue is no more than a luxury.*",
+        "*The road to ruin is shorter than you think.*",
+        "*Sleep is for the guiltless.*",
+        "*Justice. That's a pretty word.*",
+        "*Hmph. One step ahead of the past.*",
+        "*A wanderer isn't always lost.*",
+        "*Just looking for a road home.*",
+        "*I will follow this path until the end.*",
+        "*There are three certainties in life: honor, death, and hangovers.*",
+        "*Hasag!*",
+        "*Sorye Ge Ton!*",
+    ];
     const ORIANNA_TIPS = [
         "*We will kill your enemies. That will be fun*",
         "*I have sharp things.*",
@@ -75,11 +94,54 @@ class DiscordPublisher
      * @param  Match                   $match  // Matchインスタンス
      * @return void
      */
-    public static function noticeMatchCreated( Match $match )
-    {
-        $message    = self::getMessageNoticeMatchCreated( $match );
-        self::publish( $message );
-    }
+     public static function noticeMatchCreated( Match $match )
+     {
+         $message    = self::getMessageNoticeMatchCreated( $match );
+         self::publish( $message );
+     }
+
+
+	/**
+     * チームマッチ完了があったときに、運営Discordに通知する
+     * 
+     * @param  Teams                   $team  // Teamsインスタンス
+     * @return void
+     */
+
+	public static function noticeMatchCompleted($match)
+	{
+		$massage = self::getMessageNoticeMatchCompleted( $match );
+
+		
+
+		//live	ここは運営Discord通知
+		$url = "https://discordapp.com/api/webhooks/579569750989078528/7VTUqTAIkoCUgL96CfoAb7-EwZQF3nvigJ-nM-f5D9Fwv_Vs2gCfoXBKTs9UzjwIu0QP";
+		self::publish( $massage, $url );
+
+	}
+
+	/**
+	 *   2019/5/20追加
+     * チームマッチ完了があったときに、LNSDiscordに通知する
+     * (ここは方法わかんなかったから新しく追加した。)
+     * @param  Teams                   $team  // Teamsインスタンス
+     * @return void
+     */
+
+	public static function noticeMatchCompletedLNS($match)
+	{
+		$massage = self::getMessageNoticeMatchCompletedLNS( $match );
+
+		
+
+		//live	ここはDiscord通知
+		$url = "https://discordapp.com/api/webhooks/579985202751733771/1IMgFoRVBqLyzVV4mAlF_Xf5OKsfTE21NuAHZq7oe3diykreOQ3RLdD2tm4lWmhtXGba";
+		self::publish( $massage, $url );
+
+	}
+
+
+
 
 
     /**
@@ -111,6 +173,83 @@ class DiscordPublisher
     {
         return self::WEBHOOK_URLS[ENV];
     }
+
+
+
+	/**
+     * 運営Discordに飛ばすメッセージの作成 [試合マッチしたよ～]
+     * 
+     * @param  Match                   $match  // Matchインスタンス
+     * @return string
+     */
+    private static function getMessageNoticeMatchCompleted( Match $match )
+    {
+        // チーム名を取得
+        $db = new Db();
+        $team = new Teams( $db, $match->host_team_id );
+        $apteam = new Teams( $db, $match->apply_team_id);
+        $hostname = $team->team_name . " (" . $team->team_tag . ")";
+        $apname = $apteam->team_name . " (" . $apteam->team_tag . ")";
+        $league = $team->getLeague($db);
+
+
+        $message  = "@here" . "\n";
+        $message .= "モリアゲドン！". "\n\n";
+
+
+        $message .= self::YASUO_TIPS[ mt_rand(0, count(self::YASUO_TIPS)-1) ] . "\n\n";
+
+        $message .= "ホストチーム：**" . $hostname . "**\n"; // **で囲むと太字
+        $message .= "挑戦チーム：**" . $apname . "**\n"; // **で囲むと太字
+        $message .= "所属ブロック：" . $league->league_name . "\n\n";
+        $message .= "試合日時：" . $match->match_date . "\n";
+
+        $message .= "配信可否：配信を希望" . ($match->stream ? "する" : "しない") . "\n\n";
+
+
+        return $message;
+    }
+
+
+
+	/**
+     *		2019/5/20追加
+     * LNSDiscordに飛ばすメッセージの作成 [試合マッチしたよ～]
+     * 
+     * @param  Match                   $match  // Matchインスタンス
+     * @return string
+     */
+    private static function getMessageNoticeMatchCompletedLNS( Match $match )
+    {
+        // チーム名を取得
+        $db = new Db();
+        $team = new Teams( $db, $match->host_team_id );
+        $apteam = new Teams( $db, $match->apply_team_id);
+        $hostname = $team->team_name . " (" . $team->team_tag . ")";
+        $apname = $apteam->team_name . " (" . $apteam->team_tag . ")";
+        $league = $team->getLeague($db);
+
+
+        $message  = "@here" . "\n";
+        $message .= "モリアゲドン！". "\n\n";
+
+
+        $message .= self::YASUO_TIPS[ mt_rand(0, count(self::YASUO_TIPS)-1) ] . "\n\n";
+
+        $message .= "ホストチーム：**" . $hostname . "**\n"; // **で囲むと太字
+        $message .= "挑戦チーム：**" . $apname . "**\n"; // **で囲むと太字
+        $message .= "所属ブロック：" . $league->league_name . "\n\n";
+        $message .= "試合日時：" . $match->match_date . "\n";
+
+        $message .= "配信可否：配信を希望" . ($match->stream ? "する" : "しない") . "\n\n";
+
+
+        return $message;
+    }
+
+
+
+
 
 
     /**
