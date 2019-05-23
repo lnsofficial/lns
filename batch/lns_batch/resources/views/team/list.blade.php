@@ -97,6 +97,7 @@
                         <th>team_tag</th>
                         <th>logo_status</th>
                         <th>logo_updated_at</th>
+                        <th>created_at</th>
                     </tr>
                 </thead>
 
@@ -114,6 +115,7 @@
                             {{ App\Models\Team::LOGO_STATUS_MESSAGES[$team->logo_status] }}
                         </td>
                         <td>{{ $team->logo_updated_at }}</td>
+                        <td>{{ $team->created_at }}</td>
                     </tr>
                 @endforeach
                 </tbody>
