@@ -12,27 +12,7 @@
 	box-shadow: 0px 0px;
 	border-bottom: 4px solid #00CCCC;
 }
-.background-image-ahri {
-	background-image: url(../img/AhriSuits.jpg);
-}
-.background-image-jinx {
-	background-image: url(../img/JinxSuits.jpg);
-}
-.background-image-teemo {
-	background-image: url(../img/Deadline_Teemo.jpg);
-}
-.background-image-anie {
-	background-image: url(../img/AnieSuits.jpg);
-}
-.background-image-anietibber {
-	background-image: url(../img/Anie.jpg);
-}
-.background-image-alistar {
-	background-image: url(../img/UsiSuits.jpg);
-}
-.background-image-taliyah_akali {
-	background-image: url(../img/summer_taliyah_akali.png);
-}
+
 .navbar.navbar-default.navbar-static-top {
 	background-color: #00CCCC;		
 }
