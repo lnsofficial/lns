@@ -24,20 +24,12 @@
       <div class="col-lg-12">
           
           <?php
-            $array = glob("img/TOPimg/*.jpg");
-            $max = count($array);
-            $count = 0;
-            $rand = mt_rand(1, $max);
-            foreach ($array as $val) {
-                $count++;
-                if ($count == $rand) {
-                    $imgtop = $val;
-                    
-                    break;
-                }
-            }
+            //ImageOutPutSystem
+            $imgtop = glob("img/TOPimg/*.jpg");
+            $randnum = array_rand($imgtop);
+            $imgoutput = $imgtop[$randnum];
             ?>
-        <div class="header-image" style="background-image:url(<?php echo $imgtop; ?>)">
+        <div class="header-image" style="background-image:url(<?php echo $imgoutput; ?>)">
           <div>
             <?php if( !$bLogin ){ ?><a href="/User/form" class="touroku">ユーザ登録</a><?php } ?>
           </div>
