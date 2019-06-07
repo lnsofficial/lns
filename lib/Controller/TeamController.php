@@ -1014,5 +1014,46 @@ class TeamController extends BaseController{
         $smarty->assign( "logo_file" , $logo_file);
         $smarty->display('Team/Logo.tmpl');
     }
-    
+
+
+    /**
+     * チーム戦績
+     * 
+     */
+    public function record( $team_id = 0 )
+    {
+        // ログイン済みユーザーのみ、の処理
+        session_set_save_handler( new MysqlSessionHandler() );
+        @session_start();
+
+        // 該当チームの情報をDBからとってくる
+        $oDb = new Db();
+        $oTeam = new Teams( $oDb, $team_id );
+        if( $oTeam->id == null )
+        {
+            // 指定された$team_idのデータがない場合はエラー
+            self::displayError();
+            exit();
+        }
+
+        // その他、matches match_checkins あたりからもデータを取ってくる処理をこのあたりに。
+        // ...
+
+
+        // smartyを使うためのお決まりのやつ。
+        $smarty = new Smarty();
+        $smarty->template_dir = PATH_TMPL;
+        $smarty->compile_dir  = PATH_TMPL_C;
+        $smarty->default_modifiers[] = 'escape:html';
+        $smarty->default_modifiers[] = 'nl2br';
+
+        // .tmplにて使えるようにこんな感じでデータを渡す
+        $smarty->assign( "team"             , $oTeam );
+        // $smarty->assign( "〇〇"             , $〇〇 );
+        // ...
+
+        // 最後に表示するためのテンプレートを呼び出す
+        $smarty->display('Team/TeamRecord.tmpl');
+    }
+
 }
