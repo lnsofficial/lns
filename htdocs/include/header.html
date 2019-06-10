@@ -15,33 +15,59 @@ if( !empty( $_SESSION ) ){
   }
 }
 ?>
-  <nav class="navbar navbar-default navbar-static-top">
-    <div class="container-fluid">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#defaultNavbar1" aria-expanded="false"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
-        <a class="navbar-brand" href="/index.html">LNS
-        </a></div>
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse" id="defaultNavbar1">
-        <ul class="nav navbar-nav navbar-right header-font">
-        <li></li>
-        <li><a href="/About/About.html">INFO</a></li>
-        <li><a href="/Rule/Rule2.html">RULE</a></li>
-        <li><a href="/Ladder/display">RANKING</a></li>
-        <?php if( !empty($bLogin) ){ ?><li><a href="/Match/recruitList">MATCH</a></li><?php } ?>
-        <?php if( !empty($bLogin) ){ ?><li><a href="/Team/SearchList">TEAM</a></li><?php } ?>
-        <?php if( !empty($bLogin) ){ ?><li><a href="/User/MyPage">MYPAGE</a></li><?php } ?>
-        <li>
-          <?php if( $bLogin ){ ?>
-            <a href="/User/Logout" class="login">LOGOUT</a>
-          <?php }else{ ?>
-            <a href="/User/LoginForm" class="login">LOGIN</a>
-          <?php } ?>
-        </li>
-        </ul>
-      </div>
-      <!-- /.navbar-collapse -->
-    </div>
-    <!-- /.container-fluid -->
-  </nav>
+
+	<nav class="navbar navbar-default navbar-static-top">
+		<div class="container-fluid">
+
+
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#defaultNavbar1" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span><span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/index.html">
+					<img alt="LNS" src="img/NLSrogo.png" />
+				</a>
+			</div>
+
+
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse dropdown" id="defaultNavbar1">
+				<ul class="nav navbar-nav navbar-right header-font">
+					<li><a href="/About/About.html">INFO</a></li>
+					<li><a href="#">NEWS</a></li>
+					<li><a href="/Rule/Rule2.html">RULE</a></li>
+					<li>
+						<a class="dropdown-toggle" data-toggle="dropdown">LEAGUE</a>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="#">TEAM</a></li>
+							<li><a href="/Ladder/display">RANKING</a></li>
+							<li><a href="#">MUCH</a></li>
+						</ul>
+					</li>
+
+
+					<li><a href="#">SUPPORT</a></li>
+<!--
+					<?php if( !empty($bLogin) ){ ?>
+						<li><a href="/Match/recruitList">MATCH</a></li>
+						<li><a href="/Team/SearchList">TEAM</a></li>
+						<li><a href="/User/MyPage">MYPAGE</a></li>
+					<?php } ?>
+-->
+					<li>
+
+					<?php if( $bLogin ){ ?>
+						<a href="/User/Logout" class="login">SIGN OUT</a>
+					<?php }else{ ?>
+						<a href="/User/LoginForm" class="login">SIGN IN</a>
+					<?php } ?>
+					</li>
+				</ul>
+			</div>
+
+
+		</div><!-- /.navbar-collapse -->	
+	</nav><!-- /.container-fluid -->
