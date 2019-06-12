@@ -20,8 +20,8 @@
 		-45deg,
 		#00ABEB 0,
 		#00ABEB 10px,
-		#1AB3ED 10px,
-		#1AB3ED 20px
+		#1ab4ed 10px,
+		#1ab4ed 20px
 	);
 }
 
@@ -36,10 +36,25 @@
 }
 
 
-.ssn {
+.sns {
 #	margin-left: 10px;
 	margin-top: 10px;
 }
+.sns .discord_league{
+	position: absolute;
+	top: 45px;
+	left: 22px;
+	font-size: 13px;
+	color: white;
+}
+.sns .discord_event{
+	position: absolute;
+	top: 45px;
+	left: 28px;
+	font-size: 13px;
+	color: white;
+}
+
 .koumoku-l {
 	border-bottom: 1px dotted #003791;
 }
