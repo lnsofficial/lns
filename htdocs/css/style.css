@@ -29,30 +29,56 @@
 .sponsor {
 	height: 70px;
 	background-color: #2e3031;
-/*
-	margin-left: 10px;
-	margin-top: 2px;
-*/
+}
+.infoarea {
+	margin-top: 10px;
 }
 
 
 .sns {
-#	margin-left: 10px;
 	margin-top: 10px;
+	min-height: 80px;
 }
-.sns .discord_league{
-	position: absolute;
-	top: 45px;
-	left: 22px;
-	font-size: 13px;
-	color: white;
+.sns > div {
+	padding-left: 0px;
+	padding-right: 0px;
 }
-.sns .discord_event{
+.sns .icon {
+	width: 80px;
+	height: 80px;
+	border-radius: 20%;
+	border-color: #2e3031;
+	background-color: #2e3031;
+}
+.sns .icon > i {
 	position: absolute;
-	top: 45px;
-	left: 28px;
-	font-size: 13px;
-	color: white;
+	color: #f8f8f8;
+}
+.sns .icon .twitter {
+	top: 20px;
+	left: 20px;
+}
+.sns .icon .youtube {
+	top: 20px;
+	left: 16px;
+}
+.sns .icon .discord {
+	top: 13px;
+	left: 21px;
+}
+.sns .discord_league {
+	position: absolute;
+	top: 52px;
+	left: 15px;
+	font-size: 16px;
+	color: #f8f8f8;
+}
+.sns .discord_event {
+	position: absolute;
+	top: 52px;
+	left: 20px;
+	font-size: 16px;
+	color: #f8f8f8;
 }
 
 .koumoku-l {

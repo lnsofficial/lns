@@ -48,36 +48,21 @@
 
 
 	<div class="container-fluid">
-		<div class="row aisatu">
+		<div class="row infoarea">
 			<div class="col-lg-8">
-				<div class="news">
 
+				<!-- Twitch埋め込み -->
+				<div id="twitch_player"></div>
 
-<script src= "https://player.twitch.tv/js/embed/v1.js"></script>
-<div id="twitch_player"></div>
-<script type="text/javascript">
-    var options = {
-        width: 620,
-        height: 378,
-        channel: "lns_official", 
-        //video: "{VIDEO_ID}"       
-    };
-    var player = new Twitch.Player("twitch_player", options);
-    player.setVolume(0.0);
-    player.addEventListener(Twitch.Player.PAUSE, () => { console.log('Player is paused!'); });
-</script>
-
-
-				</div>
 			</div>
 			<div class="col-lg-4">
 
 				<!-- SNSアイコン -->
 				<div class="row sns">
-					<div class="col-lg-3"><i class="fab fa-twitter-square fa-5x"></i></div>
-					<div class="col-lg-3"><i class="fab fa-youtube-square fa-5x"></i></div>
-					<div class="col-lg-3"><i class="fab fa-discord fa-5x"><div class="discord_league">League</div></i></div>
-					<div class="col-lg-3"><i class="fab fa-discord fa-5x"><div class="discord_event">Event</div></i></div>
+					<div class="col-lg-3"><div class="icon"><i class="fab fa-twitter fa-3x twitter"></i></div></div>
+					<div class="col-lg-3"><div class="icon"><i class="fab fa-youtube fa-3x youtube"></i></div></div>
+					<div class="col-lg-3"><div class="icon"><i class="fab fa-discord fa-3x discord"></i><div class="discord_league">League</div></div></div>
+					<div class="col-lg-3"><div class="icon"><i class="fab fa-discord fa-3x discord"></i><div class="discord_event">Event</div></div></div>
 				</div>
 				<!-- 直近の試合予定 -->
 				<div class="row recent_matches">
@@ -97,6 +82,25 @@
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 	<script src="/js/jquery-1.11.3.min.js"></script>
 	<script src="/js/bootstrap.js"></script>
+	<script src= "https://player.twitch.tv/js/embed/v1.js"></script>
+	<script type="text/javascript">
+		var options = {
+			width: 750,
+			height: 400,
+			channel: "lns_official"
+		};
+		player_live = new Twitch.Player("twitch_player", options);
+		player_live.setVolume(0.0);
+		player_live.addEventListener(Twitch.Player.ENDED, () => {
+			console.log( "player_live is ended." );
+			delete player_live;
+			delete options.channel;
+			options.video ="146299212"; // 若手社員研修のVideoID
+			$('#twitch_player').empty();
+			player_video = new Twitch.Player("twitch_player", options);
+			player_video.setVolume(0.0);
+		});
+	</script>
 
   </body>
 </html>
