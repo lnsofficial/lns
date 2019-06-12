@@ -9,6 +9,7 @@
 		<link href="css/bootstrap.css" rel="stylesheet">
 		<link href="css/style.css" rel="stylesheet">
 		<link href="css/fa.min.css" rel="stylesheet">
+		<link href="css/fa-animation.min.css" rel="stylesheet">
 		<script>var __adobewebfontsappname__="dreamweaver"</script>
 		<script src="http://use.edgefonts.net/open-sans:n3,n8,n4:default;overlock:n4:default;poiret-one:n4:default;paytone-one:n4:default.js" type="text/javascript"></script>
 	</head>
@@ -33,13 +34,16 @@
 				<div class="header-image" style="background-image:url(<?php echo $imgoutput; ?>)">
 					<!-- 未ログインの場合、ユーザー登録ボタン(丸いやつ)表示 -->
 					<div>
-						<?php if( !$bLogin ){ ?><a href="/User/form" class="touroku">ユーザ登録</a><?php } ?>
+						<?php if( !$bLogin ){ ?>
+							<a href="/User/form" class="touroku">ユーザ登録</a>
+						<?php } ?>
 					</div>
 
 				</div>
 			</div>
 		</div>
 
+		<!-- スポンサー欄 -->
 		<div class="row sponsor">
 			<div class="col-md-10 col-md-offset-1">
 			</div>
@@ -59,10 +63,10 @@
 
 				<!-- SNSアイコン -->
 				<div class="row sns">
-					<div class="col-lg-3"><div class="icon"><i class="fab fa-twitter fa-3x twitter"></i></div></div>
-					<div class="col-lg-3"><div class="icon"><i class="fab fa-youtube fa-3x youtube"></i></div></div>
-					<div class="col-lg-3"><div class="icon"><i class="fab fa-discord fa-3x discord"></i><div class="discord_league">League</div></div></div>
-					<div class="col-lg-3"><div class="icon"><i class="fab fa-discord fa-3x discord"></i><div class="discord_event">Event</div></div></div>
+					<div class="col-lg-3"><div class="icon faa-parent animated-hover"><i class="fab fa-twitter fa-3x faa-burst twitter"></i></div></div>
+					<div class="col-lg-3"><div class="icon faa-parent animated-hover"><i class="fab fa-youtube fa-3x faa-burst youtube"></i></div></div>
+					<div class="col-lg-3"><div class="icon faa-parent animated-hover"><i class="fab fa-discord fa-3x faa-shake discord"></i><div class="discord_league">League</div></div></div>
+					<div class="col-lg-3"><div class="icon faa-parent animated-hover"><i class="fab fa-discord fa-3x faa-shake discord"></i><div class="discord_event">Event</div></div></div>
 				</div>
 				<!-- 直近の試合予定 -->
 				<div class="row recent_matches">
