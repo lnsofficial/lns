@@ -26,6 +26,72 @@
 }
 
 
+
+.signup_btn {
+	position: absolute;
+	display: inline-block;
+	width: 170px;
+	height: 50px;
+	left: 15%;
+	bottom: 79px;
+
+	color: #f8f8f8;
+	font-size: 37px;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.signup_btn .signup_text {
+	display: inline-block;
+	position: absolute;
+	width: 220px;
+	height: 70px;
+	text-align: center;
+
+	background:repeating-linear-gradient(
+		-45deg,
+		#ffa800 0,
+		#ffa800 8px,
+		#ffb11a 8px,
+		#ffb11a 16px
+	);
+	border: 3px solid #F56B09;
+	border-radius: 12px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.28);
+
+	overflow: hidden;
+}
+.signup_btn .signup_text::before {
+	content: '';
+	display: inline-block;
+	position: absolute;
+	width: 220px;
+	height: 70px;
+	top: 0px;
+	left: 0px;
+
+	background: linear-gradient(
+		to bottom,
+		rgba(255, 255, 255, 0.8),
+		rgba(255, 255, 255, 0.0) 15%,
+		rgba(255, 255, 255, 0.0) 85%,
+		rgba(255, 255, 255, 0.8)
+	);
+	border-style: none;
+}
+.signup_btn .signup_text::after {
+	content: 'SIGN UP';
+	display: inline-block;
+	position: absolute;
+	width: 220px;
+	height: 70px;
+	top: 7px;
+	left: 0px;
+}
+
+
+
+
 .sponsor {
 	height: 70px;
 	background-color: #2e3031;
