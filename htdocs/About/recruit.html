@@ -22,43 +22,37 @@
     <div class="container-fluid">
 
       <div class="row">
-        <h1 class="lead koumoku-l">LNSリーグの運営スタッフ募集中！！</h1>
+        <h2 class="lead koumoku-l">LNSリーグの運営スタッフ募集中</h2>
         <div class="col-md-6">
 
+          <p>LNSリーグではseason6よりリニューアルを行います！</p>
+          <p>そこで現在あなたの力が必要です。</p>
+          <p>一緒に日本でのLOLのコミュニティー発展を目指しましょう！</p>
+          <p></p>
+          <p>運営メンバーもほとんどが社畜です。</p>
+          <p>なので仕事や私生活がもちろん優先、</p>
+          <p>趣味の時間を使って一緒にLNSリーグを盛り上げませんか？</p>
+          <p></p>
+          <p>ウェブデザイナー、実況者(配信者)、イラストレーター、動画制作</p>
+          <p>自分の得意分野のみでの参加もＯＫ！！</p>
 
-        <p>LNSリーグでは現在あなたの力が必要です。</p>
-        <p>一緒に日本でのLOLの発展を目指しましょう！</p>
-        <p>運営メンバーもほとんどが社畜です。</p>
-        <p>なので仕事や私生活がもちろん優先、趣味の時間を使って一緒にLNSリーグを盛り上げていきましょう。</p>
-        
-        <p>ウェブデザイナー、実況者、ツイッターの鬼など自分の得意分野のみの参加でOK！</p>
-        <hr>
-        <form class="form-horizontal">
-          <div class="form-group">
-            <label class="col-sm-2 control-label">業務</label>
-            <div class="col-sm-10"><div class="form-control">LNSリーグの運営</div></div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label">資格</label>
-            <div class="col-sm-10"><div class="form-control">18歳～100歳まで、経験性別不問</div></div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label">給与</label>
-            <div class="col-sm-10"><div class="form-control">営利目的ではないので無報酬のブラック待遇</div></div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label">休日</label>
-            <div class="col-sm-10"><div class="form-control">休日を使ってやるんだよ！</div></div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label">待遇</label>
-            <div class="col-sm-10"><div class="form-control">各種保険、退職金もちろんナシ！</div></div>
-          </div>
-        </form>
-        <hr>
-        <p style="font-size:16px; font-weight: 800;">気軽にご連絡ください！</p>
-        <p>LNS運営チーム</p>
+          <hr>
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label class="col-sm-2 control-label">業務</label>
+              <div class="col-sm-10"><div class="form-control">LNSリーグの運営</div></div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">資格</label>
+              <div class="col-sm-10"><div class="form-control">18歳以上</div></div>
+            </div>
+          </form>
+          <hr>
 
+          <p>当団体は営利目的ではありませんので</p>
+          <p>もちろんボランティアにはなりますが、是非あなたの力を貸してください！</p>
+          <p></p>
+          <p style="font-size:16px; font-weight: 800;">興味がある方は下記連絡先へお気軽にご連絡ください！</p>
 
         </div>
         <div class="col-md-6">
@@ -67,19 +61,44 @@
       </div>
 
       <div class="row">
-        <h4 class="koumoku-l">連絡先</h4>
-        <form class="form-horizontal">
-          <div class="form-group">
-            <label class="col-sm-1 control-label" for="InputEmail">Twitter</label>
-            <div class="col-sm-5"><div class="form-control"><a href = "https://twitter.com/lnsofficial_lol" target="_blank">@LNSofficial_lol</a></div></div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-1 control-label" for="InputEmail">Mail</label>
-            <div class="col-sm-5"><div class="form-control"><img src="/img/recruit_mail.png"></div></div>
-          </div>
+        <h2 class="lead koumoku-l">連絡先</h2>
+
+        <?php
+              if (isset($_POST["backbtn"])) {
+                 //確認ページ（confirm.php）から戻ってきた場合にはデータを受け取る
+                 $namae       = $_POST["namae"];      //お名前
+                 $discordid   = $_POST["discordid"];  //メールアドレス
+                 $naiyou      = $_POST["naiyou"];     //お問合せ内容
+  
+                 //危険な文字列を入力された場合にそのまま利用しない対策
+                 $namae       = htmlspecialchars($namae, ENT_QUOTES);
+                 $discordid   = htmlspecialchars($discordid, ENT_QUOTES);
+                 $naiyou      = htmlspecialchars($naiyou, ENT_QUOTES);
+              } else {
+                 //確認ページから戻ってきた場合でなければ、変数の値は必ず空となる
+                 $namae       = '';               //お名前
+                 $discordid   = '';               //メールアドレス
+                 $naiyou      = '';               //お問合せ内容
+              }
+        ?>
+
+        <form method="post" action="/About/recruit_confirm.php">
+            <p><label>お名前(サモナーネーム可)：<br/>
+                <input type="text" maxlength="255" name="namae" value="<?=$namae?>">
+            </label></p>
+    
+            <p><label>連絡先DiscordID（例：○○○#○○○○）：<br/>
+               <input type="text" size="30" maxlength="255" name="discordid" value="<?=$discordid?>">
+                </label></p>
+    
+            <p><label>お問合せ内容：<br/>
+                <textarea name="naiyou" cols="40" rows="5"><?=$naiyou?></textarea>
+                </label></p>
+    
+            <p><input type="submit" value="入力内容を確認する"></p>  
         </form>
 
-      </div>
+      </div><!-- row -->
 
      </div><!-- container-fluid -->
     <?php include($_SERVER['DOCUMENT_ROOT'] . "/include/footer.html"); ?>
